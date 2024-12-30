@@ -7,6 +7,7 @@
 *.dll
 *.so
 *.dylib
+node_modules
 
 # Test binary, built with `go test -c`
 *.test
@@ -14,12 +15,29 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+.DS_Store
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
 # Go workspace file
 go.work
-go.work.sum
 
-# env file
+credentials.json
+outputs/
+
+*.blob
+*.zip
+
+*.key
+
+dist/
+completions/
+manpages/
+
+env
+site
 .env
+./voiceflow
+
+voiceflow-cli/choco

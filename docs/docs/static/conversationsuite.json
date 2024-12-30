@@ -1,0 +1,158 @@
+{
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
+		"$id": "https://github.com/xavidop/voiceflow-cli/internal/types/tests/suite",
+		"$ref": "#/$defs/Suite",
+		"$defs": {
+			"Suite": {
+				"properties": {
+					"Name": {
+						"type": "string"
+					},
+					"Description": {
+						"type": "string"
+					},
+					"EnvironmentName": {
+						"type": "string"
+					},
+					"Tests": {
+						"items": {
+							"$ref": "#/$defs/TestFile"
+						},
+						"type": "array"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"Name",
+					"Description",
+					"EnvironmentName",
+					"Tests"
+				]
+			},
+			"TestFile": {
+				"properties": {
+					"ID": {
+						"type": "string"
+					},
+					"File": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"ID",
+					"File"
+				]
+			},
+			"Tests": {
+				"$schema": "https://json-schema.org/draft/2020-12/schema",
+				"$defs": {
+					"Agent": {
+						"properties": {
+							"Validate": {
+								"items": {
+									"$ref": "#/$defs/Validation"
+								},
+								"type": "array"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"Validate"
+						]
+					},
+					"Interaction": {
+						"properties": {
+							"ID": {
+								"type": "string"
+							},
+							"User": {
+								"$ref": "#/$defs/User"
+							},
+							"Agent": {
+								"$ref": "#/$defs/Agent"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"ID",
+							"User",
+							"Agent"
+						]
+					},
+					"Test": {
+						"properties": {
+							"Name": {
+								"type": "string"
+							},
+							"Description": {
+								"type": "string"
+							},
+							"Interactions": {
+								"items": {
+									"$ref": "#/$defs/Interaction"
+								},
+								"type": "array"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"Name",
+							"Description",
+							"Interactions"
+						]
+					},
+					"User": {
+						"properties": {
+							"Type": {
+								"type": "string"
+							},
+							"Text": {
+								"type": "string"
+							},
+							"Audio": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"Type",
+							"Text",
+							"Audio"
+						]
+					},
+					"Validation": {
+						"properties": {
+							"ID": {
+								"type": "string"
+							},
+							"Type": {
+								"type": "string"
+							},
+							"Value": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"ID",
+							"Type",
+							"Value"
+						]
+					}
+				},
+				"items": {
+					"$ref": "#/$defs/Test"
+				},
+				"type": "array"
+			}
+		},
+		"description": "voiceflow-cli suite definition file"
+	}

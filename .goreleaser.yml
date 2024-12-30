@@ -1,0 +1,165 @@
+version: 2
+before:
+  hooks:
+    - go mod download
+    - go generate ./...
+    - ./scripts/completions.sh
+    - ./scripts/manpages.sh
+builds:
+- binary: voiceflow
+  env:
+  - CGO_ENABLED=0
+  ldflags:
+  - -s -w -X github.com/xavidop/voiceflow-cli/internal/global.VersionString={{.Version}}
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - "386"
+    - amd64
+    - arm
+    - arm64
+  goarm:
+    - "7"
+
+archives:
+  - name_template: >-
+      voiceflow_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+    - goos: windows
+      format: zip
+    builds_info:
+      group: root
+      owner: root
+    files:
+      - README.md
+      - LICENSE.md
+      - completions/*
+      - manpages/*
+
+universal_binaries:
+- replace: false
+  name_template: 'voiceflow_{{.Version}}'
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+    - '^test:'
+    - '^chore'
+    - 'merge conflict'
+    - Merge pull request
+    - Merge remote-tracking branch
+    - Merge branch
+    - go mod tidy
+  groups:
+    - title: Dependency updates
+      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+      order: 300
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 100
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 200
+    - title: 'Documentation updates'
+      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: Other work
+      order: 9999
+
+sboms:
+  - artifacts: archive
+milestones:
+  - close: true
+
+scoops:
+  - repository:
+      owner: xavidop
+      name: scoop-bucket
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    name: voiceflow
+    homepage:  https://voiceflow.xavidop.me
+    description: The CLI for your Voiceflow projects
+    license: Apache-2.0
+
+chocolateys:
+  - name: voiceflow
+    authors: Xavier Portilla Edo
+    title: Voiceflow CLI
+    project_url:  https://voiceflow.xavidop.me
+    license_url: https://github.com/xavidop/voiceflow-cli/blob/main/LICENSE.md
+    project_source_url: https://github.com/xavidop/voiceflow-cli
+    docs_url: https://github.com/xavidop/voiceflow-cli/blob/main/README.md
+    bug_tracker_url: https://github.com/xavidop/voiceflow-cli/issues
+    tags: "voiceflow cli"
+    description: The CLI for your Voiceflow projects
+    icon_url: https://voiceflow.xavidop.me/images/logo.png
+    api_key: '{{ .Env.CHOCOLATEY_API_KEY }}'
+
+brews:
+  - repository:
+      owner: xavidop
+      name: homebrew-tap
+    directory: Formula
+    name: voiceflow
+    homepage: 'https://voiceflow.xavidop.me'
+    description: 'The CLI for your Voiceflow projects'
+    goarm: "7"
+    test: |
+      system "#{bin}/voiceflow version"
+    commit_author:
+      name: xavidop
+      email: xavi_tb@hotmail.com
+    install: |-
+      bin.install "voiceflow"
+      bash_completion.install "completions/voiceflow.bash" => "voiceflow"
+      zsh_completion.install "completions/voiceflow.zsh" => "_voiceflow"
+      fish_completion.install "completions/voiceflow.fish"
+      man1.install "manpages/voiceflow.1.gz"
+
+winget:
+  - name: voiceflow
+    publisher: xavidop
+    license: Apache-2.0
+    homepage: https://voiceflow.xavidop.me
+    short_description: 'The CLI for your Voiceflow projects'
+    repository:
+      owner: xavidop
+      name: winget-pkgs
+      branch: "voiceflow-{{.Version}}"
+      pull_request:
+        enabled: true
+        draft: true
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: main
+
+nix:
+  - name: voiceflow
+    repository:
+      owner: xavidop
+      name: nur
+    homepage: https://voiceflow.xavidop.me
+    description: 'The CLI for your Voiceflow projects'
+    path: pkgs/voiceflow/default.nix
+    license: asl20
+    install: |-
+      mkdir -p $out/bin
+      cp -vr ./voiceflow $out/bin/voiceflow
+      installManPage ./manpages/voiceflow.1.gz
+      installShellCompletion ./completions/*

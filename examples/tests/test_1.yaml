@@ -1,0 +1,31 @@
+name: Example test
+description: These are some tests
+interactions:
+  - id: test_1_1
+    user: 
+      type: launch
+    agent:
+      validate:
+        - type: contains
+          value: Hey there
+        - type: contains
+          value: Isla
+  - id: test_1_2
+    user: 
+      type: text
+      text: 'I am doing well'
+    agent:
+      validate:
+        - type: traceType
+          value: text
+        - type: contains
+          value: good
+
+  - id: test_1_3
+    user: 
+      type: text
+      text: 'I have been working very hard'
+    agent:
+      validate:
+        - type: regexp
+          value: 'classic'

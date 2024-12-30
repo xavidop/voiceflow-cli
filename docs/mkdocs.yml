@@ -1,0 +1,126 @@
+site_name: Voiceflow CLI
+site_description: The Vocieflow CLI to interact with you Voiceflow projects.
+site_author: Xavier Portilla Edo
+site_url: https://voiceflow.xavidop.me/
+
+# Repository
+repo_name: xavidop/voiceflow-cli
+repo_url: https://github.com/xavidop/voiceflow-cli
+edit_uri: "edit/main/docs/docs/"
+
+copyright: |
+  Copyright &copy; 2025 Xavier Portilla Edo
+theme:
+  name: material
+  # custom_dir: docs/theme
+  logo: images/logo.png
+
+  palette:
+  - scheme: default
+    primary: black
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to dark mode
+  - scheme: slate
+    primary: black
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to light mode
+
+  font:
+    text: Roboto, Helvetica
+    code: Roboto Mono
+  features:
+    - navigation.tracking
+    # - navigation.sections
+    # - toc.integrate
+    # - navigation.expand
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - navigation.instant
+
+  include_search_page: false
+  search_index_only: true
+
+  language: en
+
+  favicon: images/favicon.ico
+
+extra:
+  search:
+    languages: "en"
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/xavidop/voiceflow-cli
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/xavidop
+
+plugins:
+  - search
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - def_list
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Overview:
+      - Install: overview/install.md
+      - Authentication: overview/authentication.md
+      - Roadmap: overview/roadmap.md
+      - FAQ: overview/faq.md
+  - Automated Testing:
+    - Introduction: tests/introduction.md
+    - Reference:
+      - Suites: tests/suites.md
+      - Tests: tests/tests.md
+      - Examples:
+        - Contains: tests/examples/contains.md
+  - Command Line Usage:
+      - voiceflow: cmd/voiceflow.md
+      - voiceflow test: cmd/voiceflow_test.md
+      - voiceflow completion: cmd/voiceflow_completion.md
+      - voiceflow jsonschema: cmd/voiceflow_jsonschema.md
+      - voiceflow version: cmd/voiceflow_version.md
+  - Community:
+    - Sponsors: community/sponsors.md
+    - Users: community/users.md
+    - Contributing: community/contributing.md
+  - Troubleshooting: troubleshooting.md
+  - Links: links.md
+
+extra:
+  analytics:
+    provider: google
+    property: G-J48NTVMG9Y
+    anonymize_ip: true
