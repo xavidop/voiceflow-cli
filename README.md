@@ -44,7 +44,7 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md) for further infor
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/voiceflow&style=for-the-badge)](https://artifacthub.io/packages/search?repo=voiceflow)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/xavidop/voiceflow-cli)
 [![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
-[![Sponsors on GitHub](https://opencollective.com/voiceflow/sponsors/badge.svg?style=for-the-badge)](https://github.com/sponsors/xavidop)
+[![Sponsors on GitHub](https://opencollective.com/voiceflow-cli/sponsors/badge.svg?style=for-the-badge)](https://github.com/sponsors/xavidop)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)
 [![Go Report Card](https://goreportcard.com/badge/github.com/xavidop/voiceflow-cli)](https://goreportcard.com/report/github.com/xavidop/voiceflow-cli)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli?ref=badge_shield)
@@ -65,4 +65,4 @@ Check all contributors [here](https://github.com/xavidop/voiceflow-cli/graphs/co
 
 
 ## License
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxavidop%2Fdvoiceflow-cli.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli?ref=badge_large&issueType=license)
