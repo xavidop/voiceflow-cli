@@ -259,6 +259,15 @@ winget:
           name: winget-pkgs
           branch: main
 
+
+publishers:
+  - name: fury.io
+    ids:
+    - packages
+    env:
+    - 'FURY_TOKEN={{ .Env.FURY_TOKEN }}'
+    cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
+
 nix:
   - name: voiceflow
     repository:

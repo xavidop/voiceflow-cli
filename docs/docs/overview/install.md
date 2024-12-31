@@ -13,7 +13,7 @@ brew install xavidop/tap/voiceflow
 ### snapcraft
 
 ```sh
-sudo snap install cxcli
+sudo snap install voiceflow
 ```
 
 ### scoop
@@ -27,6 +27,26 @@ scoop install voiceflow
 
 ```powershell
 choco install voiceflow
+```
+
+### apt
+
+```sh
+echo 'deb [trusted=yes] https://apt.fury.io/xavidop/ /' | sudo tee /etc/apt/sources.list.d/voiceflow.list
+sudo apt update
+sudo apt install voiceflow
+```
+
+
+### yum
+
+```sh
+echo '[voiceflow]
+name=Vocieflow CLI Repo
+baseurl=https://yum.fury.io/xavidop/
+enabled=1
+gpgcheck=0' | sudo tee /etc/yum.repos.d/voiceflow.repo
+sudo yum install voiceflow
 ```
 
 ### nix
