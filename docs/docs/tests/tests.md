@@ -78,8 +78,6 @@ validate:
   # String validation to check if the response returned by Voiceflow is correct
   - type: contains
     value: pizza
-    configuration-contains:
-      casesensitive: true
 ```
 
 If you set the `casesensitive` field to `true`, the validation will be case sensitive. By default, it is set to `false`.

@@ -68,17 +68,13 @@
 					},
 					"Text": {
 						"type": "string"
-					},
-					"Audio": {
-						"type": "string"
 					}
 				},
 				"additionalProperties": false,
 				"type": "object",
 				"required": [
 					"Type",
-					"Text",
-					"Audio"
+					"Text"
 				]
 			},
 			"Validation": {

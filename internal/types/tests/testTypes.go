@@ -13,9 +13,8 @@ type Interaction struct {
 }
 
 type User struct {
-	Type  string `yaml:"type"`
-	Text  string `yaml:"text,omitempty"`
-	Audio string `yaml:"audio,omitempty"`
+	Type string `yaml:"type"`
+	Text string `yaml:"text,omitempty"`
 }
 
 type Agent struct {
