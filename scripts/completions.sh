@@ -1,10 +1,8 @@
 #!/bin/bash
 
 set -e
-set -x
-set -v
-rm -rf completions
 
+rm -rf completions
 mkdir completions
 go version
 for sh in bash zsh fish; do

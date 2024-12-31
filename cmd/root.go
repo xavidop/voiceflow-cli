@@ -47,8 +47,7 @@ func Execute() {
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		global.Log.Error(errors.Errorf("%s", err))
-		os.Exit(1)
+		// Ignore if .env file is not found
 	}
 	// Add the subcommands
 	test.Register(rootCmd)
