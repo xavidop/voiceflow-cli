@@ -94,5 +94,4 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
           FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
           COSIGN_PWD: ${{ secrets.COSIGN_PWD }}
-          # COSIGN_PWD: ${{ secrets.COSIGN_PWD }}
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}

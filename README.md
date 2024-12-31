@@ -41,7 +41,7 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md) for further infor
 [![Release](https://img.shields.io/github/release/xavidop/voiceflow-cli.svg?style=for-the-badge)](https://github.com/xavidop/voiceflow-cli/releases/latest)
 [![Software License](https://img.shields.io/github/license/xavidop/voiceflow-cli?style=for-the-badge)](/LICENSE.md)
 [![Build status](https://img.shields.io/github/actions/workflow/status/xavidop/voiceflow-cli/release_build.yml?style=for-the-badge)](https://github.com/xavidop/voiceflow-cli/actions/workflows/release_build.yml)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/voiceflow&style=for-the-badge)](https://artifacthub.io/packages/search?repo=voiceflow)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/voiceflow&style=for-the-badge)](https://artifacthub.io/packages/search?ts_query_web=voiceflow)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/xavidop/voiceflow-cli)
 [![Powered By: GoReleaser](https://img.shields.io/badge/powered%20by-goreleaser-green.svg?style=for-the-badge)](https://github.com/goreleaser)
 [![Sponsors on GitHub](https://opencollective.com/voiceflow-cli/sponsors/badge.svg?style=for-the-badge)](https://github.com/sponsors/xavidop)
