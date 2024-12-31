@@ -53,7 +53,7 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md) for further infor
 
 Does your company use voiceflow-cli? Help keep the project bug-free and feature rich by [sponsoring the project](https://github.com/sponsors/xavidop).
 
-<a href="https://github.com/sponsors/xavidop" target="_blank"><img src="https://opencollective.com/voiceflow/sponsors/0/avatar"></a>
+<a href="https://github.com/sponsors/xavidop" target="_blank"><img src="https://opencollective.com/voiceflow-cli/sponsors/0/avatar"></a>
 
 ## Contributors
 
