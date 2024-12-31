@@ -81,6 +81,59 @@ changelog:
     - title: Other work
       order: 9999
 
+nfpms:
+  - file_name_template: 'voiceflow_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
+    package_name: voiceflow
+    id: packages
+    homepage:  https://voiceflow.xavidop.me
+    description: |-
+     The CLI to interact with your Voiceflow projects.
+    maintainer: Xavier Portilla Edo <xavierportillaedo@gmail.com>
+    license: Apache-2.0
+    vendor: Xavier Portilla Edo
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./completions/voiceflow.bash
+        dst: /usr/share/bash-completion/completions/voiceflow
+        file_info:
+          mode: 0644
+      - src: ./completions/voiceflow.fish
+        dst: /usr/share/fish/vendor_completions.d/voiceflow.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/voiceflow.zsh
+        dst:  /usr/share/zsh/vendor-completions/_voiceflow
+        file_info:
+          mode: 0644
+      - src: ./LICENSE.md
+        dst: /usr/share/doc/voiceflow/copyright
+        file_info:
+          mode: 0644
+      - src: ./manpages/voiceflow.1.gz
+        dst: /usr/share/man/man1/voiceflow.1.gz
+        file_info:
+          mode: 0644
+    formats:
+    - apk
+    - deb
+    - rpm
+    - archlinux
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
+snapcrafts:
+  - name_template: 'voiceflow_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    name: voiceflow
+    summary: The CLI to interact with your Voiceflow projects
+    description: |
+      The CLI to interact with your Voiceflow projects.
+    grade: stable
+    confinement: strict
+    publish: true
+
 dockers:
 - image_templates:
   - 'xavidop/voiceflow:{{ .Tag }}-amd64'

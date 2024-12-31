@@ -10,6 +10,12 @@ Install the Voiceflow CLI:
 brew install xavidop/tap/voiceflow
 ```
 
+### snapcraft
+
+```sh
+sudo snap install cxcli
+```
+
 ### scoop
 
 ```powershell
