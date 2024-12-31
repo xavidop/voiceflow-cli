@@ -81,6 +81,63 @@ changelog:
     - title: Other work
       order: 9999
 
+dockers:
+- image_templates:
+  - 'xavidop/voiceflow:{{ .Tag }}-amd64'
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-amd64'
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/xavidop/voiceflow-cli/master/README.md"
+  - "--label=io.artifacthub.package.logo-url=https://voiceflow.xavidop.me/images/logo.png"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Xavier Portilla Edo\",\"email\":\"xavierportillaedo@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=Apache-2.0"
+  - "--label=org.opencontainers.image.description=The CLI to interact with your Voiceflow projects"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/amd64"
+- image_templates:
+  - 'xavidop/voiceflow:{{ .Tag }}-arm64'
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-arm64'
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/xavidop/voiceflow-cli/master/README.md"
+  - "--label=io.artifacthub.package.logo-url=https://voiceflow.xavidop.me/images/logo.png"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"Xavier Portilla Edo\",\"email\":\"xavierportillaedo@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=Apache-2.0"
+  - "--label=org.opencontainers.image.description=The CLI to interact with your Voiceflow projects"
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/arm64"
+  goarch: arm64
+
+docker_manifests:
+- name_template: 'xavidop/voiceflow:{{ .Tag }}'
+  image_templates:
+  - 'xavidop/voiceflow:{{ .Tag }}-amd64'
+  - 'xavidop/voiceflow:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/xavidop/voiceflow:{{ .Tag }}'
+  image_templates:
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-amd64'
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-arm64'
+- name_template: 'xavidop/voiceflow:latest'
+  image_templates:
+  - 'xavidop/voiceflow:{{ .Tag }}-amd64'
+  - 'xavidop/voiceflow:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/xavidop/voiceflow:latest'
+  image_templates:
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-amd64'
+  - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-arm64'
+
 sboms:
   - artifacts: archive
 milestones:

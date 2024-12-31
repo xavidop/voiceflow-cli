@@ -1,5 +1,5 @@
 # Authentication
 
-`voiceflow-cli` uses Voiceflow APIs. By default, the tool uses the default configuration that uses the `gcloud` cli. If you want to use another authentication key you can provide a `json` file with the global `--credentials` parameter.
+`voiceflow-cli` uses Voiceflow APIs. To interact with your Vocieflow projects you will need a [Voiceflow API Key](https://docs.voiceflow.com/reference/authentication). You can get your API Key in your Voiceflow project > Integration page. You can pass the API Key to the CLI using the `--voiceflow-api-key` flag or by setting the `VF_API_KEY` environment variable.
 
 The `voiceflow-cli` source code is open source, you can check it out [here](https://github.com/xavidop/voiceflow-cli) to learn more about the actions the tool performs.

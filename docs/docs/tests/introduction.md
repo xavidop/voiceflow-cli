@@ -38,23 +38,28 @@ The above command will give you output similar to the following:
 ```sh
 $ voiceflow test execute examples/test/
 
-[INFO] Running suite: Example Conversation Profiler Suite
-[INFO][test-file:test_1][interaction:test_1_1][input:prompt] User> Hello! (auto-generated from prompt: "give me a one line hello")
-[INFO][test-file:test_1][interaction:test_1_1][input:prompt] Agent> Hi! How are you doing?
-[INFO][test-file:test_1][interaction:test_1_1][validation:equals] Validation with value "hi" 
-[INFO][test-file:test_1][interaction:test_1_1][validation:equals] Validation configuration: {CaseSensitive:false}
-[INFO][test-file:test_1][interaction:test_1_2][input:text] User> hi
-[INFO][test-file:test_1][interaction:test_1_2][input:text] Agent> Hi! How are you doing?
-[INFO][test-file:test_1][interaction:test_1_2][validation:contains] Validation with value "hi" 
-[INFO][test-file:test_1][interaction:test_1_2][validation:contains] Validation configuration: {CaseSensitive:false}
-[INFO][test-file:test_1][interaction:test_1_3][input:text] User> hello
-[INFO][test-file:test_1][interaction:test_1_3][input:text] Agent> Hi! How are you doing?
-[INFO][test-file:test_1][interaction:test_1_3][validation:equals] Validation with value "hello" 
-[INFO][test-file:test_1][interaction:test_1_3][validation:equals] Validation configuration: {CaseSensitive:false}
-[INFO][test-file:test_1][interaction:test_1_4][input:text] User> hi
-[INFO][test-file:test_1][interaction:test_1_4][input:text] Agent> Hi! How are you doing?
-[INFO][test-file:test_1][interaction:test_1_4][validation:similarity] Validation with value "hello" 
-[INFO][test-file:test_1][interaction:test_1_4][validation:similarity] Validation configuration: {CaseSensitive:false InsertCost:0 DeleteCost:0 ReplaceCost:0}
+Dec 31 10:54:01.664 [INFO] Suite: Example Conversation Profiler Suite
+Description: Suite used as an example
+Environment: development
+Dec 31 10:54:01.664 [INFO] Running Tests:
+Dec 31 10:54:01.664 [INFO] Running Test ID: Example test
+Dec 31 10:54:01.664 [INFO] Interaction ID: test_1_1
+Dec 31 10:54:01.664 [INFO]      Interaction Request Type: launch
+Dec 31 10:54:02.693 [INFO]      Interaction Response Type: text
+Dec 31 10:54:02.693 [INFO]      Interaction Response Message: Hey there! 🌟 Welcome to the Isla Experience! I’m like a warm cup of cocoa on a chilly day—sweet, comforting, and maybe a little too hot if you’re not careful! How’s your day going?
+Dec 31 10:54:02.693 [INFO] All validations passed for Interaction ID: test_1_1
+Dec 31 10:54:02.693 [INFO] Interaction ID: test_1_2
+Dec 31 10:54:02.693 [INFO]      Interaction Request Type: text
+Dec 31 10:54:02.693 [INFO]      Interaction Request Payload: I am doing well
+Dec 31 10:54:03.889 [INFO]      Interaction Response Type: text
+Dec 31 10:54:03.889 [INFO]      Interaction Response Message: Awesome! Glad to hear it! Are you riding the wave of good vibes, or did you just find a hidden stash of chocolate? 🍫 Either way, I’m here for it! What’s been the highlight of your day so far?
+Dec 31 10:54:03.889 [INFO] All validations passed for Interaction ID: test_1_2
+Dec 31 10:54:03.889 [INFO] Interaction ID: test_1_3
+Dec 31 10:54:03.889 [INFO]      Interaction Request Type: text
+Dec 31 10:54:03.889 [INFO]      Interaction Request Payload: I have been working very hard
+Dec 31 10:54:06.090 [INFO]      Interaction Response Type: text
+Dec 31 10:54:06.091 [INFO]      Interaction Response Message: Ah, the classic “I’m working hard” routine! It’s like a superhero origin story, but instead of gaining superpowers, you just gain a lot of coffee stains and a questionable relationship with your chair. What kind of work are you diving into?
+Dec 31 10:54:06.091 [INFO] All validations passed for Interaction ID: test_1_3
 ```
 
 !!! info "Are you running this command in a CI/CD pipeline?"
