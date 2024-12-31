@@ -13,7 +13,7 @@ import (
 )
 
 func CallInteractionAPI(EnvironmentName, userID string, interaction tests.Interaction) ([]voiceflow.InteractionResponse, error) {
-	url := fmt.Sprintf("https://general-runtime.voiceflow.com/state/user/%s/interact?logs=off", userID)
+	url := fmt.Sprintf("%s/state/user/%s/interact?logs=off", global.VoiceflowBaseURL, userID)
 	var interatctionRequest voiceflow.InteratctionRequest
 	switch interaction.User.Type {
 	case "launch":
