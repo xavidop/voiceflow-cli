@@ -93,6 +93,31 @@ signs:
       - "${artifact}"
       - --yes
 
+aurs:
+  - homepage:  https://voiceflow.xavidop.me
+    description: The CLI for your Voiceflow projects
+    maintainers:
+      - 'Xavier Portilla Edo <xavierportillaedo at gmail dot com>'
+    license: Apache-2.0
+    private_key: '{{ .Env.AUR_KEY }}'
+    git_url: 'ssh://aur@aur.archlinux.org/voiceflow-bin.git'
+    name: voiceflow
+    package: |-
+      # bin
+      install -Dm755 "./voiceflow" "${pkgdir}/usr/bin/voiceflow"
+      # license
+      install -Dm644 "./LICENSE.md" "${pkgdir}/usr/share/licenses/voiceflow/LICENSE"
+      # completions
+      mkdir -p "${pkgdir}/usr/share/bash-completion/completions/"
+      mkdir -p "${pkgdir}/usr/share/zsh/site-functions/"
+      mkdir -p "${pkgdir}/usr/share/fish/vendor_completions.d/"
+      install -Dm644 "./completions/voiceflow.bash" "${pkgdir}/usr/share/bash-completion/completions/voiceflow"
+      install -Dm644 "./completions/voiceflow.zsh" "${pkgdir}/usr/share/zsh/site-functions/_voiceflow"
+      install -Dm644 "./completions/voiceflow.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/voiceflow.fish"
+
+      # man pages
+      install -Dm644 "./manpages/voiceflow.1.gz" "${pkgdir}/usr/share/man/man1/voiceflow.1.gz"
+
 nfpms:
   - file_name_template: 'voiceflow_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
     package_name: voiceflow

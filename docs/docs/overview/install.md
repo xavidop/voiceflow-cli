@@ -16,6 +16,12 @@ brew install xavidop/tap/voiceflow
 sudo snap install voiceflow
 ```
 
+### aur
+
+```sh
+yay -S cxcli-bin
+```
+
 ### scoop
 
 ```powershell
