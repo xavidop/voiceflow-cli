@@ -29,6 +29,8 @@ jobs:
 
       - name: Chocolatey 🍫📦
         run: |
+          set -x
+          set -v
           go mod download
           go generate ./...
           go run main.go completion bash
