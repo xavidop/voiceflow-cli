@@ -81,6 +81,18 @@ changelog:
     - title: Other work
       order: 9999
 
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    output: true
+    artifacts: checksum
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - --yes
+
 nfpms:
   - file_name_template: 'voiceflow_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
     package_name: voiceflow
@@ -190,6 +202,15 @@ docker_manifests:
   image_templates:
   - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-amd64'
   - 'ghcr.io/xavidop/voiceflow:{{ .Tag }}-arm64'
+
+docker_signs:
+  - cmd: cosign
+    artifacts: manifests
+    output: true
+    args:
+      - "sign"
+      - "${artifact}@${digest}"
+      - --yes
 
 sboms:
   - artifacts: archive

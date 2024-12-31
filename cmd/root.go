@@ -46,7 +46,10 @@ func Execute() {
 }
 
 func init() {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		global.Log.Error(errors.Errorf("%s", err))
+		os.Exit(1)
+	}
 	// Add the subcommands
 	test.Register(rootCmd)
 
