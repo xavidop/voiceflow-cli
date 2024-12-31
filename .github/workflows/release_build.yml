@@ -87,7 +87,7 @@ jobs:
         uses: goreleaser/goreleaser-action@master
         with:
           version: latest
-          args: release --clean
+          args: release --clean --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
           AUR_KEY: ${{ secrets.AUR_KEY }}
