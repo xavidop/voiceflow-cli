@@ -5,16 +5,16 @@
 		"$defs": {
 			"Suite": {
 				"properties": {
-					"Name": {
+					"name": {
 						"type": "string"
 					},
-					"Description": {
+					"description": {
 						"type": "string"
 					},
-					"EnvironmentName": {
+					"environmentName": {
 						"type": "string"
 					},
-					"Tests": {
+					"tests": {
 						"items": {
 							"$ref": "#/$defs/TestFile"
 						},
@@ -24,26 +24,26 @@
 				"additionalProperties": false,
 				"type": "object",
 				"required": [
-					"Name",
-					"Description",
-					"EnvironmentName",
-					"Tests"
+					"name",
+					"description",
+					"environmentName",
+					"tests"
 				]
 			},
 			"TestFile": {
 				"properties": {
-					"ID": {
+					"id": {
 						"type": "string"
 					},
-					"File": {
+					"file": {
 						"type": "string"
 					}
 				},
 				"additionalProperties": false,
 				"type": "object",
 				"required": [
-					"ID",
-					"File"
+					"id",
+					"file"
 				]
 			},
 			"Tests": {
@@ -51,7 +51,7 @@
 				"$defs": {
 					"Agent": {
 						"properties": {
-							"Validate": {
+							"validate": {
 								"items": {
 									"$ref": "#/$defs/Validation"
 								},
@@ -61,38 +61,38 @@
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"Validate"
+							"validate"
 						]
 					},
 					"Interaction": {
 						"properties": {
-							"ID": {
+							"id": {
 								"type": "string"
 							},
-							"User": {
+							"user": {
 								"$ref": "#/$defs/User"
 							},
-							"Agent": {
+							"agent": {
 								"$ref": "#/$defs/Agent"
 							}
 						},
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"ID",
-							"User",
-							"Agent"
+							"id",
+							"user",
+							"agent"
 						]
 					},
 					"Test": {
 						"properties": {
-							"Name": {
+							"name": {
 								"type": "string"
 							},
-							"Description": {
+							"description": {
 								"type": "string"
 							},
-							"Interactions": {
+							"interactions": {
 								"items": {
 									"$ref": "#/$defs/Interaction"
 								},
@@ -102,45 +102,44 @@
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"Name",
-							"Description",
-							"Interactions"
+							"name",
+							"description",
+							"interactions"
 						]
 					},
 					"User": {
 						"properties": {
-							"Type": {
+							"type": {
 								"type": "string"
 							},
-							"Text": {
+							"text": {
 								"type": "string"
 							}
 						},
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"Type",
-							"Text"
+							"type"
 						]
 					},
 					"Validation": {
 						"properties": {
-							"ID": {
+							"id": {
 								"type": "string"
 							},
-							"Type": {
+							"type": {
 								"type": "string"
 							},
-							"Value": {
+							"value": {
 								"type": "string"
 							}
 						},
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"ID",
-							"Type",
-							"Value"
+							"id",
+							"type",
+							"value"
 						]
 					}
 				},
