@@ -39,4 +39,6 @@ env
 site
 .env
 
+output/
+
 voiceflow-cli/choco

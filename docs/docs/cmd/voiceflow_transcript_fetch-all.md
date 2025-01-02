@@ -1,15 +1,17 @@
-# voiceflow test execute
+# voiceflow transcript fetch-all
 
-Execute a suite
+Fetch all transcripts from a project
 
 ```
-voiceflow test execute [suite-path] [flags]
+voiceflow transcript fetch-all [flags]
 ```
 
 ## Options
 
 ```
-  -h, --help   help for execute
+  -a, --agent-id string           Voiceflow Agent ID (required)
+  -h, --help                      help for fetch-all
+  -d, --output-directory string   Output directory to save the transcripts. Default is ./output (optional) (default "./output")
 ```
 
 ## Options inherited from parent commands
@@ -24,5 +26,5 @@ voiceflow test execute [suite-path] [flags]
 
 ## See also
 
-* [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing
+* [voiceflow transcript](/cmd/voiceflow_transcript/)	 - Actions on transcripts
 

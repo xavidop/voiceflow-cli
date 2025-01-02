@@ -1,15 +1,15 @@
-# voiceflow test execute
+# voiceflow transcript
 
-Execute a suite
+Actions on transcripts
 
 ```
-voiceflow test execute [suite-path] [flags]
+voiceflow transcript [flags]
 ```
 
 ## Options
 
 ```
-  -h, --help   help for execute
+  -h, --help   help for transcript
 ```
 
 ## Options inherited from parent commands
@@ -24,5 +24,7 @@ voiceflow test execute [suite-path] [flags]
 
 ## See also
 
-* [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing
+* [voiceflow](/cmd/voiceflow/)	 - Voiceflow CLI
+* [voiceflow transcript fetch](/cmd/voiceflow_transcript_fetch/)	 - Fetch one transcripts from a project
+* [voiceflow transcript fetch-all](/cmd/voiceflow_transcript_fetch-all/)	 - Fetch all transcripts from a project
 

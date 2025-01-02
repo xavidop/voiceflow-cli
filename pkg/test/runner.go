@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
-	voiceflowTypes "github.com/xavidop/voiceflow-cli/internal/types/voiceflow"
+	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
@@ -59,7 +59,7 @@ func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validati
 
 }
 
-func validateResponse(interactionResponse voiceflowTypes.InteractionResponse, validations []tests.Validation) ([]tests.Validation, error) {
+func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation) ([]tests.Validation, error) {
 	messageResponse, ok := getNestedValue(interactionResponse.Payload, "message")
 	// Ensure payload is of type Speak before accessing its fields
 	if ok {

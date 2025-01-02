@@ -20,12 +20,12 @@ voiceflow [flags]
 ## Options
 
 ```
-  -h, --help                        help for voiceflow
-  -o, --output-format string        Output Format. Options: text, json. Default: text (optional) (default "text")
-  -u, --skip-update-check           Skip the check for updates check run before every command (optional)
-  -v, --verbose                     verbose error output (with stack trace) (optional)
-  -x, --voiceflow-api-key string    Voiceflow API Key (optional)
-  -b, --voiceflow-base-url string   Voiceflow Base URL (optional). Default: https://general-runtime.voiceflow.com (default "https://general-runtime.voiceflow.com")
+  -h, --help                         help for voiceflow
+  -o, --output-format string         Output Format. Options: text, json. Default: text (optional) (default "text")
+  -u, --skip-update-check            Skip the check for updates check run before every command (optional)
+  -v, --verbose                      verbose error output (with stack trace) (optional)
+  -x, --voiceflow-api-key string     Voiceflow API Key (optional)
+  -b, --voiceflow-subdomain string   Voiceflow Base URL (optional). Default: empty
 ```
 
 ## See also
@@ -33,5 +33,6 @@ voiceflow [flags]
 * [voiceflow completion](/cmd/voiceflow_completion/)	 - Generate the autocompletion script for the specified shell
 * [voiceflow jsonschema](/cmd/voiceflow_jsonschema/)	 - outputs voiceflow's JSON schema
 * [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing
+* [voiceflow transcript](/cmd/voiceflow_transcript/)	 - Actions on transcripts
 * [voiceflow version](/cmd/voiceflow_version/)	 - Get voiceflow-cli version
 

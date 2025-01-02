@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xavidop/voiceflow-cli/cmd/cmdutils"
 	test "github.com/xavidop/voiceflow-cli/cmd/test"
+	"github.com/xavidop/voiceflow-cli/cmd/transcript"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 )
 
@@ -51,11 +52,12 @@ func init() {
 	}
 	// Add the subcommands
 	test.Register(rootCmd)
+	transcript.Register(rootCmd)
 
 	// Add the subcommands
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "verbose error output (with stack trace) (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowAPIKey, "voiceflow-api-key", "x", "", "Voiceflow API Key (optional)")
-	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowBaseURL, "voiceflow-base-url", "b", "https://general-runtime.voiceflow.com", "Voiceflow Base URL (optional). Default: https://general-runtime.voiceflow.com")
+	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowSubdomain, "voiceflow-subdomain", "b", "", "Voiceflow Base URL (optional). Default: empty")
 	rootCmd.PersistentFlags().BoolVarP(&global.SkipUpdate, "skip-update-check", "u", false, "Skip the check for updates check run before every command (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.Output, "output-format", "o", "text", "Output Format. Options: text, json. Default: text (optional)")
 

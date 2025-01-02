@@ -106,9 +106,13 @@ nav:
       - Tests: tests/tests.md
       - Examples:
         - Contains: tests/examples/contains.md
+  - Transcripts:
+    - Introduction: transcripts/introduction.md
+    - Fetching: transcripts/fetching.md
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
+      - voiceflow transcript: cmd/voiceflow_transcript.md
       - voiceflow completion: cmd/voiceflow_completion.md
       - voiceflow jsonschema: cmd/voiceflow_jsonschema.md
       - voiceflow version: cmd/voiceflow_version.md
@@ -122,5 +126,5 @@ nav:
 extra:
   analytics:
     provider: google
-    property: G-J48NTVMG9Y
+    property: G-76ER1WJJTR
     anonymize_ip: true

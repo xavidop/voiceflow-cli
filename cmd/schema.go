@@ -60,8 +60,6 @@ func generateTestSchema(output string) error {
 		return fmt.Errorf("failed to create suite jsonschema: %w", err)
 	}
 	if output == "-" {
-		fmt.Println(string(suiteBts))
-		fmt.Println(string(testBts))
 		return nil
 	}
 	if err := os.MkdirAll(filepath.Dir(output), 0o755); err != nil {

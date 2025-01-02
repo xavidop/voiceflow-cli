@@ -1,4 +1,4 @@
-package voiceflow
+package interact
 
 type InteractionResponse struct {
 	Type    string                 `json:"type"`
