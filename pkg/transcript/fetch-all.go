@@ -44,9 +44,12 @@ func SaveTranscript(transcript [][]string, outputDirectory string) error {
 	fullPath := filepath.Join(outputDirectory, filename)
 	buf := new(bytes.Buffer)
 	wr := csv.NewWriter(buf)
-	wr.WriteAll(transcript)
+	err := wr.WriteAll(transcript)
+	if err != nil {
+		return fmt.Errorf("failed to write transcript to buffer: %w", err)
+	}
 	// Write transcript to file
-	err := os.WriteFile(fullPath, buf.Bytes(), 0644)
+	err = os.WriteFile(fullPath, buf.Bytes(), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to write transcript file: %w", err)
 	}
