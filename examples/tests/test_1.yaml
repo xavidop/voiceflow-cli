@@ -29,3 +29,5 @@ interactions:
       validate:
         - type: regexp
           value: 'classic'
+
+# yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json

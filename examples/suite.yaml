@@ -4,3 +4,6 @@ environmentName: development
 tests:
   - id: test_1
     file: ./tests/test_1.yaml
+
+
+# yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationsuite.json

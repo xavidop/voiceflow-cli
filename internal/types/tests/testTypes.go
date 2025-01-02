@@ -22,7 +22,7 @@ type Agent struct {
 }
 
 type Validation struct {
-	ID    string `yaml:"id" json:"id"`
+	ID    string `yaml:"id" json:"id,omitempty"`
 	Type  string `yaml:"type" json:"type"`
 	Value string `yaml:"value" json:"value"`
 }
