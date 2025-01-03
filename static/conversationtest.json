@@ -1,0 +1,100 @@
+{
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
+		"$id": "https://github.com/xavidop/voiceflow-cli/internal/types/tests/test",
+		"$ref": "#/$defs/Test",
+		"$defs": {
+			"Agent": {
+				"properties": {
+					"validate": {
+						"items": {
+							"$ref": "#/$defs/Validation"
+						},
+						"type": "array"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"validate"
+				]
+			},
+			"Interaction": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"user": {
+						"$ref": "#/$defs/User"
+					},
+					"agent": {
+						"$ref": "#/$defs/Agent"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"id",
+					"user",
+					"agent"
+				]
+			},
+			"Test": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"interactions": {
+						"items": {
+							"$ref": "#/$defs/Interaction"
+						},
+						"type": "array"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"description",
+					"interactions"
+				]
+			},
+			"User": {
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"text": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"type"
+				]
+			},
+			"Validation": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"type",
+					"value"
+				]
+			}
+		},
+		"description": "voiceflow-cli Conversation Profiler test definition file"
+	}
