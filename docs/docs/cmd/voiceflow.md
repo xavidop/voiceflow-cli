@@ -34,6 +34,7 @@ voiceflow [flags]
 * [voiceflow analytics](/cmd/voiceflow_analytics/)	 - Actions on analytics
 * [voiceflow completion](/cmd/voiceflow_completion/)	 - Generate the autocompletion script for the specified shell
 * [voiceflow jsonschema](/cmd/voiceflow_jsonschema/)	 - outputs voiceflow's JSON schema
+* [voiceflow kb](/cmd/voiceflow_kb/)	 - Actions on knowledge base
 * [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing
 * [voiceflow transcript](/cmd/voiceflow_transcript/)	 - Actions on transcripts
 * [voiceflow version](/cmd/voiceflow_version/)	 - Get voiceflow-cli version
