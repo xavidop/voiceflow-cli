@@ -6,6 +6,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/xavidop/voiceflow-cli/cmd/agent"
+	"github.com/xavidop/voiceflow-cli/cmd/analytics"
 	"github.com/xavidop/voiceflow-cli/cmd/cmdutils"
 	test "github.com/xavidop/voiceflow-cli/cmd/test"
 	"github.com/xavidop/voiceflow-cli/cmd/transcript"
@@ -53,6 +55,8 @@ func init() {
 	// Add the subcommands
 	test.Register(rootCmd)
 	transcript.Register(rootCmd)
+	analytics.Register(rootCmd)
+	agent.Register(rootCmd)
 
 	// Add the subcommands
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "verbose error output (with stack trace) (optional)")

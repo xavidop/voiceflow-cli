@@ -3,7 +3,7 @@
 ## What is this?
 
 <p align="center">
-  <img alt="Flow" src="/images/transcript.png" style="height:512px;width:512px" />
+  <img alt="Flow" src="/images/transcript.png" style="height:400px;width:500px" />
 </p>
 
 The goal of the Transcripts is to give you and your team an understanding of where your assistant was successful in helping your users, and where it can be improved.
@@ -14,4 +14,4 @@ Each transcript provides a turn-by-turn record of each user interaction, what ut
 
 The `voiceflow-cli` has a command that allows you to interact with transcripts from your terminal or from your CI pipelines.
 
-To execute a suite, you can run the `voiceflow transcript` command. For the usage, please refer to this [page](/cmd/voiceflow_transcript).
+To execute know more, you can run the `voiceflow transcript` command. For the usage, please refer to this [page](/cmd/voiceflow_transcript).

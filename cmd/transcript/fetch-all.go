@@ -20,8 +20,12 @@ var fetchAllCmd = &cobra.Command{
 		voiceflow.SetVoiceflowAPIKey()
 		agentID, _ := cmd.Flags().GetString("agent-id")
 		outputDirectory, _ := cmd.Flags().GetString("output-directory")
+		startTime, _ := cmd.Flags().GetString("start-time")
+		endTime, _ := cmd.Flags().GetString("end-time")
+		tag, _ := cmd.Flags().GetString("tag")
+		rang, _ := cmd.Flags().GetString("range")
 
-		if err := transcript.FetchAll(agentID, outputDirectory); err != nil {
+		if err := transcript.FetchAll(agentID, startTime, endTime, tag, rang, outputDirectory); err != nil {
 			global.Log.Errorf("%s", err.Error())
 			os.Exit(1)
 		}
@@ -41,7 +45,10 @@ func init() {
 		global.Log.Errorf("%s", err.Error())
 		os.Exit(1)
 	}
-
+	fetchAllCmd.Flags().StringP("start-time", "s", "", "Start time in ISO-8601 format to fetch the analytics. Default is current day but a month ago (optional)")
+	fetchAllCmd.Flags().StringP("end-time", "e", "", "Start time in ISO-8601 format to fetch the analytics. Default is current day ago (optional)")
+	fetchAllCmd.Flags().StringP("tag", "g", "", "Tag to filter the transcripts. Default is empty (optional)")
+	fetchAllCmd.Flags().StringP("range", "r", "", "Range to filter the transcripts. Default is empty (optional)")
 	fetchAllCmd.Flags().StringP("output-directory", "d", "./output", "Output directory to save the transcripts. Default is ./output (optional)")
 
 }

@@ -109,10 +109,18 @@ nav:
   - Transcripts:
     - Introduction: transcripts/introduction.md
     - Fetching: transcripts/fetching.md
+  - Agent:
+    - Introduction: agents/introduction.md
+    - Export: agents/export.md
+  - Analytics:
+    - Introduction: analytics/introduction.md
+    - Fetch: analytics/fetch.md
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
       - voiceflow transcript: cmd/voiceflow_transcript.md
+      - voiceflow agent: cmd/voiceflow_agent.md
+      - voiceflow analytics: cmd/voiceflow_analytics.md
       - voiceflow completion: cmd/voiceflow_completion.md
       - voiceflow jsonschema: cmd/voiceflow_jsonschema.md
       - voiceflow version: cmd/voiceflow_version.md
@@ -126,5 +134,5 @@ nav:
 extra:
   analytics:
     provider: google
-    property: G-76ER1WJJTR
+    property: G-4YRZ5DD8QY
     anonymize_ip: true

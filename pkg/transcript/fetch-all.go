@@ -11,8 +11,8 @@ import (
 	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
-func FetchAll(agentID, outputDirectory string) error {
-	transcriptsInformation, err := voiceflow.FetchTranscriptInformations(agentID)
+func FetchAll(agentID, startTime, endTime, tag, rang, outputDirectory string) error {
+	transcriptsInformation, err := voiceflow.FetchTranscriptInformations(agentID, startTime, endTime, tag, rang)
 	if err != nil {
 		return fmt.Errorf("failed to fetch transcripts: %w", err)
 	}

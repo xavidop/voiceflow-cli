@@ -12,11 +12,23 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/transcript"
 )
 
-func FetchTranscriptInformations(agentID string) ([]transcript.TranscriptInformation, error) {
+func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) ([]transcript.TranscriptInformation, error) {
 	if global.VoiceflowSubdomain != "" {
 		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
 	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s", global.VoiceflowSubdomain, agentID)
+	if startTime != "" {
+		startTime = fmt.Sprintf("&startDate=%s", startTime)
+	}
+	if endTime != "" {
+		endTime = fmt.Sprintf("&endDate=%s", endTime)
+	}
+	if tag != "" {
+		tag = fmt.Sprintf("&tag=%s", tag)
+	}
+	if rang != "" {
+		rang = fmt.Sprintf("&range=%s", rang)
+	}
+	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s?%s%s%s%s", global.VoiceflowSubdomain, agentID, startTime, endTime, tag, rang)
 
 	req, _ := http.NewRequest("GET", url, nil)
 

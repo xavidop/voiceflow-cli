@@ -1,4 +1,4 @@
-package test
+package agent
 
 import (
 	"os"
@@ -7,11 +7,11 @@ import (
 	"github.com/xavidop/voiceflow-cli/cmd/cmdutils"
 )
 
-// testCmd represents the test root command
-var testCmd = &cobra.Command{
-	Use:     "test",
-	Aliases: []string{"test-conversation", "tc", "conversation-tests", "tests"},
-	Short:   "Actions on conversation testing",
+// agentCmd represents the agent root command
+var agentCmd = &cobra.Command{
+	Use:     "agent",
+	Aliases: []string{"a", "project", "agents", "projects"},
+	Short:   "Actions on agents",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := cmd.Help(); err != nil {
 			os.Exit(1)
@@ -26,5 +26,5 @@ var testCmd = &cobra.Command{
 }
 
 func Register(rootCmd *cobra.Command) {
-	rootCmd.AddCommand(testCmd)
+	rootCmd.AddCommand(agentCmd)
 }

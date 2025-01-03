@@ -30,6 +30,8 @@ voiceflow [flags]
 
 ## See also
 
+* [voiceflow agent](/cmd/voiceflow_agent/)	 - Actions on agents
+* [voiceflow analytics](/cmd/voiceflow_analytics/)	 - Actions on analytics
 * [voiceflow completion](/cmd/voiceflow_completion/)	 - Generate the autocompletion script for the specified shell
 * [voiceflow jsonschema](/cmd/voiceflow_jsonschema/)	 - outputs voiceflow's JSON schema
 * [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing

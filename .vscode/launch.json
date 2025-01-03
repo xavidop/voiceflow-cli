@@ -37,7 +37,33 @@
                 "ENV": "development"
             },
             "args": [
-                "transcript", "fetch-all", "--agent-id", "67213ee4d6009327e23018a9"
+                "transcript", "fetch-all", "--agent-id", "67213ee4d6009327e23018a9", "--tag", "6777dedec07cff77a659a017"
+            ]
+        },
+        {
+            "name": "Export agent command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "agent", "export", "--version-id", "development", "--agent-id", "67213ee4d6009327e23018a9"
+            ]
+        },
+        {
+            "name": "Fetch analytics command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "analytics", "fetch", "--agent-id", "67213ee4d6009327e23018a9"
             ]
         }
     ]

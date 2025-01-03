@@ -10,8 +10,12 @@ voiceflow transcript fetch-all [flags]
 
 ```
   -a, --agent-id string           Voiceflow Agent ID (required)
+  -e, --end-time string           Start time in ISO-8601 format to fetch the analytics. Default is current day ago (optional)
   -h, --help                      help for fetch-all
   -d, --output-directory string   Output directory to save the transcripts. Default is ./output (optional) (default "./output")
+  -r, --range string              Range to filter the transcripts. Default is empty (optional)
+  -s, --start-time string         Start time in ISO-8601 format to fetch the analytics. Default is current day but a month ago (optional)
+  -g, --tag string                Tag to filter the transcripts. Default is empty (optional)
 ```
 
 ## Options inherited from parent commands
