@@ -19,7 +19,6 @@ var uploadFileCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		voiceflow.SetVoiceflowAPIKey()
 		fileToUpload, _ := cmd.Flags().GetString("file")
-		name, _ := cmd.Flags().GetString("name")
 		overwrite, _ := cmd.Flags().GetBool("overwrite")
 		maxChunkSize, _ := cmd.Flags().GetInt("max-chunk-size")
 		markdownConversion, _ := cmd.Flags().GetBool("markdown-conversion")
@@ -29,7 +28,7 @@ var uploadFileCmd = &cobra.Command{
 		llmContentSummarization, _ := cmd.Flags().GetBool("llm-content-summarization")
 		tags, _ := cmd.Flags().GetStringArray("tags")
 
-		if err := document.UploadFile(fileToUpload, name, overwrite, maxChunkSize, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization, tags); err != nil {
+		if err := document.UploadFile(fileToUpload, overwrite, maxChunkSize, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization, tags); err != nil {
 			global.Log.Errorf("%s", err.Error())
 			os.Exit(1)
 		}
@@ -45,12 +44,6 @@ func init() {
 	documentCmd.AddCommand(uploadFileCmd)
 	uploadFileCmd.Flags().StringP("file", "f", "", "File to upload to the knowledge base (required)")
 	if err := uploadFileCmd.MarkFlagRequired("file"); err != nil {
-		global.Log.Errorf("%s", err.Error())
-		os.Exit(1)
-	}
-
-	uploadFileCmd.Flags().StringP("name", "n", "", "Name of the document that will be uploaded to the knowledge base (required)")
-	if err := uploadFileCmd.MarkFlagRequired("name"); err != nil {
 		global.Log.Errorf("%s", err.Error())
 		os.Exit(1)
 	}

@@ -2,13 +2,14 @@ package voiceflow
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
@@ -83,7 +84,7 @@ func UploadDocumentUrl(urlToUpload, name string, overwrite bool, maxChunkSize in
 	return string(body), nil
 }
 
-func UploadDocumentFile(fileToUpload, name string, overwrite bool, maxChunkSize int, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization bool, tags []string) (string, error) {
+func UploadDocumentFile(fileToUpload string, overwrite bool, maxChunkSize int, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization bool, tags []string) (string, error) {
 	if global.VoiceflowSubdomain != "" {
 		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
 	}
@@ -118,22 +119,33 @@ func UploadDocumentFile(fileToUpload, name string, overwrite bool, maxChunkSize 
 		return "", err
 	}
 
+	file, err := os.Open(fileToUpload)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
 	// Create a buffer to hold the multipart form data
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
+	fileName := filepath.Base(fileToUpload)
 
-	encodedContent := base64.StdEncoding.EncodeToString(fileContent)
+	// Write the encoded content in the required format to the form field
+	contentType := http.DetectContentType(fileContent)
 
-	// Create a form file field
-	part, err := writer.CreateFormField("file")
+	// Create a custom form field with filename in Content-Disposition
+	partHeaders := make(textproto.MIMEHeader)
+	partHeaders.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, fileName))
+	partHeaders.Set("Content-Type", contentType)
+
+	part, err := writer.CreatePart(partHeaders)
 	if err != nil {
 		return "", err
 	}
 
-	// Copy the file data to the form file field
-	_, err = part.Write([]byte(encodedContent))
+	_, err = io.Copy(part, file)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error copying file content: %v", err)
 	}
 
 	// Close the multipart writer to set the boundary

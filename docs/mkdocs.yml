@@ -111,7 +111,7 @@ nav:
     - Query: kb/query.md
   - Documents:
     - Introduction: documents/introduction.md
-    - Upload URls: documents/upload-url.md
+    - Upload URLs: documents/upload-url.md
     - Upload Files: documents/upload-file.md
   - Transcripts:
     - Introduction: transcripts/introduction.md

@@ -4,7 +4,7 @@ With the `vocieflow-cli` you can upload content from a URL to your Voiceflow Kno
 
 ## Command Usage
 ```bash
-vf document upload-url [flags]
+voiceflow document upload-url [flags]
 ```
 
 ### Aliases
@@ -35,13 +35,13 @@ vf document upload-url [flags]
 
 ### Basic Upload
 ```bash
-vf document upload-url --url https://docs.example.com/api --name "API Documentation"
+voiceflow document upload-url --url https://docs.example.com/api --name "API Documentation"
 ```
 
 ### Advanced Upload with LLM Processing
 
 ```bash
-vf document upload-url \
+voiceflow document upload-url \
   --url https://docs.example.com/api \
   --name "API Documentation" \
   --max-chunk-size 1000 \
@@ -54,7 +54,7 @@ vf document upload-url \
 ### Upload with Overwrite
 
 ```bash
-vf document upload-url \
+voiceflow document upload-url \
   --url https://docs.example.com/api \
   --name "API Documentation" \
   --overwrite \

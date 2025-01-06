@@ -65,5 +65,5 @@ With the `vocieflow-cli` you can query your agents' knowledge base. This is usef
 ### Basic Query
 
 ```bash
-vf kb query --quesiton "How does feature X work?" --model gpt-4
+voiceflow kb query --quesiton "How does feature X work?" --model gpt-4
 ```

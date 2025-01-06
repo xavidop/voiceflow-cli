@@ -103,7 +103,7 @@
                 "ENV": "development"
             },
             "args": [
-                "document", "upload-file", "--file", "./git.pdf", "--name", "Vocieflow CLI Readme"
+                "document", "upload-file", "--file", "./db.pdf"
             ]
         }
     ]

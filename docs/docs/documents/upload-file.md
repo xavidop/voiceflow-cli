@@ -4,7 +4,7 @@ With the `vocieflow-cli` you can upload content from a file to your Voiceflow Kn
 
 ## Command Usage
 ```bash
-vf document upload-file [flags]
+voiceflow document upload-file [flags]
 ```
 
 ### Aliases
@@ -15,7 +15,6 @@ vf document upload-file [flags]
 
 ### Required Flags
 - `--file`: Path to local file
-- `--name`: Name for the document in Knowledge Base
 
 ### Processing Options
 - `--max-chunk-size`: Maximum size of content chunks
@@ -35,16 +34,14 @@ vf document upload-file [flags]
 
 ### Basic File Upload
 ```bash
-vf document upload-file \
-  --file ./docs/api.pdf \
-  --name "API Documentation"
+voiceflow document upload-file \
+  --file ./docs/api.pdf
 ```
 
 ### Advanced Upload with Processing
 ```bash
-vf document upload-file \
+voiceflow document upload-file \
   --file ./docs/guide.md \
-  --name "User Guide" \
   --max-chunk-size 1000 \
   --markdown-conversion \
   --llm-generated-q \
@@ -54,9 +51,8 @@ vf document upload-file \
 
 ### Upload with Overwrite
 ```bash
-vf document upload-file \
+voiceflow document upload-file \
   --file ./docs/updated-policy.pdf \
-  --name "Privacy Policy" \
   --overwrite \
   --tags policy,legal
 ```
