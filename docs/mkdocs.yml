@@ -109,6 +109,10 @@ nav:
   - Knowledge Base:
     - Introduction: kb/introduction.md
     - Query: kb/query.md
+  - Documents:
+    - Introduction: documents/introduction.md
+    - Upload URls: documents/upload-url.md
+    - Upload Files: documents/upload-file.md
   - Transcripts:
     - Introduction: transcripts/introduction.md
     - Fetching: transcripts/fetching.md
@@ -122,6 +126,7 @@ nav:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
       - voiceflow kb: cmd/voiceflow_kb.md
+      - voiceflow document: cmd/voiceflow_document.md
       - voiceflow transcript: cmd/voiceflow_transcript.md
       - voiceflow agent: cmd/voiceflow_agent.md
       - voiceflow analytics: cmd/voiceflow_analytics.md
