@@ -5,7 +5,7 @@ With the `vocieflow-cli` you can fetch the analytics of your project. This is us
 To export the analytics, you need to know the `agent-id` of the agent you want to export from. You can find that information in the Voiceflow Agent section under your Agent Settings on [voiceflow.com](https://voiceflow.com).
 
 ```sh
-voiceflow agent export --agent-id <your-agent-id> --output-file <path-to-save>
+voiceflow analytics fetch --agent-id <your-agent-id> --output-file <path-to-save>
 ```
 
 ### Filters
@@ -19,14 +19,14 @@ The Voiceflow analytics command has a few filters that you can use to narrow dow
     * Flag: `--start-time, -s`
     * Format: ISO-8601
     * Default: Current day minus one month
-    * Example: `--start-time 2024-01-01T00:00:00Z`
+    * Example: `--start-time 2025-01-01T00:00:00.000Z`
 
 - End Time
 
     * Flag: `--end-time, -s`
     * Format: ISO-8601
     * Default: Current day
-    * Example: `--end-time 2024-01-01T00:00:00Z`
+    * Example: `--end-time 2025-01-02T00:00:00.000Z`
 
 
 #### Limit
@@ -65,8 +65,8 @@ The Voiceflow analytics command has a few filters that you can use to narrow dow
 ```bash
 voiceflow analytics fetch \
   --agent-id abc123 \
-  --start-time 2024-01-01T00:00:00Z \
-  --end-time 2024-02-01T00:00:00Z \
+  --start-time 2025-01-01T00:00:00.000Z \
+  --end-time 2025-01-02T00:00:00.000Z \
   --limit 500 \
   --analytics interactions,sessions \
   --output-file jan-2024-analytics.json
