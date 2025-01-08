@@ -1,6 +1,9 @@
 package analytics
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // Query represents the root structure of the JSON
 type Query struct {
@@ -16,7 +19,28 @@ type QueryItem struct {
 // Filter represents the filter criteria for the query
 type Filter struct {
 	ProjectID string    `json:"projectID"`
-	StartTime time.Time `json:"startTime,omitempty"`
-	EndTime   time.Time `json:"endTime,omitempty"`
+	StartTime CustomTime `json:"startTime,omitempty"`
+	EndTime   CustomTime `json:"endTime,omitempty"`
 	Limit     int       `json:"limit,omitempty"`
+}
+
+// CustomTime is a wrapper around time.Time that formats to ISO-8601 with milliseconds
+type CustomTime struct {
+	time.Time
+}
+
+// MarshalJSON implements the json.Marshaler interface
+func (ct CustomTime) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + ct.Format("2006-01-02T15:04:05.000Z") + `"`), nil
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (ct *CustomTime) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), "\"")
+	t, err := time.Parse("2006-01-02T15:04:05.000Z", s)
+	if err != nil {
+		return err
+	}
+	ct.Time = t
+	return nil
 }

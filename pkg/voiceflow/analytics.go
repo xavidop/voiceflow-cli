@@ -24,8 +24,8 @@ func FetchAnalytics(agentID string, startTime time.Time, endTime time.Time, limi
 			Name: analytic,
 			Filter: analytics.Filter{
 				ProjectID: agentID,
-				StartTime: startTime,
-				EndTime:   endTime,
+				StartTime: analytics.CustomTime{Time: startTime},
+				EndTime:   analytics.CustomTime{Time: endTime},
 				Limit:     limit,
 			},
 		})
@@ -73,29 +73,30 @@ func SaveAnalytics(analytics string, outputFile string) error {
 }
 
 func ParseFilters(startTime, endTime string, limit int) (time.Time, time.Time, int, error) {
+	const timeFormat = "2006-01-02T15:04:05.000Z"
+
 	if startTime == "" {
-		startTime = time.Now().AddDate(0, 0, -30).Format(global.FilterDateFormat)
+		startTime = time.Now().AddDate(0, 0, -30).Format(timeFormat)
 	}
 	if endTime == "" {
-		endTime = time.Now().Format(global.FilterDateFormat)
+		endTime = time.Now().Format(timeFormat)
 	}
 
-	startTimeDate, err := time.Parse(global.FilterDateFormat, startTime)
+	startTimeDate, err := time.Parse(timeFormat, startTime)
 
 	if err != nil {
-		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid start time: %w", err)
+		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid start time (should be in ISO-8601 format, e.g. 2025-01-01T00:00:00.000Z): %w", err)
 	}
 
-	endTimeDate, err := time.Parse(global.FilterDateFormat, endTime)
+	endTimeDate, err := time.Parse(timeFormat, endTime)
 
 	if err != nil {
-		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid end time: %w", err)
+		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid end time (should be in ISO-8601 format, e.g. 2025-01-01T00:00:00.000Z): %w", err)
 	}
 
 	if limit <= 0 {
-		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid limit: %w", err)
+		return time.Time{}, time.Time{}, 0, fmt.Errorf("invalid limit: must be greater than 0")
 	}
 
 	return startTimeDate, endTimeDate, limit, nil
-
 }
