@@ -16,7 +16,17 @@ type QueryItem struct {
 // Filter represents the filter criteria for the query
 type Filter struct {
 	ProjectID string    `json:"projectID"`
-	StartTime time.Time `json:"startTime,omitempty"`
-	EndTime   time.Time `json:"endTime,omitempty"`
+	StartTime CustomTime `json:"startTime,omitempty"`
+	EndTime   CustomTime `json:"endTime,omitempty"`
 	Limit     int       `json:"limit,omitempty"`
+}
+
+// CustomTime is a wrapper around time.Time that formats to ISO-8601 with milliseconds
+type CustomTime struct {
+	time.Time
+}
+
+// MarshalJSON implements the json.Marshaler interface
+func (ct CustomTime) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + ct.Format("2006-01-02T15:04:05.000Z") + `"`), nil
 }
