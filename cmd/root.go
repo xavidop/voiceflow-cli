@@ -9,6 +9,8 @@ import (
 	"github.com/xavidop/voiceflow-cli/cmd/agent"
 	"github.com/xavidop/voiceflow-cli/cmd/analytics"
 	"github.com/xavidop/voiceflow-cli/cmd/cmdutils"
+	"github.com/xavidop/voiceflow-cli/cmd/document"
+	"github.com/xavidop/voiceflow-cli/cmd/kb"
 	test "github.com/xavidop/voiceflow-cli/cmd/test"
 	"github.com/xavidop/voiceflow-cli/cmd/transcript"
 	"github.com/xavidop/voiceflow-cli/internal/global"
@@ -57,6 +59,8 @@ func init() {
 	transcript.Register(rootCmd)
 	analytics.Register(rootCmd)
 	agent.Register(rootCmd)
+	kb.Register(rootCmd)
+	document.Register(rootCmd)
 
 	// Add the subcommands
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "verbose error output (with stack trace) (optional)")

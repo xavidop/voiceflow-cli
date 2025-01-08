@@ -106,6 +106,13 @@ nav:
       - Tests: tests/tests.md
       - Examples:
         - Contains: tests/examples/contains.md
+  - Knowledge Base:
+    - Introduction: kb/introduction.md
+    - Query: kb/query.md
+  - Documents:
+    - Introduction: documents/introduction.md
+    - Upload URLs: documents/upload-url.md
+    - Upload Files: documents/upload-file.md
   - Transcripts:
     - Introduction: transcripts/introduction.md
     - Fetching: transcripts/fetching.md
@@ -118,6 +125,8 @@ nav:
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
+      - voiceflow kb: cmd/voiceflow_kb.md
+      - voiceflow document: cmd/voiceflow_document.md
       - voiceflow transcript: cmd/voiceflow_transcript.md
       - voiceflow agent: cmd/voiceflow_agent.md
       - voiceflow analytics: cmd/voiceflow_analytics.md

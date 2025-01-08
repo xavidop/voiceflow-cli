@@ -65,6 +65,46 @@
             "args": [
                 "analytics", "fetch", "--agent-id", "67213ee4d6009327e23018a9"
             ]
+        },
+        {
+            "name": "KB Query command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "kb", "query", "--model", "claude-3-haiku", "--question", "What is voiceflow?"
+            ]
+        },
+        {
+            "name": "Upload Document URL command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "document", "upload-url", "--url", "https://www.voiceflow.com/", "--name", "Vocieflow Page"
+            ]
+        },
+        ,
+        {
+            "name": "Upload Document File command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "document", "upload-file", "--file", "./db.pdf"
+            ]
         }
     ]
 }

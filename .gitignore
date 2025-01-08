@@ -42,5 +42,5 @@ site
 output/
 agent.vf
 analytics.json
-
+query.json
 voiceflow-cli/choco
