@@ -1,6 +1,9 @@
 package analytics
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // Query represents the root structure of the JSON
 type Query struct {
