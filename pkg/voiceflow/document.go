@@ -8,8 +8,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
@@ -174,4 +176,66 @@ func UploadDocumentFile(fileToUpload string, overwrite bool, maxChunkSize int, m
 	}
 
 	return string(bodyResponse), nil
+}
+
+// ListDocuments fetches all documents in a knowledge base
+func ListDocuments(page int, limit int, documentType string, includeTags []string, excludeTags []string, includeAllNonTagged bool, includeAllTagged bool) (string, error) {
+	if global.VoiceflowSubdomain != "" {
+		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
+	}
+	baseURL := fmt.Sprintf("https://api%s.voiceflow.com/v1/knowledge-base/docs", global.VoiceflowSubdomain)
+
+	// Build query parameters
+	values := url.Values{}
+	if page > 0 {
+		values.Add("page", strconv.Itoa(page))
+	}
+	if limit > 0 {
+		values.Add("limit", strconv.Itoa(limit))
+	}
+	if documentType != "" {
+		values.Add("documentType", documentType)
+	}
+	if len(includeTags) > 0 {
+		for _, tag := range includeTags {
+				values.Add("includeTags", tag)
+		}
+	}
+	if len(excludeTags) > 0 {
+		for _, tag := range excludeTags {
+			values.Add("excludeTags", tag)
+		}
+	}
+	if includeAllNonTagged {
+		values.Add("includeAllNonTagged", "true")
+	}
+	if includeAllTagged {
+		values.Add("includeAllTagged", "true")
+	}
+
+	// Add query parameters to URL if any exist
+	if len(values) > 0 {
+		baseURL = baseURL + "?" + values.Encode()
+	}
+
+	req, err := http.NewRequest("GET", baseURL, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("Authorization", global.VoiceflowAPIKey)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
 }

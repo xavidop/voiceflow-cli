@@ -25,6 +25,13 @@ var rootCmd = &cobra.Command{
 This utility provides you with an easy way to interact
 with your Voiceflow agents.
 
+You can run it in two modes:
+1. CLI mode (default): Execute commands directly
+2. Server mode: Run as a local HTTP server with REST API endpoints
+
+For server mode, use --server flag or set SERVER=true in your .env file.
+Example: voiceflow --server --port 3000
+
 You can find the documentation at https://github.com/xavidop/voiceflow-cli.
 
 Please file all bug reports on GitHub at https://github.com/xavidop/voiceflow-cli/issues.`,
@@ -50,6 +57,13 @@ func Execute() {
 	}
 }
 
+// RegisterServerFlags registers the server-related flags
+func RegisterServerFlags() {
+	// Add server flags
+	rootCmd.Flags().BoolP("server", "s", false, "Run in server mode with REST API endpoints")
+	rootCmd.Flags().StringP("port", "p", "8080", "Port to run the server on (only used with --server)")
+}
+
 func init() {
 	if err := godotenv.Load(); err != nil {
 		global.Log.Debug("No .env file found")
@@ -62,11 +76,10 @@ func init() {
 	kb.Register(rootCmd)
 	document.Register(rootCmd)
 
-	// Add the subcommands
+	// Add the flags
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "verbose error output (with stack trace) (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowAPIKey, "voiceflow-api-key", "x", "", "Voiceflow API Key (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowSubdomain, "voiceflow-subdomain", "b", "", "Voiceflow Base URL (optional). Default: empty")
 	rootCmd.PersistentFlags().BoolVarP(&global.SkipUpdate, "skip-update-check", "u", false, "Skip the check for updates check run before every command (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.Output, "output-format", "o", "text", "Output Format. Options: text, json. Default: text (optional)")
-
 }
