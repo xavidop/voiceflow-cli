@@ -232,6 +232,11 @@ func ListDocuments(page int, limit int, documentType string, includeTags []strin
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(res.Body)
+		return "", fmt.Errorf("unexpected status code: %d, body: %s", res.StatusCode, string(body))
+	}
+
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", err
