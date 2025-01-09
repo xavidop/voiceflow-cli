@@ -26,7 +26,7 @@ func authMiddleware() gin.HandlerFunc {
 		apiKey := c.GetHeader("Authorization")
 		// If still not found, use the one from .env
 		if apiKey == "" {
-			apiKey = os.Getenv("VOICEFLOW_API_KEY")
+			apiKey = os.Getenv("VF_API_KEY")
 		}
 
 		if apiKey == "" {

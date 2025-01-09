@@ -20,7 +20,7 @@ voiceflow -s -p 3000
 SERVER=true
 PORT=3000 # Optional: Change to any port number
 VOICEFLOW_SUBDOMAIN=staging # Optional: Change to your Voiceflow subdomain (private cloud only)
-VOICEFLOW_API_KEY=your_api_key
+VF_API_KEY=your_api_key
 TRUSTED_PROXIES=10.0.0.1,10.0.0.2
 ```
 
@@ -44,7 +44,7 @@ voiceflow --server
 - `SERVER`: Set to "true" to enable server mode
 - `PORT`: Port number for the server
 - `VOICEFLOW_SUBDOMAIN`: Voiceflow environment subdomain (private cloud only)
-- `VOICEFLOW_API_KEY`: Your Voiceflow API key
+- `VF_API_KEY`: Your Voiceflow API key
 - `TRUSTED_PROXIES`: Comma-separated list of trusted proxy IPs
 
 ### Authentication
@@ -57,7 +57,7 @@ Authorization: YOUR_API_KEY
 
 2. Set it in your `.env` file:
 ```
-VOICEFLOW_API_KEY=YOUR_API_KEY
+VF_API_KEY=YOUR_API_KEY
 ```
 
 ### Proxy Configuration
@@ -66,10 +66,6 @@ By default, the server only trusts localhost proxies (`127.0.0.1` and `::1`). If
 ```bash
 TRUSTED_PROXIES=10.0.0.1,10.0.0.2
 ```
-
-## API Endpoints
-
-For detailed information about available endpoints, see the [API Reference](../api/endpoints.md).
 
 ## Agent Endpoints
 
