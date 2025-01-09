@@ -399,6 +399,24 @@ func (s *Server) handleDocumentUploadFile(c *gin.Context) {
 		return
 	}
 
+	maxSize := int64(50 * 1024 * 1024) // 50MB limit
+	if file.Size > maxSize {
+			c.JSON(400, gin.H{"error": "file too large"})
+			return
+	}
+
+	allowedTypes := map[string]bool{
+			".txt": true,
+			".pdf": true,
+			".doc": true,
+			".docx": true,
+	}
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	if !allowedTypes[ext] {
+			c.JSON(400, gin.H{"error": "invalid file type"})
+			return
+	}
+
 	// Create temp file in system's temp directory
 	safeFileName := filepath.Base(file.Filename)
 	tempFile := filepath.Join(os.TempDir(), "vf_cli_"+safeFileName)
