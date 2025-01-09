@@ -66,3 +66,4 @@ Check all contributors [here](https://github.com/xavidop/voiceflow-cli/graphs/co
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fxavidop%2Fvoiceflow-cli?ref=badge_large&issueType=license)
+

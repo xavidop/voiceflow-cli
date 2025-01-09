@@ -95,10 +95,14 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Overview:
-      - Install: overview/install.md
-      - Authentication: overview/authentication.md
-      - Roadmap: overview/roadmap.md
-      - FAQ: overview/faq.md
+    - Install: overview/install.md
+    - Authentication: overview/authentication.md
+    - Roadmap: overview/roadmap.md
+    - FAQ: overview/faq.md
+  - Server Mode (BETA): server/server.md
+  - Agents:
+    - agents/introduction.md
+    - agents/exporting.md
   - Automated Testing:
     - Introduction: tests/introduction.md
     - Reference:
