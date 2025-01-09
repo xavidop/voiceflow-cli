@@ -394,7 +394,8 @@ func (s *Server) handleDocumentUploadFile(c *gin.Context) {
 	}
 
 	// Create temp file in system's temp directory
-	tempFile := filepath.Join(os.TempDir(), "vf_cli_"+file.Filename)
+	safeFileName := filepath.Base(file.Filename)
+	tempFile := filepath.Join(os.TempDir(), "vf_cli_"+safeFileName)
 	if err := c.SaveUploadedFile(file, tempFile); err != nil {
 		c.JSON(500, gin.H{"error": "failed to save file"})
 		return
