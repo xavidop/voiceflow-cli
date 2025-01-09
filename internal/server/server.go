@@ -53,10 +53,16 @@ func NewServer() *Server {
 
 	// Configure trusted proxies based on environment
 	if proxyList := os.Getenv("TRUSTED_PROXIES"); proxyList != "" {
-		router.SetTrustedProxies(strings.Split(proxyList, ","))
+		if err := router.SetTrustedProxies(strings.Split(proxyList, ",")); err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting trusted proxies: %v\n", err)
+			os.Exit(1)
+		}
 	} else {
 		// Default to only trusting localhost
-		router.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+		if err := router.SetTrustedProxies([]string{"127.0.0.1", "::1"}); err != nil {
+			fmt.Fprintf(os.Stderr, "Error setting default trusted proxies: %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	// Add the auth middleware to all routes
