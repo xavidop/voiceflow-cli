@@ -116,6 +116,7 @@ nav:
   - Transcripts:
     - Introduction: transcripts/introduction.md
     - Fetching: transcripts/fetching.md
+    - Transcripts To Test: transcripts/to-test.md
   - Agent:
     - Introduction: agents/introduction.md
     - Export: agents/export.md

@@ -8,7 +8,7 @@ import (
 
 func Fetch(agentID, transcriptID, outputDirectory string) error {
 
-	transcript, err := voiceflow.FetchTranscript(agentID, transcriptID)
+	transcript, err := voiceflow.FetchTranscriptCSV(agentID, transcriptID)
 	if err != nil {
 		return fmt.Errorf("failed to fetch transcript %s: %w", transcriptID, err)
 	}

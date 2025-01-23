@@ -18,7 +18,7 @@ func FetchAll(agentID, startTime, endTime, tag, rang, outputDirectory string) er
 	}
 
 	for _, transcriptInformation := range transcriptsInformation {
-		transcript, err := voiceflow.FetchTranscript(agentID, transcriptInformation.ID)
+		transcript, err := voiceflow.FetchTranscriptCSV(agentID, transcriptInformation.ID)
 		if err != nil {
 			return fmt.Errorf("failed to fetch transcript %s: %w", transcriptInformation.ID, err)
 		}

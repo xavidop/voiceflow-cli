@@ -55,7 +55,7 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 	return transcriptInformations, nil
 }
 
-func FetchTranscript(agentID, transcriptID string) ([][]string, error) {
+func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
 	if global.VoiceflowSubdomain != "" {
 		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
 	}
@@ -89,4 +89,36 @@ func FetchTranscript(agentID, transcriptID string) ([][]string, error) {
 	}
 
 	return content, nil
+}
+
+func FetchTranscriptJSON(agentID, transcriptID string) ([]transcript.Turn, error) {
+	if global.VoiceflowSubdomain != "" {
+		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
+	}
+
+	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s/%s", global.VoiceflowSubdomain, agentID, transcriptID)
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	req.Header.Add("accept", "application/json")
+	req.Header.Add("content-type", "application/json")
+	req.Header.Add("Authorization", global.VoiceflowAPIKey)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return []transcript.Turn{}, err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return []transcript.Turn{}, err
+	}
+	var transcriptResponse []transcript.Turn
+	err = json.Unmarshal([]byte(string(body)), &transcriptResponse)
+	if err != nil {
+		return []transcript.Turn{}, fmt.Errorf("error unmarshalling response: %v", err)
+	}
+
+	return transcriptResponse, nil
 }
