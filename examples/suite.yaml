@@ -1,6 +1,6 @@
 name: Example Conversation Profiler Suite
 description: Suite used as an example
-environmentName: development
+environmentName: production
 tests:
   - id: test_1
     file: ./tests/test_1.yaml

@@ -9,6 +9,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
+	"github.com/xavidop/voiceflow-cli/pkg/openai"
 	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
@@ -41,7 +42,7 @@ func runTest(EnvironmentName, userID string, test tests.Test) error {
 		if len(validations) == 0 {
 			global.Log.Infof("All validations passed for Interaction ID: %s", interaction.ID)
 		} else {
-			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed", validations)
+			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed: %v", interaction.ID, validations)
 		}
 	}
 	// No errors, test passed
@@ -95,9 +96,31 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 					continue
 				}
 			}
+			if validation.Type == "similarity" {
+				if checkSimilarity(message, validation.Values, *validation.SimilarityConfig) {
+					validations = removeById(validations, validation.ID)
+					continue
+				}
+			}
 		}
 	}
 	return validations, nil
+}
+
+func checkSimilarity(message string, stringsToEvaluate []string, similarityConfig tests.SimilarityConfig) bool {
+	switch similarityConfig.Provider {
+	case "openai":
+		similarity, err := openai.OpenAICheckSimilarity(message, stringsToEvaluate, similarityConfig)
+		if err != nil {
+			global.Log.Errorf("Error checking similarity: %s", err.Error())
+			return false
+		}
+		return similarity >= similarityConfig.SimilarityThreshold
+
+	default:
+		global.Log.Errorf("Unsupported provider: %s", similarityConfig.Provider)
+		return false
+	}
 }
 
 func removeById(slice []tests.Validation, ID string) []tests.Validation {

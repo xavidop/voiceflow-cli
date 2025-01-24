@@ -16,7 +16,7 @@ type State struct {
 }
 
 type InteratctionRequest struct {
-	Action Action `json:"action"`
-	Config Config `json:"config,omitempty"`
-	State  State  `json:"state,omitempty"`
+	Action Action  `json:"action"`
+	Config *Config `json:"config,omitempty"`
+	State  *State  `json:"state,omitempty"`
 }

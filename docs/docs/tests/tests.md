@@ -48,6 +48,25 @@ interactions:
       validate:
         - type: regexp
           value: '/my-regex/'
+
+  - id: test_4
+    user: 
+      type: text
+      audio: hello
+    agent:
+      # example with a similarity validation
+      validate:
+        - type: similarity
+          similarityConfig:
+            provider: 'openai'
+            model: 'gpt-4o'
+            temperature: 0.8
+            top_k: 5
+            top_p: 0.9
+            similarityThreshold: 0.5
+          values:
+            - 'hi'
+            - 'Hello'
 ```
 
 ## Input types
@@ -71,17 +90,6 @@ validate:
     value: pizza
 ```
 
-The `contains` validation has its own options:
-
-```yaml
-validate:
-  # String validation to check if the response returned by Voiceflow is correct
-  - type: contains
-    value: pizza
-```
-
-If you set the `casesensitive` field to `true`, the validation will be case sensitive. By default, it is set to `false`.
-
 ### Equals
 
 The equals validation type is a little bit more complex. It checks if the response returned by the Voiceflow agent is equal to the value specified in the `value` field. To use this type you have to set the `type` field to `equals` and the `value` field to the value you want to check:
@@ -92,17 +100,6 @@ validate:
   - type: equals
     value: Here you have 3 pizzas
 ```
-
-The `equals` validation has its own options:
-
-```yaml
-validate:
-  # String validation to check if the response returned by Voiceflow is correct
-  - type: equals
-    value: Here you have 3 pizzas
-```
-
-If you set the `casesensitive` field to `true`, the validation will be case sensitive. By default, it is set to `false`.
 
 ### Regexp
 
@@ -115,16 +112,41 @@ validate:
     value: '/Here you have \d pizzas/'
 ```
 
-The `regexp` validation has its own options:
+### TraceType
+The traceType validation type checks if the response returned by the Voiceflow agent has the trace type specified in the `value` field. To use this type you have to set the `type` field to `traceType` and the `value` field to the trace type you want to check:
 
 ```yaml
 validate:
   # String validation to check if the response returned by Voiceflow is correct
-  - type: regexp
-    value: '/Here you have \d pizzas/'
+  - type: traceType
+    value: speak
 ```
 
-If you set the `findinsubmatches` field to `true`, the validation will check if the regexp matches any of the submatches. By default, it is set to `false`.
+### Similarity
+The similarity validation type checks if the response returned by the Voiceflow agent is similar to the values specified in the `values` field. To use this type you have to set the `type` field to `similarity` and the `values` field to the values you want to check:
+
+```yaml
+validate:
+  # String validation to check if the response returned by Voiceflow is correct
+  - type: similarity
+    similarityConfig:
+      provider: 'openai'
+      model: 'gpt-4o'
+      temperature: 0.8
+      top_k: 5
+      top_p: 0.9
+      similarityThreshold: 0.5
+    values:
+      - 'hi'
+      - 'Hello'
+```
+
+You can also use the `similarityConfig` field to specify the similarity configuration. The `provider` field specifies the similarity provider you want to use. The `model` field specifies the model you want to use. The `temperature` field specifies the temperature you want to use. The `top_k` field specifies the top k you want to use. The `top_p` field specifies the top p you want to use. The `similarityThreshold` field specifies the similarity threshold you want to use.
+
+The only provider available for now is `openai`.
+
+For LLM Providers authentication please check the [Authentication](/overview/authentication) page.
+
 
 ## JSON Schema
 

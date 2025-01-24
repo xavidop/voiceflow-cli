@@ -65,6 +65,7 @@ func init() {
 	// Add the subcommands
 	rootCmd.PersistentFlags().BoolVarP(&global.Verbose, "verbose", "v", false, "verbose error output (with stack trace) (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowAPIKey, "voiceflow-api-key", "x", "", "Voiceflow API Key (optional)")
+	rootCmd.PersistentFlags().StringVarP(&global.OpenAIAPIKey, "open-api-key", "z", "", "Open API Key (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowSubdomain, "voiceflow-subdomain", "b", "", "Voiceflow Base URL (optional). Default: empty")
 	rootCmd.PersistentFlags().BoolVarP(&global.SkipUpdate, "skip-update-check", "u", false, "Skip the check for updates check run before every command (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.Output, "output-format", "o", "text", "Output Format. Options: text, json. Default: text (optional)")

@@ -38,6 +38,38 @@
 					"agent"
 				]
 			},
+			"SimilarityConfig": {
+				"properties": {
+					"provider": {
+						"type": "string"
+					},
+					"model": {
+						"type": "string"
+					},
+					"temperature": {
+						"type": "number"
+					},
+					"similarityThreshold": {
+						"type": "number"
+					},
+					"top_k": {
+						"type": "integer"
+					},
+					"top_p": {
+						"type": "number"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"provider",
+					"model",
+					"temperature",
+					"similarityThreshold",
+					"top_k",
+					"top_p"
+				]
+			},
 			"Test": {
 				"properties": {
 					"name": {
@@ -86,6 +118,15 @@
 					},
 					"value": {
 						"type": "string"
+					},
+					"values": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"similarityConfig": {
+						"$ref": "#/$defs/SimilarityConfig"
 					}
 				},
 				"additionalProperties": false,

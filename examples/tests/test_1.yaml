@@ -29,5 +29,16 @@ interactions:
       validate:
         - type: regexp
           value: 'classic'
+        - type: similarity
+          similarityConfig:
+            provider: 'openai'
+            model: 'gpt-4o'
+            temperature: 0.8
+            top_k: 5
+            top_p: 0.9
+            similarityThreshold: 0.1
+          values:
+            - 'work hard'
+            - 'expressing hard work'
 
 # yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json

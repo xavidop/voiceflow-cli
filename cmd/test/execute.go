@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xavidop/voiceflow-cli/cmd/cmdutils"
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	"github.com/xavidop/voiceflow-cli/internal/openai"
 	"github.com/xavidop/voiceflow-cli/internal/voiceflow"
 	"github.com/xavidop/voiceflow-cli/pkg/test"
 )
@@ -20,6 +21,7 @@ var executeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		suite := args[0]
 		voiceflow.SetVoiceflowAPIKey()
+		openai.SetOpenAIAPIKey()
 		if err := test.ExecuteSuite(suite); err != nil {
 			global.Log.Errorf("%s", err.Error())
 			os.Exit(1)
