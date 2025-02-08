@@ -67,6 +67,18 @@ interactions:
           values:
             - 'hi'
             - 'Hello'
+
+  - id: test_5
+    user: 
+      type: text
+      text: 'myVariableValue1'
+    agent:
+      # example with a variable validation
+      validate:
+        - type: variable
+          value: 'myVariableValue1'
+          variableConfig:
+            name: 'variableName1'
 ```
 
 ## Input types
@@ -147,6 +159,46 @@ The only provider available for now is `openai`.
 
 For LLM Providers authentication please check the [Authentication](/overview/authentication) page.
 
+
+### Variable
+The variable validation type checks if a variable in the Voiceflow agent has the expected value. To use this type you have to set the `type` field to `variable`, the `value` field to the expected value, and provide a `variableConfig` object with the variable details:
+
+```yaml
+validate:
+  # Variable validation to check if a variable has the expected value
+  - type: variable
+    value: 'myVariableValue1'
+    variableConfig:
+      name: 'variableName1'
+```
+
+The `variableConfig` object accepts the following properties:
+- `name`: (Required) The name of the variable to validate
+- `jsonPath`: (Optional) A JSONPath expression to extract nested values from JSON/object variables
+
+Examples:
+
+```yaml
+validate:
+  # Simple variable validation
+  - type: variable
+    value: 'myVariableValue1'
+    variableConfig:
+      name: 'variableName1'
+  
+  # Multiple variable validations
+  - type: variable
+    value: 'myVariableValue2'
+    variableConfig:
+      name: 'variableName2'
+  
+  # Variable validation with JSONPath if the variable is a JSON/object
+  - type: variable
+    value: 'myVariableValue3'
+    variableConfig:
+      name: 'variableName3'
+      jsonPath: '$.hello'
+```
 
 ## JSON Schema
 

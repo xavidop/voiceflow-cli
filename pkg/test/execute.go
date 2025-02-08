@@ -21,7 +21,7 @@ func ExecuteSuite(suitesPath string) error {
 
 	// Iterate over each suite and its tests
 	for _, suite := range suites {
-		global.Log.Infof("Suite: %s\nDescription: %s\nEnvironment: %s", suite.Name, suite.Description, suite.EnvironmentName)
+		global.Log.Infof("Suite: %s\nDescription: %s\nEnvironment: %s\nUser ID: %s", suite.Name, suite.Description, suite.EnvironmentName, userID)
 		global.Log.Infof("Running Tests:")
 
 		for _, testFile := range suite.Tests {

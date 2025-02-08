@@ -127,13 +127,31 @@
 					},
 					"similarityConfig": {
 						"$ref": "#/$defs/SimilarityConfig"
+					},
+					"variableConfig": {
+						"$ref": "#/$defs/VariableConfig"
 					}
 				},
 				"additionalProperties": false,
 				"type": "object",
 				"required": [
-					"type",
-					"value"
+					"type"
+				]
+			},
+			"VariableConfig": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"jsonPath": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"jsonPath"
 				]
 			}
 		},

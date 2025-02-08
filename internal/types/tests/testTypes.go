@@ -24,9 +24,15 @@ type Agent struct {
 type Validation struct {
 	ID               string            `yaml:"id" json:"id,omitempty"`
 	Type             string            `yaml:"type" json:"type"`
-	Value            string            `yaml:"value" json:"value"`
+	Value            string            `yaml:"value,omitempty" json:"value,omitempty"`
 	Values           []string          `yaml:"values,omitempty" json:"values,omitempty"`
 	SimilarityConfig *SimilarityConfig `yaml:"similarityConfig,omitempty" json:"similarityConfig,omitempty"`
+	VariableConfig   *VariableConfig   `yaml:"variableConfig,omitempty" json:"variableConfig,omitempty"`
+}
+
+type VariableConfig struct {
+	Name     string `yaml:"name" json:"name"`
+	JsonPath string `yaml:"jsonPath" json:"jsonPath"`
 }
 
 type SimilarityConfig struct {

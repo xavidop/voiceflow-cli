@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/PaesslerAG/jsonpath"
 	"github.com/google/uuid"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
@@ -14,7 +15,7 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(EnvironmentName, userID string, test tests.Test) error {
+func runTest(environmentName, userID string, test tests.Test) error {
 	global.Log.Infof("Running Test ID: %s", test.Name)
 	// Here, you would implement the actual test execution logic
 	for _, interaction := range test.Interactions {
@@ -23,7 +24,7 @@ func runTest(EnvironmentName, userID string, test tests.Test) error {
 		if interaction.User.Type != "launch" {
 			global.Log.Infof("\tInteraction Request Payload: %v", interaction.User.Text)
 		}
-		interactionResponses, err := voiceflow.CallInteractionAPI(EnvironmentName, userID, interaction)
+		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction)
 		if err != nil {
 			return err
 		}
@@ -33,7 +34,7 @@ func runTest(EnvironmentName, userID string, test tests.Test) error {
 		for _, interactionResponse := range interactionResponses {
 			global.Log.Infof("\tInteraction Response Type: %s", interactionResponse.Type)
 
-			validations, err = validateResponse(interactionResponse, validations)
+			validations, err = validateResponse(interactionResponse, validations, environmentName, userID)
 			if err != nil {
 				return err
 			}
@@ -60,51 +61,108 @@ func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validati
 
 }
 
-func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation) ([]tests.Validation, error) {
+func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID string) ([]tests.Validation, error) {
 	messageResponse, ok := getNestedValue(interactionResponse.Payload, "message")
 	// Ensure payload is of type Speak before accessing its fields
+	// Create a slice to store validations that should be kept
+	remainingValidations := make([]tests.Validation, 0)
 	if ok {
 		message := messageResponse.(string)
 		global.Log.Infof("\tInteraction Response Message: %s", message)
-		for _, validation := range validations {
+
+		for i := 0; i < len(validations); i++ {
+			validation := validations[i]
+			passed := false
 			if validation.Type == "equals" {
 				if message == validation.Value {
-					validations = removeById(validations, validation.ID)
-					continue
+					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					passed = true
 				}
 			}
 			if validation.Type == "contains" {
 				if strings.Contains(message, validation.Value) {
-					validations = removeById(validations, validation.ID)
-					continue
+					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					passed = true
 				}
 			}
 			if validation.Type == "regexp" {
 				regexString := validation.Value
 				compiledRegexp, err := regexp.Compile(regexString)
 				if err != nil {
-					return validations, err
+					global.Log.Errorf("Error compiling regexp: %s", err.Error())
+					return nil, err
 				}
 				if compiledRegexp.MatchString(message) {
-					validations = removeById(validations, validation.ID)
-					continue
+					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					passed = true
 				}
 			}
 			if validation.Type == "traceType" {
 				if interactionResponse.Type == validation.Value {
-					validations = removeById(validations, validation.ID)
-					continue
+					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					passed = true
 				}
 			}
 			if validation.Type == "similarity" {
 				if checkSimilarity(message, validation.Values, *validation.SimilarityConfig) {
-					validations = removeById(validations, validation.ID)
-					continue
+					global.Log.Infof("\tValidation type: %s PASSED with values: %v and config %v", validation.Type, validation.Values, *validation.SimilarityConfig)
+					passed = true
 				}
+			}
+
+			if validation.Type == "variable" {
+				if checkVariableValue(validation, environmentName, userID) {
+					global.Log.Infof("\tValidation type: %s PASSED with values: %v and config %v", validation.Type, validation.Value, *validation.VariableConfig)
+					passed = true
+				}
+			}
+			if !passed {
+				global.Log.Infof("\tValidation type: %s FAILED with value: %s", validation.Type, validation.Value)
+				remainingValidations = append(remainingValidations, validation)
 			}
 		}
 	}
-	return validations, nil
+	return remainingValidations, nil
+}
+
+func checkVariableValue(validation tests.Validation, environmentName, userID string) bool {
+
+	state, err := voiceflow.FetchState(environmentName, userID)
+	if err != nil {
+		global.Log.Errorf("Error fetching variable state: %s", err.Error())
+		return false
+	}
+
+	var stateValue interface{}
+	if validation.VariableConfig.JsonPath != "" {
+
+		// Make sure the jsonpath starts with $
+		jsonPathExpr := validation.VariableConfig.JsonPath
+		if !strings.HasPrefix(jsonPathExpr, "$") {
+			jsonPathExpr = "$" + jsonPathExpr
+		}
+		variableValue := state.Variables[validation.VariableConfig.Name]
+
+		// Apply JSONPath expression
+		stateValue, err = jsonpath.Get(jsonPathExpr, variableValue)
+		if err != nil {
+			global.Log.Errorf("Error applying JSONPath: %v", err)
+			return false
+		}
+
+	} else {
+		// Use the whole state as the value
+		stateValue = state.Variables[validation.VariableConfig.Name]
+	}
+
+	// Compare the value with the expected value by converting both to strings
+	if fmt.Sprint(stateValue) == fmt.Sprint(validation.Value) {
+		return true
+	} else {
+		global.Log.Errorf("Variable value does not match, expected: %s, got: %s", validation.Value, fmt.Sprint(stateValue))
+		return false
+	}
+
 }
 
 func checkSimilarity(message string, stringsToEvaluate []string, similarityConfig tests.SimilarityConfig) bool {
@@ -121,15 +179,6 @@ func checkSimilarity(message string, stringsToEvaluate []string, similarityConfi
 		global.Log.Errorf("Unsupported provider: %s", similarityConfig.Provider)
 		return false
 	}
-}
-
-func removeById(slice []tests.Validation, ID string) []tests.Validation {
-	for index, validation := range slice {
-		if validation.ID == ID {
-			return append(slice[:index], slice[index+1:]...)
-		}
-	}
-	return slice
 }
 
 func getNestedValue(data map[string]interface{}, keys ...string) (interface{}, bool) {

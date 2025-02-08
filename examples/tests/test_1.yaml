@@ -40,5 +40,18 @@ interactions:
           values:
             - 'work hard'
             - 'expressing hard work'
+        - type: variable
+          value: 'ok'
+          variableConfig:
+            name: 'test_1'
+        - type: variable
+          value: '3'
+          variableConfig:
+            name: 'test_2'
+        - type: variable
+          value: 'hi'
+          variableConfig:
+            name: 'test_3'
+            jsonPath: '$.hello'
 
 # yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json
