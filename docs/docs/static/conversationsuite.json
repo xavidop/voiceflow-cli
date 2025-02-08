@@ -196,8 +196,7 @@
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
-							"name",
-							"jsonPath"
+							"name"
 						]
 					}
 				},

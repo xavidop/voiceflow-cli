@@ -32,7 +32,7 @@ type Validation struct {
 
 type VariableConfig struct {
 	Name     string `yaml:"name" json:"name"`
-	JsonPath string `yaml:"jsonPath" json:"jsonPath"`
+	JsonPath string `yaml:"jsonPath,omitempty" json:"jsonPath,omitempty"`
 }
 
 type SimilarityConfig struct {
