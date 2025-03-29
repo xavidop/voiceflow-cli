@@ -32,13 +32,14 @@ func ToTest(agentID, transcriptID, outputFile, testName, testDescription string)
 }
 
 func TranscriptToTest(transcriptJSON []transcript.Turn, testName, testDescription string) (tests.Test, error) {
-	var test tests.Test = tests.Test{
+	var test = tests.Test{
 		Name:         testName,
 		Description:  testDescription,
 		Interactions: []tests.Interaction{},
 	}
 	for index, turn := range transcriptJSON {
-		if turn.Type == "launch" {
+		switch turn.Type {
+		case "launch":
 			agentResponse := findNextAgentTextResponse(transcriptJSON, index)
 			test.Interactions = append(test.Interactions, tests.Interaction{
 				ID: uuid.New().String(),
@@ -56,7 +57,7 @@ func TranscriptToTest(transcriptJSON []transcript.Turn, testName, testDescriptio
 					},
 				},
 			})
-		} else if turn.Type == "request" {
+		case "request":
 			request, err := turn.Payload.GetIntentPayload()
 			if err != nil {
 				return tests.Test{}, fmt.Errorf("failed to get request payload message: %w", err)

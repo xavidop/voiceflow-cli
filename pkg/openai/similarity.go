@@ -9,6 +9,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func OpenAICheckSimilarity(message string, s []string, similarityConfig tests.SimilarityConfig) (float64, error) {
@@ -55,7 +56,7 @@ func OpenAICheckSimilarity(message string, s []string, similarityConfig tests.Si
 	if err != nil {
 		return 0.0, fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer utils.SafeClose(resp.Body)
 
 	// Read and parse the response
 	body, err := io.ReadAll(resp.Body)

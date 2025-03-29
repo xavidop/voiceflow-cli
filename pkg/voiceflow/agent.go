@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func ExportAgent(agentID, versionID string) (string, error) {
@@ -26,7 +27,7 @@ func ExportAgent(agentID, versionID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

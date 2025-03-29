@@ -10,6 +10,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction) ([]interact.InteractionResponse, error) {
@@ -55,7 +56,7 @@ func DialogManagerInteract(environmentName, userID string, interaction tests.Int
 	if err != nil {
 		return []interact.InteractionResponse{}, fmt.Errorf("error calling API: %v", err)
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

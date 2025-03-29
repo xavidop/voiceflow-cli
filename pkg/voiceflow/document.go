@@ -14,6 +14,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/document"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func UploadDocumentUrl(urlToUpload, name string, overwrite bool, maxChunkSize int, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization bool, tags []string) (string, error) {
@@ -74,7 +75,7 @@ func UploadDocumentUrl(urlToUpload, name string, overwrite bool, maxChunkSize in
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -123,7 +124,7 @@ func UploadDocumentFile(fileToUpload string, overwrite bool, maxChunkSize int, m
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer utils.SafeClose(file)
 
 	// Create a buffer to hold the multipart form data
 	body := &bytes.Buffer{}
@@ -166,7 +167,7 @@ func UploadDocumentFile(fileToUpload string, overwrite bool, maxChunkSize int, m
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	bodyResponse, err := io.ReadAll(res.Body)
 	if err != nil {

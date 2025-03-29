@@ -25,7 +25,7 @@ func WriteFile(b []byte, file string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer SafeClose(f)
 	err = os.WriteFile(file, b, 0644)
 	if err != nil {
 		return err
