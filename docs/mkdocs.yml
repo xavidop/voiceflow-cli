@@ -106,6 +106,10 @@ nav:
       - Tests: tests/tests.md
       - Examples:
         - Contains: tests/examples/contains.md
+  - Dialog:
+    - Introduction: dialog/introduction.md
+    - Start: dialog/start.md
+    - Replay: dialog/replay.md
   - Knowledge Base:
     - Introduction: kb/introduction.md
     - Query: kb/query.md

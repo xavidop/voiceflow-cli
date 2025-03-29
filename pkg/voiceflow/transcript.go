@@ -10,6 +10,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/transcript"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) ([]transcript.TranscriptInformation, error) {
@@ -40,7 +41,7 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 	if err != nil {
 		return []transcript.TranscriptInformation{}, err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -70,7 +71,7 @@ func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
 	if err != nil {
 		return [][]string{}, err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 	body, _ := io.ReadAll(res.Body)
 	// Remove quotes from the beginning and end of the string
 	contentString := string(body)[1 : len(string(body))-2]
@@ -108,7 +109,7 @@ func FetchTranscriptJSON(agentID, transcriptID string) ([]transcript.Turn, error
 	if err != nil {
 		return []transcript.Turn{}, err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

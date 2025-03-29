@@ -11,6 +11,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/analytics"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func FetchAnalytics(agentID string, startTime time.Time, endTime time.Time, limit int, analyticsToFetch []string) (string, error) {
@@ -51,7 +52,7 @@ func FetchAnalytics(agentID string, startTime time.Time, endTime time.Time, limi
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

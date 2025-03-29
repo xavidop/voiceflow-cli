@@ -8,6 +8,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/state"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func FetchState(EnvironmentName, userID string) (state.State, error) {
@@ -31,7 +32,7 @@ func FetchState(EnvironmentName, userID string) (state.State, error) {
 	if err != nil {
 		return state.State{}, fmt.Errorf("error calling API: %v", err)
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {

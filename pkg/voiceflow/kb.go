@@ -10,6 +10,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	kbTypes "github.com/xavidop/voiceflow-cli/internal/types/voiceflow/kb"
+	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
 func QueryKB(question, model string, temperature float64, chunkLimit int, synthesis bool, systemPrompt string, includeTags []string, includeOperator string, excludeTags []string, excludeOperator string, includeAllTagged bool, includeAllNonTagged bool) (string, error) {
@@ -101,7 +102,7 @@ func QueryKB(question, model string, temperature float64, chunkLimit int, synthe
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
