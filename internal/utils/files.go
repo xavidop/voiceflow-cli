@@ -62,7 +62,7 @@ func LoadSuitesFromPath(path string) ([]tests.Suite, error) {
 
 		filePath := filepath.Join(absPath, file.Name())
 		// Check if the file is a YAML file
-		if !file.IsDir() && filepath.Ext(filePath) == ".yaml" {
+		if !file.IsDir() && file.Name() == "suite.yaml" {
 			data, err := os.ReadFile(filePath)
 			if err != nil {
 				return []tests.Suite{}, fmt.Errorf("failed to read file %s: %v", filePath, err)
