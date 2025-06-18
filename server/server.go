@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -66,35 +65,9 @@ func NewServer(config *ServerConfig) *Server {
 		router.Use(cors.Default())
 	}
 
-	// Custom middleware to capture logs
-	router.Use(LogCapturingMiddleware())
-
 	return &Server{
 		config: config,
 		router: router,
-	}
-}
-
-// LogCapturingMiddleware captures logs for API responses
-func LogCapturingMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// Create a buffer to capture logs
-		var logBuffer bytes.Buffer
-
-		// Create a new logger that writes to both the original output and our buffer
-		originalOut := global.Log.Out
-		global.Log.SetOutput(&logBuffer)
-
-		// Continue with the request
-		c.Next()
-
-		// Restore the original logger output
-		global.Log.SetOutput(originalOut)
-
-		// Store the captured logs in the context for the handler to use
-		if logBuffer.Len() > 0 {
-			c.Set("captured_logs", logBuffer.String())
-		}
 	}
 }
 
