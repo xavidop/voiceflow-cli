@@ -3,6 +3,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	"github.com/xavidop/voiceflow-cli/internal/openai"
+	"github.com/xavidop/voiceflow-cli/internal/voiceflow"
 	"github.com/xavidop/voiceflow-cli/server"
 )
 
@@ -35,6 +37,9 @@ The server includes auto-generated OpenAPI/Swagger documentation available at /s
 		debug, _ := cmd.Flags().GetBool("debug")
 		corsEnabled, _ := cmd.Flags().GetBool("cors")
 		swaggerEnabled, _ := cmd.Flags().GetBool("swagger")
+
+		voiceflow.SetVoiceflowAPIKey()
+		openai.SetOpenAIAPIKey()
 
 		config := &server.ServerConfig{
 			Port:           port,

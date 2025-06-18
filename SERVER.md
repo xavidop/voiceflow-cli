@@ -52,7 +52,38 @@ POST /api/v1/tests/execute
 Content-Type: application/json
 
 {
-  "suites_path": "/path/to/your/suite.yaml"
+  "api_key": "your_api_key (optional)",
+  "suite": {
+    "name": "Example Suite",
+    "description": "Suite used as an example",
+    "environment_name": "production",
+    "tests": [
+      {
+        "id": "test_1",
+        "test": {
+          "name": "Example test",
+          "description": "These are some tests",
+          "interactions": [
+            {
+              "id": "test_1_1",
+              "user": {
+                "type": "text",
+                "text": "hi"
+              },
+              "agent": {
+                "validate": [
+                  {
+                    "type": "contains",
+                    "value": "hello"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -80,7 +111,6 @@ GET /api/v1/tests/status/{execution_id}
   "completed_at": "2023-01-01T00:05:00Z",
   "logs": [
     "Starting test suite execution...",
-    "Suite path: /path/to/suite.yaml",
     "Running Test ID: example_test",
     "Test suite execution completed successfully"
   ]
@@ -118,7 +148,40 @@ http://localhost:8080/swagger/index.html
 ```bash
 curl -X POST http://localhost:8080/api/v1/tests/execute \
   -H "Content-Type: application/json" \
-  -d '{"suites_path": "/path/to/your/suite.yaml"}'
+  -d '{
+  "api_key": "your_api_key (optional)",
+  "suite": {
+    "name": "Example Suite",
+    "description": "Suite used as an example",
+    "environment_name": "production",
+    "tests": [
+      {
+        "id": "test_1",
+        "test": {
+          "name": "Example test",
+          "description": "These are some tests",
+          "interactions": [
+            {
+              "id": "test_1_1",
+              "user": {
+                "type": "text",
+                "text": "hi"
+              },
+              "agent": {
+                "validate": [
+                  {
+                    "type": "contains",
+                    "value": "hello"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}'
 ```
 
 #### 2. Check test status
@@ -141,9 +204,41 @@ const response = await fetch('http://localhost:8080/api/v1/tests/execute', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    suites_path: '/path/to/your/suite.yaml'
+    api_key: "your_api_key (optional)",
+    suite: {
+      name: "Example Suite",
+      description: "Suite used as an example",
+      environment_name: "production",
+      tests: [
+        {
+          id: "test_1",
+          test: {
+            name: "Example test",
+            description: "These are some tests",
+            interactions: [
+              {
+                id: "test_1_1",
+                user: {
+                  type: "text",
+                  text: "hi"
+                },
+                agent: {
+                  validate: [
+                    {
+                      type: "contains",
+                      value: "hello"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
   })
 });
+
 
 const execution = await response.json();
 console.log('Execution ID:', execution.id);
@@ -163,7 +258,38 @@ import time
 
 # Execute a test suite
 response = requests.post('http://localhost:8080/api/v1/tests/execute', json={
-    'suites_path': '/path/to/your/suite.yaml'
+    'api_key': 'your_api_key (optional)',
+    'suite': {
+        'name': 'Example Suite',
+        'description': 'Suite used as an example',
+        'environment_name': 'production',
+        'tests': [
+            {
+                'id': 'test_1',
+                'test': {
+                    'name': 'Example test',
+                    'description': 'These are some tests',
+                    'interactions': [
+                        {
+                            'id': 'test_1_1',
+                            'user': {
+                                'type': 'text',
+                                'text': 'hi'
+                            },
+                            'agent': {
+                                'validate': [
+                                    {
+                                        'type': 'contains',
+                                        'value': 'hello'
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 })
 execution = response.json()
 print(f"Execution ID: {execution['id']}")
@@ -207,49 +333,6 @@ Enable debug mode for detailed logging:
 
 ```bash
 voiceflow server --debug
-```
-
-## Integration with CI/CD
-
-The API server makes it easy to integrate Voiceflow test execution into CI/CD pipelines:
-
-### GitHub Actions Example
-
-```yaml
-name: Voiceflow Tests
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Start Voiceflow CLI Server
-        run: |
-          voiceflow server --port 8080 &
-          sleep 5
-        env:
-          VF_API_KEY: ${{ secrets.VF_API_KEY }}
-      
-      - name: Run Tests
-        run: |
-          EXECUTION_ID=$(curl -s -X POST http://localhost:8080/api/v1/tests/execute \
-            -H "Content-Type: application/json" \
-            -d '{"suites_path": "./tests/suite.yaml"}' | jq -r '.id')
-          
-          # Poll for completion
-          while true; do
-            STATUS=$(curl -s http://localhost:8080/api/v1/tests/status/$EXECUTION_ID | jq -r '.status')
-            if [ "$STATUS" = "completed" ]; then
-              echo "Tests passed!"
-              break
-            elif [ "$STATUS" = "failed" ]; then
-              echo "Tests failed!"
-              exit 1
-            fi
-            sleep 2
-          done
 ```
 
 ## Security Considerations

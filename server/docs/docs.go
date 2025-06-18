@@ -49,7 +49,7 @@ const docTemplate = `{
         },
         "/api/v1/tests/execute": {
             "post": {
-                "description": "Execute a Voiceflow test suite and return execution ID",
+                "description": "Execute a Voiceflow test suite from request data and return execution ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -62,7 +62,7 @@ const docTemplate = `{
                 "summary": "Execute a test suite",
                 "parameters": [
                     {
-                        "description": "Test execution request",
+                        "description": "Test execution request with embedded suite and tests",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -196,12 +196,15 @@ const docTemplate = `{
         "TestExecutionRequest": {
             "type": "object",
             "required": [
-                "suites_path"
+                "suite"
             ],
             "properties": {
-                "suites_path": {
-                    "type": "string",
-                    "example": "/path/to/suite.yaml"
+                "api_key": {
+                    "description": "Optional token to override global.VoiceflowAPIKey",
+                    "type": "string"
+                },
+                "suite": {
+                    "$ref": "#/definitions/TestSuiteRequest"
                 }
             }
         },
@@ -228,6 +231,22 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "running"
+                }
+            }
+        },
+        "TestRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "test"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "test_1"
+                },
+                "test": {
+                    "$ref": "#/definitions/tests.Test"
                 }
             }
         },
@@ -258,6 +277,147 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "completed"
+                }
+            }
+        },
+        "TestSuiteRequest": {
+            "type": "object",
+            "required": [
+                "environment_name",
+                "name",
+                "tests"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Suite used as an example"
+                },
+                "environment_name": {
+                    "type": "string",
+                    "example": "production"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Example Suite"
+                },
+                "tests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TestRequest"
+                    }
+                }
+            }
+        },
+        "tests.Agent": {
+            "type": "object",
+            "properties": {
+                "validate": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.Validation"
+                    }
+                }
+            }
+        },
+        "tests.Interaction": {
+            "type": "object",
+            "properties": {
+                "agent": {
+                    "$ref": "#/definitions/tests.Agent"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/tests.User"
+                }
+            }
+        },
+        "tests.SimilarityConfig": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "similarityThreshold": {
+                    "type": "number"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "top_k": {
+                    "type": "integer"
+                },
+                "top_p": {
+                    "type": "number"
+                }
+            }
+        },
+        "tests.Test": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "interactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.Interaction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.User": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.Validation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "similarityConfig": {
+                    "$ref": "#/definitions/tests.SimilarityConfig"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "variableConfig": {
+                    "$ref": "#/definitions/tests.VariableConfig"
+                }
+            }
+        },
+        "tests.VariableConfig": {
+            "type": "object",
+            "properties": {
+                "jsonPath": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         }

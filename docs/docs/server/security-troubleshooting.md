@@ -54,8 +54,7 @@
    voiceflow server --debug
    ```
 
-2. Check that the test suite path is correct and accessible
-3. Verify that environment variables (VF_API_KEY, etc.) are properly set
+2. Verify that environment variables (VF_API_KEY, etc.) are properly set or the api key is provided in the request is correct
 
 ### Connection Refused Errors
 

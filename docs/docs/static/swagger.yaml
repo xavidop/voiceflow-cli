@@ -26,11 +26,13 @@ definitions:
     type: object
   TestExecutionRequest:
     properties:
-      suites_path:
-        example: /path/to/suite.yaml
+      api_key:
+        description: Optional token to override global.VoiceflowAPIKey
         type: string
+      suite:
+        $ref: '#/definitions/TestSuiteRequest'
     required:
-    - suites_path
+    - suite
     type: object
   TestExecutionResponse:
     properties:
@@ -49,6 +51,17 @@ definitions:
       status:
         example: running
         type: string
+    type: object
+  TestRequest:
+    properties:
+      id:
+        example: test_1
+        type: string
+      test:
+        $ref: '#/definitions/tests.Test'
+    required:
+    - id
+    - test
     type: object
   TestStatusResponse:
     properties:
@@ -69,6 +82,99 @@ definitions:
         type: string
       status:
         example: completed
+        type: string
+    type: object
+  TestSuiteRequest:
+    properties:
+      description:
+        example: Suite used as an example
+        type: string
+      environment_name:
+        example: production
+        type: string
+      name:
+        example: Example Suite
+        type: string
+      tests:
+        items:
+          $ref: '#/definitions/TestRequest'
+        type: array
+    required:
+    - environment_name
+    - name
+    - tests
+    type: object
+  tests.Agent:
+    properties:
+      validate:
+        items:
+          $ref: '#/definitions/tests.Validation'
+        type: array
+    type: object
+  tests.Interaction:
+    properties:
+      agent:
+        $ref: '#/definitions/tests.Agent'
+      id:
+        type: string
+      user:
+        $ref: '#/definitions/tests.User'
+    type: object
+  tests.SimilarityConfig:
+    properties:
+      model:
+        type: string
+      provider:
+        type: string
+      similarityThreshold:
+        type: number
+      temperature:
+        type: number
+      top_k:
+        type: integer
+      top_p:
+        type: number
+    type: object
+  tests.Test:
+    properties:
+      description:
+        type: string
+      interactions:
+        items:
+          $ref: '#/definitions/tests.Interaction'
+        type: array
+      name:
+        type: string
+    type: object
+  tests.User:
+    properties:
+      text:
+        type: string
+      type:
+        type: string
+    type: object
+  tests.Validation:
+    properties:
+      id:
+        type: string
+      similarityConfig:
+        $ref: '#/definitions/tests.SimilarityConfig'
+      type:
+        type: string
+      value:
+        type: string
+      values:
+        items:
+          type: string
+        type: array
+      variableConfig:
+        $ref: '#/definitions/tests.VariableConfig'
+    type: object
+  tests.VariableConfig:
+    properties:
+      jsonPath:
+        type: string
+      name:
         type: string
     type: object
 host: localhost:8080
@@ -104,9 +210,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Execute a Voiceflow test suite and return execution ID
+      description: Execute a Voiceflow test suite from request data and return execution
+        ID
       parameters:
-      - description: Test execution request
+      - description: Test execution request with embedded suite and tests
         in: body
         name: request
         required: true

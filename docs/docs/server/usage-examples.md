@@ -6,7 +6,7 @@
 ```bash
 curl -X POST http://localhost:8080/api/v1/tests/execute \
   -H "Content-Type: application/json" \
-  -d '{"suites_path": "/path/to/your/suite.yaml"}'
+  -d '{"api_key": "your_api_key (optional)","suite": {"name": "Example Suite","description": "Suite used as an example","environment_name": "production","tests": [{"id": "test_1","test": {"name": "Example test","description": "These are some tests","interactions": [{"id": "test_1_1","user": {"type": "text","text": "hi"},"agent": {"validate": [{"type": "contains","value": "hello"}]}}}]}}}]}}'
 ```
 
 ### 2. Check test status
@@ -29,7 +29,38 @@ const response = await fetch('http://localhost:8080/api/v1/tests/execute', {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    suites_path: '/path/to/your/suite.yaml'
+    api_key: "your_api_key (optional)",
+    suite: {
+      name: "Example Suite",
+      description: "Suite used as an example",
+      environment_name: "production",
+      tests: [
+        {
+          id: "test_1",
+          test: {
+            name: "Example test",
+            description: "These are some tests",
+            interactions: [
+              {
+                id: "test_1_1",
+                user: {
+                  type: "text",
+                  text: "hi"
+                },
+                agent: {
+                  validate: [
+                    {
+                      type: "contains",
+                      value: "hello"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
   })
 });
 
@@ -51,7 +82,38 @@ import time
 
 # Execute a test suite
 response = requests.post('http://localhost:8080/api/v1/tests/execute', json={
-    'suites_path': '/path/to/your/suite.yaml'
+    'api_key': 'your_api_key (optional)',
+    'suite': {
+        'name': 'Example Suite',
+        'description': 'Suite used as an example',
+        'environment_name': 'production',
+        'tests': [
+            {
+                'id': 'test_1',
+                'test': {
+                    'name': 'Example test',
+                    'description': 'These are some tests',
+                    'interactions': [
+                        {
+                            'id': 'test_1_1',
+                            'user': {
+                                'type': 'text',
+                                'text': 'hi'
+                            },
+                            'agent': {
+                                'validate': [
+                                    {
+                                        'type': 'contains',
+                                        'value': 'hello'
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 })
 execution = response.json()
 print(f"Execution ID: {execution['id']}")

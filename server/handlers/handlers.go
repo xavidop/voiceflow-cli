@@ -9,13 +9,31 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/pkg/test"
 )
 
 // TestExecutionRequest represents the request body for test execution
+// Now accepts the suite configuration directly instead of a file path
 type TestExecutionRequest struct {
-	SuitesPath string `json:"suites_path" binding:"required" example:"/path/to/suite.yaml"`
+	Suite  TestSuiteRequest `json:"suite" binding:"required"`
+	ApiKey string           `json:"api_key,omitempty"` // Optional token to override global.VoiceflowAPIKey
 } // @name TestExecutionRequest
+
+// TestSuiteRequest represents a test suite configuration for HTTP requests
+type TestSuiteRequest struct {
+	Name            string        `json:"name" binding:"required" example:"Example Suite"`
+	Description     string        `json:"description" example:"Suite used as an example"`
+	EnvironmentName string        `json:"environment_name" binding:"required" example:"production"`
+	Tests           []TestRequest `json:"tests" binding:"required,dive"`
+} // @name TestSuiteRequest
+
+// TestRequest represents a test configuration for HTTP requests
+// Contains the test definition directly instead of a file reference
+type TestRequest struct {
+	ID   string     `json:"id" binding:"required" example:"test_1"`
+	Test tests.Test `json:"test" binding:"required"`
+} // @name TestRequest
 
 // TestExecutionResponse represents the response for test execution
 type TestExecutionResponse struct {
@@ -121,11 +139,11 @@ func HealthCheck(c *gin.Context) {
 
 // ExecuteTestSuite godoc
 // @Summary Execute a test suite
-// @Description Execute a Voiceflow test suite and return execution ID
+// @Description Execute a Voiceflow test suite from request data and return execution ID
 // @Tags tests
 // @Accept json
 // @Produce json
-// @Param request body TestExecutionRequest true "Test execution request"
+// @Param request body TestExecutionRequest true "Test execution request with embedded suite and tests"
 // @Success 202 {object} TestExecutionResponse
 // @Failure 400 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
@@ -160,10 +178,28 @@ func ExecuteTestSuite(c *gin.Context) {
 	go func() {
 		// Create a custom logger that captures output
 		execution.AddLog("Starting test suite execution...")
-		execution.AddLog("Suite path: " + req.SuitesPath)
+		execution.AddLog("Suite: " + req.Suite.Name)
+		execution.AddLog("Environment: " + req.Suite.EnvironmentName)
+
+		// Convert the HTTP request to the format expected by the test package
+		httpSuite := test.HTTPSuiteRequest{
+			Name:            req.Suite.Name,
+			Description:     req.Suite.Description,
+			EnvironmentName: req.Suite.EnvironmentName,
+			Tests:           make([]test.HTTPTestRequest, len(req.Suite.Tests)),
+			ApiKey:          req.ApiKey, // Pass the optional ApiKey
+		}
+
+		// Convert the tests
+		for i, testReq := range req.Suite.Tests {
+			httpSuite.Tests[i] = test.HTTPTestRequest{
+				ID:   testReq.ID,
+				Test: testReq.Test,
+			}
+		}
 
 		// Execute the test suite with log capture
-		result := test.ExecuteSuiteWithLogs(req.SuitesPath)
+		result := test.ExecuteFromHTTPRequest(httpSuite)
 
 		// Add all captured logs
 		for _, logLine := range result.Logs {

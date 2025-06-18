@@ -13,7 +13,38 @@ POST /api/v1/tests/execute
 Content-Type: application/json
 
 {
-  "suites_path": "/path/to/your/suite.yaml"
+  "api_key": "your_api_key (optional)",
+  "suite": {
+    "name": "Example Suite",
+    "description": "Suite used as an example",
+    "environment_name": "production",
+    "tests": [
+      {
+        "id": "test_1",
+        "test": {
+          "name": "Example test",
+          "description": "These are some tests",
+          "interactions": [
+            {
+              "id": "test_1_1",
+              "user": {
+                "type": "text",
+                "text": "hi"
+              },
+              "agent": {
+                "validate": [
+                  {
+                    "type": "contains",
+                    "value": "hello"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -27,7 +58,7 @@ Content-Type: application/json
 }
 ```
 
-Executes a test suite asynchronously and returns an execution ID for tracking.
+Executes a test suite asynchronously and returns an execution ID for tracking. The suite configuration and tests are now embedded directly in the request body, making the API more HTTP-friendly and eliminating the need for file system access.
 
 ## Get Test Status
 ```http
@@ -43,7 +74,6 @@ GET /api/v1/tests/status/{execution_id}
   "completed_at": "2023-01-01T00:05:00Z",
   "logs": [
     "Starting test suite execution...",
-    "Suite path: /path/to/suite.yaml",
     "Running Test ID: example_test",
     "Test suite execution completed successfully"
   ]
