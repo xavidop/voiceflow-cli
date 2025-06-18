@@ -22,3 +22,14 @@ go run . schema -f ./docs/docs/static/
 	-e 's/^#### /### /g' \
 	-e 's/^##### /#### /g' \
 	./docs/docs/cmd/*.md
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+
+$SCRIPT_DIR/generate-docs.sh
+$SCRIPT_DIR/validate-openapi.sh
+
+cp -rf server/docs/swagger.json docs/docs/static/swagger.json
+cp -rf server/docs/swagger.yaml docs/docs/static/swagger.yaml
+rm -rf server/docs/swagger.json
+rm -rf server/docs/swagger.yaml

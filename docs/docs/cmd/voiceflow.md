@@ -38,6 +38,7 @@ voiceflow [flags]
 * [voiceflow document](/cmd/voiceflow_document/)	 - Actions on documents
 * [voiceflow jsonschema](/cmd/voiceflow_jsonschema/)	 - outputs voiceflow's JSON schema
 * [voiceflow kb](/cmd/voiceflow_kb/)	 - Actions on knowledge base
+* [voiceflow server](/cmd/voiceflow_server/)	 - Start the Voiceflow CLI API server
 * [voiceflow test](/cmd/voiceflow_test/)	 - Actions on conversation testing
 * [voiceflow transcript](/cmd/voiceflow_transcript/)	 - Actions on transcripts
 * [voiceflow version](/cmd/voiceflow_version/)	 - Get voiceflow-cli version

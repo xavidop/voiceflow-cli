@@ -1,0 +1,175 @@
+basePath: /
+definitions:
+  ErrorResponse:
+    properties:
+      error:
+        example: Invalid request
+        type: string
+      message:
+        example: Detailed error message
+        type: string
+    type: object
+  SystemInfoResponse:
+    properties:
+      arch:
+        example: amd64
+        type: string
+      go_version:
+        example: go1.20.0
+        type: string
+      os:
+        example: linux
+        type: string
+      version:
+        example: 1.0.0
+        type: string
+    type: object
+  TestExecutionRequest:
+    properties:
+      suites_path:
+        example: /path/to/suite.yaml
+        type: string
+    required:
+    - suites_path
+    type: object
+  TestExecutionResponse:
+    properties:
+      error:
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      logs:
+        items:
+          type: string
+        type: array
+      started_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      status:
+        example: running
+        type: string
+    type: object
+  TestStatusResponse:
+    properties:
+      completed_at:
+        example: "2023-01-01T00:05:00Z"
+        type: string
+      error:
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      logs:
+        items:
+          type: string
+        type: array
+      started_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      status:
+        example: completed
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API server for Voiceflow CLI test execution and management
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Voiceflow CLI API
+  version: "1.0"
+paths:
+  /api/v1/system/info:
+    get:
+      consumes:
+      - application/json
+      description: Get information about the API server system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/SystemInfoResponse'
+      summary: Get system information
+      tags:
+      - system
+  /api/v1/tests/execute:
+    post:
+      consumes:
+      - application/json
+      description: Execute a Voiceflow test suite and return execution ID
+      parameters:
+      - description: Test execution request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/TestExecutionRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/TestExecutionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Execute a test suite
+      tags:
+      - tests
+  /api/v1/tests/status/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get the status and logs of a test execution
+      parameters:
+      - description: Test execution ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/TestStatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get test execution status
+      tags:
+      - tests
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Check if the API server is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - system
+swagger: "2.0"
