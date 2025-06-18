@@ -19,13 +19,17 @@ FROM alpine:latest
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates tzdata
 
-WORKDIR /root/
-
-# Copy the binary from builder stage
-COPY --from=builder /app/voiceflow-cli .
-
 # Create a non-root user
 RUN adduser -D -s /bin/sh voiceflow
+
+WORKDIR /app
+
+# Copy the binary from builder stage and set proper ownership
+COPY --from=builder --chown=voiceflow:voiceflow /app/voiceflow-cli .
+
+# Make sure the binary is executable
+RUN chmod +x voiceflow-cli
+
 USER voiceflow
 
 # Expose port for the server
@@ -36,4 +40,4 @@ ENV PORT=8080
 ENV GIN_MODE=release
 
 # Run the binary
-CMD ["./voiceflow-cli", "server", "--port", "8080"]
+CMD ["/app/voiceflow-cli", "server", "--port", "8080"]
