@@ -7,7 +7,6 @@ import (
 
 	"github.com/PaesslerAG/jsonpath"
 	"github.com/google/uuid"
-	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 	"github.com/xavidop/voiceflow-cli/pkg/openai"
@@ -15,14 +14,14 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride string) error {
-	global.Log.Infof("Running Test ID: %s", test.Name)
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride string, logCollector *LogCollector) error {
+	logCollector.AddLog("Running Test ID: " + test.Name)
 	// Here, you would implement the actual test execution logic
 	for _, interaction := range test.Interactions {
-		global.Log.Infof("Interaction ID: %s", interaction.ID)
-		global.Log.Infof("\tInteraction Request Type: %s", interaction.User.Type)
+		logCollector.AddLog("Interaction ID: " + interaction.ID)
+		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
 		if interaction.User.Type != "launch" {
-			global.Log.Infof("\tInteraction Request Payload: %v", interaction.User.Text)
+			logCollector.AddLog("\tInteraction Request Payload: " + fmt.Sprintf("%v", interaction.User.Text))
 		}
 
 		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride)
@@ -33,16 +32,16 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride str
 		validations = autoGenerateValidationsIDs(validations)
 
 		for _, interactionResponse := range interactionResponses {
-			global.Log.Infof("\tInteraction Response Type: %s", interactionResponse.Type)
+			logCollector.AddLog("\tInteraction Response Type: " + interactionResponse.Type)
 
-			validations, err = validateResponse(interactionResponse, validations, environmentName, userID)
+			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, logCollector)
 			if err != nil {
 				return err
 			}
 
 		}
 		if len(validations) == 0 {
-			global.Log.Infof("All validations passed for Interaction ID: %s", interaction.ID)
+			logCollector.AddLog("All validations passed for Interaction ID: " + interaction.ID)
 		} else {
 			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed: %v", interaction.ID, validations)
 		}
@@ -62,27 +61,27 @@ func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validati
 
 }
 
-func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID string) ([]tests.Validation, error) {
+func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID string, logCollector *LogCollector) ([]tests.Validation, error) {
 	messageResponse, ok := getNestedValue(interactionResponse.Payload, "message")
 	// Ensure payload is of type Speak before accessing its fields
 	// Create a slice to store validations that should be kept
 	remainingValidations := make([]tests.Validation, 0)
 	if ok {
 		message := messageResponse.(string)
-		global.Log.Infof("\tInteraction Response Message: %s", message)
+		logCollector.AddLog("\tInteraction Response Message: " + message)
 
 		for i := 0; i < len(validations); i++ {
 			validation := validations[i]
 			passed := false
 			if validation.Type == "equals" {
 				if message == validation.Value {
-					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
 					passed = true
 				}
 			}
 			if validation.Type == "contains" {
 				if strings.Contains(message, validation.Value) {
-					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
 					passed = true
 				}
 			}
@@ -90,35 +89,36 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 				regexString := validation.Value
 				compiledRegexp, err := regexp.Compile(regexString)
 				if err != nil {
-					global.Log.Errorf("Error compiling regexp: %s", err.Error())
+					errorMsg := "Error compiling regexp: " + err.Error()
+					logCollector.AddLog(errorMsg)
 					return nil, err
 				}
 				if compiledRegexp.MatchString(message) {
-					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
 					passed = true
 				}
 			}
 			if validation.Type == "traceType" {
 				if interactionResponse.Type == validation.Value {
-					global.Log.Infof("\tValidation type: %s PASSED with value: %s", validation.Type, validation.Value)
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
 					passed = true
 				}
 			}
 			if validation.Type == "similarity" {
-				if checkSimilarity(message, validation.Values, *validation.SimilarityConfig) {
-					global.Log.Infof("\tValidation type: %s PASSED with values: %v and config %v", validation.Type, validation.Values, *validation.SimilarityConfig)
+				if checkSimilarity(message, validation.Values, *validation.SimilarityConfig, logCollector) {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + fmt.Sprintf("%v", validation.Values) + " and config " + fmt.Sprintf("%v", *validation.SimilarityConfig))
 					passed = true
 				}
 			}
 
 			if validation.Type == "variable" {
-				if checkVariableValue(validation, environmentName, userID) {
-					global.Log.Infof("\tValidation type: %s PASSED with values: %v and config %v", validation.Type, validation.Value, *validation.VariableConfig)
+				if checkVariableValue(validation, environmentName, userID, logCollector) {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + validation.Value + " and config " + fmt.Sprintf("%v", *validation.VariableConfig))
 					passed = true
 				}
 			}
 			if !passed {
-				global.Log.Infof("\tValidation type: %s FAILED with value: %s", validation.Type, validation.Value)
+				logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
 				remainingValidations = append(remainingValidations, validation)
 			}
 		}
@@ -126,11 +126,12 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 	return remainingValidations, nil
 }
 
-func checkVariableValue(validation tests.Validation, environmentName, userID string) bool {
+func checkVariableValue(validation tests.Validation, environmentName, userID string, logCollector *LogCollector) bool {
 
 	state, err := voiceflow.FetchState(environmentName, userID)
 	if err != nil {
-		global.Log.Errorf("Error fetching variable state: %s", err.Error())
+		errorMsg := "Error fetching variable state: " + err.Error()
+		logCollector.AddLog(errorMsg)
 		return false
 	}
 
@@ -147,7 +148,8 @@ func checkVariableValue(validation tests.Validation, environmentName, userID str
 		// Apply JSONPath expression
 		stateValue, err = jsonpath.Get(jsonPathExpr, variableValue)
 		if err != nil {
-			global.Log.Errorf("Error applying JSONPath: %v", err)
+			errorMsg := "Error applying JSONPath: " + err.Error()
+			logCollector.AddLog(errorMsg)
 			return false
 		}
 
@@ -160,24 +162,27 @@ func checkVariableValue(validation tests.Validation, environmentName, userID str
 	if fmt.Sprint(stateValue) == fmt.Sprint(validation.Value) {
 		return true
 	} else {
-		global.Log.Errorf("Variable value does not match, expected: %s, got: %s", validation.Value, fmt.Sprint(stateValue))
+		errorMsg := "Variable value does not match, expected: " + validation.Value + ", got: " + fmt.Sprint(stateValue)
+		logCollector.AddLog(errorMsg)
 		return false
 	}
 
 }
 
-func checkSimilarity(message string, stringsToEvaluate []string, similarityConfig tests.SimilarityConfig) bool {
+func checkSimilarity(message string, stringsToEvaluate []string, similarityConfig tests.SimilarityConfig, logCollector *LogCollector) bool {
 	switch similarityConfig.Provider {
 	case "openai":
 		similarity, err := openai.OpenAICheckSimilarity(message, stringsToEvaluate, similarityConfig)
 		if err != nil {
-			global.Log.Errorf("Error checking similarity: %s", err.Error())
+			errorMsg := "Error checking similarity: " + err.Error()
+			logCollector.AddLog(errorMsg)
 			return false
 		}
 		return similarity >= similarityConfig.SimilarityThreshold
 
 	default:
-		global.Log.Errorf("Unsupported provider: %s", similarityConfig.Provider)
+		errorMsg := "Unsupported provider: " + similarityConfig.Provider
+		logCollector.AddLog(errorMsg)
 		return false
 	}
 }
