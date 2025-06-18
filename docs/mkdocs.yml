@@ -127,6 +127,11 @@ nav:
   - Analytics:
     - Introduction: analytics/introduction.md
     - Fetch: analytics/fetch.md
+  - API Server:
+    - Introduction: server/introduction.md
+    - API Endpoints: server/api-endpoints.md
+    - Usage Examples: server/usage-examples.md
+    - Security & Troubleshooting: server/security-troubleshooting.md
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
@@ -135,6 +140,7 @@ nav:
       - voiceflow transcript: cmd/voiceflow_transcript.md
       - voiceflow agent: cmd/voiceflow_agent.md
       - voiceflow analytics: cmd/voiceflow_analytics.md
+      - voiceflow server: cmd/voiceflow_server.md
       - voiceflow completion: cmd/voiceflow_completion.md
       - voiceflow jsonschema: cmd/voiceflow_jsonschema.md
       - voiceflow version: cmd/voiceflow_version.md

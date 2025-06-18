@@ -19,7 +19,7 @@ interactions:
         - type: traceType
           value: text
         - type: contains
-          value: good
+          value: well
 
   - id: test_1_3
     user: 

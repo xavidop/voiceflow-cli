@@ -13,7 +13,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
-func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction) ([]interact.InteractionResponse, error) {
+func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride string) ([]interact.InteractionResponse, error) {
 	if global.VoiceflowSubdomain != "" {
 		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
 	}
@@ -49,7 +49,12 @@ func DialogManagerInteract(environmentName, userID string, interaction tests.Int
 
 	req.Header.Add("accept", "application/json")
 	req.Header.Add("content-type", "application/json")
-	req.Header.Add("Authorization", global.VoiceflowAPIKey)
+	// Pass the optional token to the interaction
+	apiKey := global.VoiceflowAPIKey
+	if apiKeyOverride != "" {
+		apiKey = apiKeyOverride
+	}
+	req.Header.Add("Authorization", apiKey)
 	req.Header.Add("versionID", environmentName)
 
 	res, err := http.DefaultClient.Do(req)

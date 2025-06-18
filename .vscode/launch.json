@@ -118,5 +118,18 @@
                 "transcript", "to-test", "--agent-id", "67213ee4d6009327e23018a9", "--transcript-id", "6776b68b184eadd628bbf98b"
             ]
         },
+        {
+            "name": "Server command",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/main.go",
+            "env": {
+                "ENV": "development"
+            },
+            "args": [
+                "server", "--host", "127.0.0.1", "--port", "8080"
+            ]
+        }
     ]
 }

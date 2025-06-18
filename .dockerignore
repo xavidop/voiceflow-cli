@@ -1,0 +1,58 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+LICENSE.md
+SECURITY.md
+SERVER.md
+USERS.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+
+# Documentation build artifacts
+docs/
+*.md
+
+# Build artifacts
+dist/
+*.tar.gz
+*.zip
+voiceflow-cli
+voiceflow_*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.env
+.env.local
+
+# Test files
+*_test.go
+test/
+examples/
+
+# Scripts
+scripts/
+
+# Makefile
+Makefile
+
+# CI/CD
+.github/
+artifacthub-repo.yml
+.golangci.yaml
+.grype.yaml

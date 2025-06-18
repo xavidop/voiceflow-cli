@@ -64,7 +64,7 @@ func Replay(userID, environment, recordFile string) error {
 		time.Sleep(500 * time.Millisecond)
 
 		// Send interaction to Voiceflow
-		responses, err := voiceflow.DialogManagerInteract(environment, userID, testInteraction)
+		responses, err := voiceflow.DialogManagerInteract(environment, userID, testInteraction, "")
 		if err != nil {
 			return fmt.Errorf("error during dialog: %v", err)
 		}
