@@ -13,11 +13,19 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
-func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride string) ([]interact.InteractionResponse, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
+func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string) ([]interact.InteractionResponse, error) {
+	// Use the provided subdomain override, or fall back to global if not provided
+	subdomain := global.VoiceflowSubdomain
+	if subdomainOverride != "" {
+		subdomain = subdomainOverride
 	}
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s/interact?logs=off", global.VoiceflowSubdomain, userID)
+
+	// Add the dot prefix if subdomain is not empty
+	if subdomain != "" {
+		subdomain = "." + subdomain
+	}
+
+	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s/interact?logs=off", subdomain, userID)
 	var interatctionRequest interact.InteratctionRequest
 	switch interaction.User.Type {
 	case "launch":

@@ -205,6 +205,10 @@ const docTemplate = `{
                 },
                 "suite": {
                     "$ref": "#/definitions/TestSuiteRequest"
+                },
+                "voiceflow_subdomain": {
+                    "description": "Optional subdomain to override global.VoiceflowSubdomain",
+                    "type": "string"
                 }
             }
         },

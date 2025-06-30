@@ -14,6 +14,7 @@ Content-Type: application/json
 
 {
   "api_key": "your_api_key (optional)",
+  "voiceflow_subdomain": "your_custom_subdomain (optional)",
   "suite": {
     "name": "Example Suite",
     "description": "Suite used as an example",
@@ -59,6 +60,20 @@ Content-Type: application/json
 ```
 
 Executes a test suite asynchronously and returns an execution ID for tracking. The suite configuration and tests are now embedded directly in the request body, making the API more HTTP-friendly and eliminating the need for file system access.
+
+### Request Parameters
+
+- `api_key` (optional): Override the global Voiceflow API key for this specific test execution
+- `voiceflow_subdomain` (optional): Override the global Voiceflow subdomain for this specific test execution. This allows you to test against different Voiceflow environments or custom subdomains without affecting the global configuration
+- `suite`: The test suite configuration containing the test definitions
+
+### Using Custom Subdomains
+
+When you specify a `voiceflow_subdomain`, the API will use that subdomain for all interactions in the test suite. For example:
+
+- If you set `"voiceflow_subdomain": "my-custom-env"`, requests will be sent to `https://general-runtime.my-custom-env.voiceflow.com`
+- If you omit this field, the global subdomain configuration will be used
+- This is particularly useful for testing against staging environments or customer-specific deployments
 
 ## Get Test Status
 ```http
