@@ -14,7 +14,7 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride string, logCollector *LogCollector) error {
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
 	// Here, you would implement the actual test execution logic
 	for _, interaction := range test.Interactions {
@@ -24,7 +24,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride str
 			logCollector.AddLog("\tInteraction Request Payload: " + fmt.Sprintf("%v", interaction.User.Text))
 		}
 
-		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride)
+		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride, subdomainOverride)
 		if err != nil {
 			return err
 		}

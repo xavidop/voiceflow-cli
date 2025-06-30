@@ -94,6 +94,66 @@ Located in `server/handlers/handlers.go`:
 // @Router /api/v1/tests/execute [post]
 ```
 
+## 📝 API Request Examples
+
+### Test Execution with Custom Subdomain
+
+The API now supports specifying a custom Voiceflow subdomain for individual test executions:
+
+```json
+{
+  "api_key": "VF.DM.YOUR_API_KEY",
+  "voiceflow_subdomain": "staging-env",
+  "suite": {
+    "name": "Multi-Environment Test",
+    "description": "Test that runs against custom subdomain",
+    "environment_name": "production",
+    "tests": [
+      {
+        "id": "custom_subdomain_test",
+        "test": {
+          "name": "Basic conversation test",
+          "description": "Test basic conversation flow",
+          "interactions": [
+            {
+              "id": "launch_interaction",
+              "user": {
+                "type": "launch"
+              },
+              "agent": {
+                "validate": [
+                  {
+                    "id": "welcome_validation",
+                    "type": "contains",
+                    "value": "welcome"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "text_interaction",
+              "user": {
+                "type": "text",
+                "text": "hello"
+              },
+              "agent": {
+                "validate": [
+                  {
+                    "id": "response_validation",
+                    "type": "contains",
+                    "value": "hi"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
 ## 🔧 Customization
 
 ### Modify API Information
