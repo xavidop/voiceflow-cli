@@ -133,6 +133,15 @@ nav:
     - Usage Examples: server/usage-examples.md
     - Security & Troubleshooting: server/security-troubleshooting.md
     - Public Instance: server/public-instance.md
+  - Test Platform:
+    - Introduction: test-platform/introduction.md
+    - Test Suites: test-platform/test-suites.md
+    - Scheduled Tests: test-platform/scheduled-tests.md
+    - Test Execution: test-platform/test-execution.md
+    - User Authentication: test-platform/user-authentication.md
+    - Statistics & Analytics: test-platform/statistics-analytics.md
+    - Settings Configuration: test-platform/settings-configuration.md
+    - Email Notifications: test-platform/email-notifications.md
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md

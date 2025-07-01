@@ -1,6 +1,6 @@
 # Upload URLs to the Knowledge Base
 
-With the `vocieflow-cli` you can upload content from a URL to your Voiceflow Knowledge Base with customizable processing options. This is useful when you want to perform a automations around your knowledge base. The `voiceflow-cli` has one command that allows you to update your knowledge base from your terminal:
+With the `voiceflow-cli` you can upload content from a URL to your Voiceflow Knowledge Base with customizable processing options. This is useful when you want to perform a automations around your knowledge base. The `voiceflow-cli` has one command that allows you to update your knowledge base from your terminal:
 
 ## Command Usage
 ```bash
