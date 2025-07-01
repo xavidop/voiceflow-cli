@@ -132,6 +132,7 @@ nav:
     - API Endpoints: server/api-endpoints.md
     - Usage Examples: server/usage-examples.md
     - Security & Troubleshooting: server/security-troubleshooting.md
+    - Public Instance: server/public-instance.md
   - Command Line Usage:
       - voiceflow: cmd/voiceflow.md
       - voiceflow test: cmd/voiceflow_test.md
