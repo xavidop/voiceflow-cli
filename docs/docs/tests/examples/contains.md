@@ -7,9 +7,7 @@
 
 name: Example Suite
 description: Suite used as an example
-projectId: test-cx-346408
-locationId: us-central1
-agentName: test-agent
+environmentName: production
 tests:
   - id: test_id
     file: ./test.yaml
@@ -22,7 +20,6 @@ tests:
 
 name: Example test
 description: These are some tests
-localeId: en
 interactions:
   - id: test_1
     user: 
