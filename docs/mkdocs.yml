@@ -56,6 +56,10 @@ extra:
       link: https://github.com/xavidop/voiceflow-cli
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/xavidop
+  analytics:
+    provider: google
+    property: G-4YRZ5DD8QY
+    anonymize_ip: true
 
 plugins:
   - search
@@ -102,10 +106,12 @@ nav:
   - Automated Testing:
     - Introduction: tests/introduction.md
     - Reference:
-      - Suites: tests/suites.md
-      - Tests: tests/tests.md
+      - Suites Reference: tests/suites.md
+      - Interaction Testing: tests/interaction-tests.md
+      - Agent-to-Agent Testing: tests/agent-to-agent-tests.md
       - Examples:
         - Contains: tests/examples/contains.md
+        - Agent-to-Agent Examples: tests/examples/agent-to-agent.md
   - Dialog:
     - Introduction: dialog/introduction.md
     - Start: dialog/start.md
@@ -160,9 +166,3 @@ nav:
     - Contributing: community/contributing.md
   - Troubleshooting: troubleshooting.md
   - Links: links.md
-
-extra:
-  analytics:
-    provider: google
-    property: G-4YRZ5DD8QY
-    anonymize_ip: true
