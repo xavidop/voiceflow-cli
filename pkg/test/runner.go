@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -43,7 +44,9 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 		if len(validations) == 0 {
 			logCollector.AddLog("All validations passed for Interaction ID: " + interaction.ID)
 		} else {
-			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed: %v", interaction.ID, validations)
+			// Convert to JSON to automatically omit nil/empty fields
+			validationsJSON, _ := json.Marshal(validations)
+			return fmt.Errorf("validation failed for Interaction ID: %s, validation: %s", interaction.ID, string(validationsJSON))
 		}
 	}
 	// No errors, test passed

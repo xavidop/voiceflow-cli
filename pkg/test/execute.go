@@ -1,6 +1,8 @@
 package test
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
@@ -30,6 +32,9 @@ type LogCollector struct {
 
 // AddLog adds a log message to the collector
 func (lc *LogCollector) AddLog(message string) {
+	// Remove tabs from the message for cleaner logging
+	// This is useful to avoid issues with tab characters in logs
+	message = strings.ReplaceAll(message, "\t", "")
 	lc.Logs = append(lc.Logs, message)
 }
 
