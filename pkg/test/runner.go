@@ -17,7 +17,13 @@ import (
 // Function to simulate running a test
 func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
-	// Here, you would implement the actual test execution logic
+
+	// Check if this is an agent test
+	if test.Agent != nil {
+		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector)
+	}
+
+	// Original interaction-based test logic
 	for _, interaction := range test.Interactions {
 		logCollector.AddLog("Interaction ID: " + interaction.ID)
 		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
@@ -51,6 +57,17 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 	}
 	// No errors, test passed
 	return nil
+}
+
+// runAgentTest executes an agent-to-agent test
+func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
+	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
+
+	// Create agent test runner
+	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+	// Execute the agent test
+	return runner.ExecuteAgentTest(*test.Agent)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {

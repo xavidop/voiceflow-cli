@@ -323,6 +323,26 @@ const docTemplate = `{
                 }
             }
         },
+        "tests.AgentTest": {
+            "type": "object",
+            "properties": {
+                "goal": {
+                    "type": "string"
+                },
+                "maxSteps": {
+                    "type": "integer"
+                },
+                "persona": {
+                    "type": "string"
+                },
+                "userInformation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.UserInfo"
+                    }
+                }
+            }
+        },
         "tests.Interaction": {
             "type": "object",
             "properties": {
@@ -363,6 +383,9 @@ const docTemplate = `{
         "tests.Test": {
             "type": "object",
             "properties": {
+                "agent": {
+                    "$ref": "#/definitions/tests.AgentTest"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -384,6 +407,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.UserInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }

@@ -36,6 +36,7 @@ func (lc *LogCollector) AddLog(message string) {
 	// This is useful to avoid issues with tab characters in logs
 	message = strings.ReplaceAll(message, "\t", "")
 	lc.Logs = append(lc.Logs, message)
+	global.Log.Info(message) // Also log to the global logger
 }
 
 // ExecuteFromHTTPRequest executes a test suite directly from HTTP request data

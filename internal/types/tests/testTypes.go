@@ -3,7 +3,22 @@ package tests
 type Test struct {
 	Name         string        `yaml:"name" json:"name"`
 	Description  string        `yaml:"description" json:"description"`
-	Interactions []Interaction `yaml:"interactions" json:"interactions"`
+	Interactions []Interaction `yaml:"interactions,omitempty" json:"interactions,omitempty"`
+	Agent        *AgentTest    `yaml:"agent,omitempty" json:"agent,omitempty"`
+}
+
+// AgentTest defines an agent-to-agent test configuration
+type AgentTest struct {
+	Goal            string     `yaml:"goal" json:"goal"`
+	Persona         string     `yaml:"persona" json:"persona"`
+	MaxSteps        int        `yaml:"maxSteps" json:"maxSteps"`
+	UserInformation []UserInfo `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
+}
+
+// UserInfo represents information that the agent can use when requested
+type UserInfo struct {
+	Name  string `yaml:"name" json:"name"`
+	Value string `yaml:"value" json:"value"`
 }
 
 type Interaction struct {

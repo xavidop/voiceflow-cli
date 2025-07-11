@@ -64,6 +64,32 @@
 							"validate"
 						]
 					},
+					"AgentTest": {
+						"properties": {
+							"goal": {
+								"type": "string"
+							},
+							"persona": {
+								"type": "string"
+							},
+							"maxSteps": {
+								"type": "integer"
+							},
+							"userInformation": {
+								"items": {
+									"$ref": "#/$defs/UserInfo"
+								},
+								"type": "array"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"goal",
+							"persona",
+							"maxSteps"
+						]
+					},
 					"Interaction": {
 						"properties": {
 							"id": {
@@ -129,14 +155,16 @@
 									"$ref": "#/$defs/Interaction"
 								},
 								"type": "array"
+							},
+							"agent": {
+								"$ref": "#/$defs/AgentTest"
 							}
 						},
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
 							"name",
-							"description",
-							"interactions"
+							"description"
 						]
 					},
 					"User": {
@@ -152,6 +180,22 @@
 						"type": "object",
 						"required": [
 							"type"
+						]
+					},
+					"UserInfo": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"value": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"name",
+							"value"
 						]
 					},
 					"Validation": {
