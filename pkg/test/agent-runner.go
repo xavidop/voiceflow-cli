@@ -87,7 +87,7 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 	currentStep++
 
 	for currentStep < agentTest.MaxSteps && !goalAchieved {
-		atr.addLog(fmt.Sprintf("Step %d: %s", currentStep, agentResponse))
+		atr.addLog(fmt.Sprintf("Step %d", currentStep))
 
 		// Check if goal is achieved
 		achieved, err := atr.isGoalAchieved(agentTest.Goal)
@@ -266,9 +266,6 @@ Provide only your response message, without any explanation or meta-commentary. 
 	if err != nil {
 		return "", fmt.Errorf("error generating response: %w", err)
 	}
-
-	// Log the generated response
-	atr.addLog(fmt.Sprintf("AI Agent generated response: %s", response))
 
 	// Add the agent's response to conversation history
 	atr.chatHistory = append(atr.chatHistory, ChatMessage{
