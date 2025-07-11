@@ -3,6 +3,18 @@
 		"$id": "https://github.com/xavidop/voiceflow-cli/internal/types/tests/suite",
 		"$ref": "#/$defs/Suite",
 		"$defs": {
+			"OpenAIConfig": {
+				"properties": {
+					"model": {
+						"type": "string"
+					},
+					"temperature": {
+						"type": "number"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object"
+			},
 			"Suite": {
 				"properties": {
 					"name": {
@@ -19,6 +31,9 @@
 							"$ref": "#/$defs/TestFile"
 						},
 						"type": "array"
+					},
+					"openAIConfig": {
+						"$ref": "#/$defs/OpenAIConfig"
 					}
 				},
 				"additionalProperties": false,
@@ -80,6 +95,9 @@
 									"$ref": "#/$defs/UserInfo"
 								},
 								"type": "array"
+							},
+							"openAIConfig": {
+								"$ref": "#/$defs/OpenAIConfig"
 							}
 						},
 						"additionalProperties": false,
@@ -109,6 +127,18 @@
 							"user",
 							"agent"
 						]
+					},
+					"OpenAIConfig": {
+						"properties": {
+							"model": {
+								"type": "string"
+							},
+							"temperature": {
+								"type": "number"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object"
 					},
 					"SimilarityConfig": {
 						"properties": {

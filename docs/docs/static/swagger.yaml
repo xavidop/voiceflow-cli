@@ -120,6 +120,8 @@ definitions:
         type: string
       maxSteps:
         type: integer
+      openAIConfig:
+        $ref: '#/definitions/tests.OpenAIConfig'
       persona:
         type: string
       userInformation:
@@ -135,6 +137,13 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/tests.User'
+    type: object
+  tests.OpenAIConfig:
+    properties:
+      model:
+        type: string
+      temperature:
+        type: number
     type: object
   tests.SimilarityConfig:
     properties:

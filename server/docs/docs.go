@@ -332,6 +332,9 @@ const docTemplate = `{
                 "maxSteps": {
                     "type": "integer"
                 },
+                "openAIConfig": {
+                    "$ref": "#/definitions/tests.OpenAIConfig"
+                },
                 "persona": {
                     "type": "string"
                 },
@@ -354,6 +357,17 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/tests.User"
+                }
+            }
+        },
+        "tests.OpenAIConfig": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
                 }
             }
         },
