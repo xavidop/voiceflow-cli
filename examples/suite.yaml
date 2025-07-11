@@ -5,6 +5,6 @@ tests:
   - id: traditional_test
     file: ./tests/test_1.yaml
   - id: agent_test
-    file: ./tests/test_3.yaml
+    file: ./tests/test_2.yaml
 
 # yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationsuite.json
