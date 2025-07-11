@@ -110,7 +110,7 @@ nav:
       - Interaction Testing: tests/interaction-tests.md
       - Agent-to-Agent Testing: tests/agent-to-agent-tests.md
       - Examples:
-        - Contains: tests/examples/contains.md
+        - Interaction Examples: tests/examples/contains.md
         - Agent-to-Agent Examples: tests/examples/agent-to-agent.md
   - Dialog:
     - Introduction: dialog/introduction.md
