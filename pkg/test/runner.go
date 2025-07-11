@@ -15,12 +15,12 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
 
 	// Check if this is an agent test
 	if test.Agent != nil {
-		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector)
+		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig)
 	}
 
 	// Original interaction-based test logic
@@ -60,14 +60,21 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 }
 
 // runAgentTest executes an agent-to-agent test
-func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
+func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
 	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
 
 	// Create agent test runner
 	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
+	// Apply suite-level OpenAI configuration if test doesn't have its own config
+	agentTest := *test.Agent
+	if agentTest.OpenAIConfig == nil && suiteOpenAIConfig != nil {
+		agentTest.OpenAIConfig = suiteOpenAIConfig
+		logCollector.AddLog("Using suite-level OpenAI configuration")
+	}
+
 	// Execute the agent test
-	return runner.ExecuteAgentTest(*test.Agent)
+	return runner.ExecuteAgentTest(agentTest)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {

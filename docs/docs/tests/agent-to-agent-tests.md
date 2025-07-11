@@ -85,6 +85,59 @@ Predefined user data that the AI agent can provide when your Voiceflow agent req
 - Personal details: `name`, `first_name`, `last_name`, `date_of_birth`
 - Transaction data: `order_number`, `transaction_id`, `amount`
 
+#### `openAIConfig` (Optional)
+Configures the OpenAI model and parameters used for the AI agent in this specific test. This configuration overrides any suite-level OpenAI settings.
+
+**Properties:**
+
+- `model`: The OpenAI model to use (default: `gpt-4o`)
+- `temperature`: Controls response randomness from 0.0 (deterministic) to 1.0 (creative) (default: `0.7`)
+
+**Example:**
+
+```yaml
+agent:
+  goal: "Get technical support for a complex software issue"
+  persona: "A software developer who needs detailed technical assistance"
+  maxSteps: 15
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.3  # Lower temperature for more focused technical responses
+```
+
+**Model Recommendations:**
+
+- `gpt-4o`: Best for complex reasoning and nuanced conversations
+- `gpt-4o-mini`: Good balance of performance and cost for most use cases
+- `gpt-3.5-turbo`: Budget-friendly option for simpler interactions
+
+**Temperature Guidelines:**
+
+- `0.0-0.3`: Highly focused, deterministic responses (ideal for technical support)
+- `0.4-0.7`: Balanced responses with some creativity (good for general conversations)
+- `0.8-1.0`: More creative and varied responses (useful for casual interactions)
+
+## Suite-Level OpenAI Configuration
+
+You can also configure OpenAI settings at the suite level, which applies to all agent tests unless overridden at the test level:
+
+```yaml
+name: Customer Service Test Suite
+description: Comprehensive customer service scenarios
+environmentName: production
+
+# Suite-level OpenAI configuration
+openAIConfig:
+  model: gpt-4o-mini
+  temperature: 0.5
+
+tests:
+  - id: billing_support
+    file: ./tests/billing_test.yaml
+  - id: technical_support
+    file: ./tests/technical_test.yaml  # Can override with test-level config
+```
+
 ## Best Practices
 
 ### Writing Effective Goals

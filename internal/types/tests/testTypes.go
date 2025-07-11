@@ -9,10 +9,11 @@ type Test struct {
 
 // AgentTest defines an agent-to-agent test configuration
 type AgentTest struct {
-	Goal            string     `yaml:"goal" json:"goal"`
-	Persona         string     `yaml:"persona" json:"persona"`
-	MaxSteps        int        `yaml:"maxSteps" json:"maxSteps"`
-	UserInformation []UserInfo `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
+	Goal            string        `yaml:"goal" json:"goal"`
+	Persona         string        `yaml:"persona" json:"persona"`
+	MaxSteps        int           `yaml:"maxSteps" json:"maxSteps"`
+	UserInformation []UserInfo    `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
+	OpenAIConfig    *OpenAIConfig `yaml:"openAIConfig,omitempty" json:"openAIConfig,omitempty"`
 }
 
 // UserInfo represents information that the agent can use when requested
@@ -57,4 +58,10 @@ type SimilarityConfig struct {
 	SimilarityThreshold float64 `yaml:"similarityThreshold" json:"similarityThreshold"`
 	TopK                int     `yaml:"top_k" json:"top_k"`
 	TopP                float64 `yaml:"top_p" json:"top_p"`
+}
+
+// OpenAIConfig defines OpenAI configuration for agent-to-agent tests
+type OpenAIConfig struct {
+	Model       string   `yaml:"model,omitempty" json:"model,omitempty"`
+	Temperature *float64 `yaml:"temperature,omitempty" json:"temperature,omitempty"`
 }

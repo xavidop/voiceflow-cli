@@ -11,12 +11,13 @@ import (
 
 // HTTPSuiteRequest represents a test suite from HTTP request
 type HTTPSuiteRequest struct {
-	Name               string            `json:"name"`
-	Description        string            `json:"description"`
-	EnvironmentName    string            `json:"environment_name"`
-	Tests              []HTTPTestRequest `json:"tests"`
-	ApiKey             string            `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
-	VoiceflowSubdomain string            `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
+	Name               string              `json:"name"`
+	Description        string              `json:"description"`
+	EnvironmentName    string              `json:"environment_name"`
+	Tests              []HTTPTestRequest   `json:"tests"`
+	ApiKey             string              `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
+	VoiceflowSubdomain string              `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
+	OpenAIConfig       *tests.OpenAIConfig `json:"openAIConfig,omitempty"`        // Optional OpenAI configuration for agent tests
 }
 
 // HTTPTestRequest represents a test from HTTP request
@@ -82,7 +83,7 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 	// Execute each test directly from the request data
 	for _, testReq := range suiteReq.Tests {
 		logCollector.AddLog("Running Test ID: " + testReq.ID)
-		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector)
+		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig)
 		if err != nil {
 			errorMsg := "Error running test " + testReq.ID + ": " + err.Error()
 			logCollector.AddLog(errorMsg)
@@ -118,7 +119,7 @@ func ExecuteSuite(suitesPath string) error {
 			}
 			// Create a dummy log collector for the existing file-based execution
 			logCollector := &LogCollector{Logs: []string{}}
-			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector) // No token or subdomain provided, will use global values
+			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig) // Pass suite-level OpenAI config
 			if err != nil {
 				global.Log.Errorf("Error running test: %v", err)
 				return err

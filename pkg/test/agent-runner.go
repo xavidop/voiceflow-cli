@@ -24,6 +24,7 @@ type AgentTestRunner struct {
 	logCollector      *LogCollector
 	userInformation   map[string]string
 	chatHistory       []ChatMessage
+	openAIConfig      *tests.OpenAIConfig
 }
 
 // ChatMessage represents a message in the conversation history
@@ -55,6 +56,17 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 	// Set up user information for easy lookup
 	for _, info := range agentTest.UserInformation {
 		atr.userInformation[info.Name] = info.Value
+	}
+
+	// Configure OpenAI settings for this test
+	atr.openAIConfig = agentTest.OpenAIConfig
+	if atr.openAIConfig != nil {
+		if atr.openAIConfig.Model != "" {
+			atr.addLog(fmt.Sprintf("Using OpenAI model: %s", atr.openAIConfig.Model))
+		}
+		if atr.openAIConfig.Temperature != nil {
+			atr.addLog(fmt.Sprintf("Using OpenAI temperature: %.2f", *atr.openAIConfig.Temperature))
+		}
 	}
 
 	atr.addLog(fmt.Sprintf("Starting agent test with goal: %s", agentTest.Goal))
@@ -447,10 +459,26 @@ Just respond with the %s value only, no explanation.`, infoType, infoType)
 func (atr *AgentTestRunner) callOpenAI(messages []ChatMessage) (string, error) {
 	apiURL := "https://api.openai.com/v1/chat/completions"
 
+	// Set default values
+	model := "gpt-4o"
+	temperature := 0.7
+
+	// Override with custom config if available
+	if atr.openAIConfig != nil {
+		// Use custom model if provided, otherwise use default
+		if atr.openAIConfig.Model != "" {
+			model = atr.openAIConfig.Model
+		}
+		// Use custom temperature if explicitly provided (including 0), otherwise use default
+		if atr.openAIConfig.Temperature != nil {
+			temperature = *atr.openAIConfig.Temperature
+		}
+	}
+
 	// Create the request payload
 	payload := map[string]interface{}{
-		"model":       "gpt-4o",
-		"temperature": 0.7,
+		"model":       model,
+		"temperature": temperature,
 		"messages":    messages,
 	}
 
