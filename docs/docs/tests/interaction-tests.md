@@ -1,8 +1,11 @@
-# Tests
+# Traditional Interaction-Based Tests
+
+## Overview
+Test the conversation flow with **predefined interactions** where you send specific user utterances to your agent and validate exact responses.
 
 ## Reference
 
-A test is a yaml file with the following structure:
+A traditional test is a YAML file with the following structure:
 
 ```yaml
 # test.yaml

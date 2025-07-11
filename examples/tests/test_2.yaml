@@ -1,0 +1,17 @@
+name: Agent Example test
+description: These are some tests
+agent:
+  goal: "Have a friendly conversation and get information about available services"
+  persona: "A curious and polite potential customer who is interested in learning about what services are available. You are friendly, ask follow-up questions, and want to understand how the service can help you."
+  maxSteps: 8
+  # OpenAI configuration for this specific test
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.3
+  userInformation:
+    - name: "name"
+      value: "Alex Johnson"
+    - name: "email"
+      value: "alex@example.com"
+
+# yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json

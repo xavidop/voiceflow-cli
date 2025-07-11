@@ -50,34 +50,12 @@ A Test Suite is a JSON-formatted definition that contains:
 The YAML import feature expects the standard Voiceflow CLI file structure:
 
 ###### Suite File (suite.yaml or suite.yml)
-The main suite configuration file containing:
-```yaml
-name: "Main Conversation Flow Tests"
-description: "Comprehensive tests for primary user interactions"
-environmentName: "production"
-tests:
-  - id: "greeting_test"
-    file: "tests/greeting.yaml"
-  - id: "help_test"  
-    file: "tests/help.yaml"
-```
+
+Individual test case files referenced in the suite. You can find more details on the [Suite Reference](/tests/introduction/) page.
 
 ###### Test Files (individual .yaml/.yml files)
-Individual test case files referenced in the suite:
-```yaml
-name: "Greeting Test"
-description: "Test the bot's greeting response"
-interactions:
-  - id: "greeting_interaction"
-    user:
-      type: "text"
-      text: "Hello"
-    agent:
-      validate:
-        - id: "greeting_validation"
-          type: "exact_match"
-          value: "Hello! How can I help you today?"
-```
+
+Individual test case files referenced in the suite. You can find more details on the [Test Reference](/tests/introduction/) page.
 
 
 
@@ -95,44 +73,6 @@ interactions:
 - **Delete**: Permanently remove a test suite (requires confirmation)
 
 ### Test Suite Structure
-Your JSON definition should include:
-```json
-{
-  "api_key": "VF.xxxxx.xxxxx",
-  "suite": {
-    "name": "Main Conversation Flow Tests",
-    "description": "Tests for primary user interactions",
-    "environment_name": "production",
-    "tests": [
-      {
-        "id": "greeting_test",
-        "test": {
-          "name": "Greeting Test",
-          "description": "Test the bot's greeting response",
-          "interactions": [
-            {
-              "id": "greeting_interaction",
-              "user": {
-                "type": "text",
-                "text": "Hello"
-              },
-              "agent": {
-                "validate": [
-                  {
-                    "id": "greeting_validation",
-                    "type": "exact_match",
-                    "value": "Hello! How can I help you today?"
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    ]
-  }
-}
-```
 
 For more details on the JSON structure, refer to the [Test Suite JSON Schema](https://docs.voiceflow.com/reference/post_api-v1-tests-execute#/).
 
