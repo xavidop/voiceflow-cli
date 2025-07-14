@@ -3,6 +3,18 @@
 		"$id": "https://github.com/xavidop/voiceflow-cli/internal/types/tests/suite",
 		"$ref": "#/$defs/Suite",
 		"$defs": {
+			"OpenAIConfig": {
+				"properties": {
+					"model": {
+						"type": "string"
+					},
+					"temperature": {
+						"type": "number"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object"
+			},
 			"Suite": {
 				"properties": {
 					"name": {
@@ -19,6 +31,9 @@
 							"$ref": "#/$defs/TestFile"
 						},
 						"type": "array"
+					},
+					"openAIConfig": {
+						"$ref": "#/$defs/OpenAIConfig"
 					}
 				},
 				"additionalProperties": false,
@@ -64,6 +79,38 @@
 							"validate"
 						]
 					},
+					"AgentTest": {
+						"properties": {
+							"goal": {
+								"type": "string"
+							},
+							"persona": {
+								"type": "string"
+							},
+							"maxSteps": {
+								"type": "integer"
+							},
+							"userInformation": {
+								"items": {
+									"$ref": "#/$defs/UserInfo"
+								},
+								"type": "array"
+							},
+							"openAIConfig": {
+								"$ref": "#/$defs/OpenAIConfig"
+							},
+							"voiceflowAgentTesterConfig": {
+								"$ref": "#/$defs/VoiceflowAgentTesterConfig"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"goal",
+							"persona",
+							"maxSteps"
+						]
+					},
 					"Interaction": {
 						"properties": {
 							"id": {
@@ -83,6 +130,18 @@
 							"user",
 							"agent"
 						]
+					},
+					"OpenAIConfig": {
+						"properties": {
+							"model": {
+								"type": "string"
+							},
+							"temperature": {
+								"type": "number"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object"
 					},
 					"SimilarityConfig": {
 						"properties": {
@@ -129,14 +188,16 @@
 									"$ref": "#/$defs/Interaction"
 								},
 								"type": "array"
+							},
+							"agent": {
+								"$ref": "#/$defs/AgentTest"
 							}
 						},
 						"additionalProperties": false,
 						"type": "object",
 						"required": [
 							"name",
-							"description",
-							"interactions"
+							"description"
 						]
 					},
 					"User": {
@@ -152,6 +213,22 @@
 						"type": "object",
 						"required": [
 							"type"
+						]
+					},
+					"UserInfo": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"value": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"name",
+							"value"
 						]
 					},
 					"Validation": {
@@ -197,6 +274,22 @@
 						"type": "object",
 						"required": [
 							"name"
+						]
+					},
+					"VoiceflowAgentTesterConfig": {
+						"properties": {
+							"environmentName": {
+								"type": "string"
+							},
+							"apiKey": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"environmentName",
+							"apiKey"
 						]
 					}
 				},

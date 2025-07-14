@@ -16,8 +16,9 @@ import (
 // TestExecutionRequest represents the request body for test execution
 // Now accepts the suite configuration directly instead of a file path
 type TestExecutionRequest struct {
-	Suite  TestSuiteRequest `json:"suite" binding:"required"`
-	ApiKey string           `json:"api_key,omitempty"` // Optional token to override global.VoiceflowAPIKey
+	Suite              TestSuiteRequest `json:"suite" binding:"required"`
+	ApiKey             string           `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
+	VoiceflowSubdomain string           `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
 } // @name TestExecutionRequest
 
 // TestSuiteRequest represents a test suite configuration for HTTP requests
@@ -183,11 +184,12 @@ func ExecuteTestSuite(c *gin.Context) {
 
 		// Convert the HTTP request to the format expected by the test package
 		httpSuite := test.HTTPSuiteRequest{
-			Name:            req.Suite.Name,
-			Description:     req.Suite.Description,
-			EnvironmentName: req.Suite.EnvironmentName,
-			Tests:           make([]test.HTTPTestRequest, len(req.Suite.Tests)),
-			ApiKey:          req.ApiKey, // Pass the optional ApiKey
+			Name:               req.Suite.Name,
+			Description:        req.Suite.Description,
+			EnvironmentName:    req.Suite.EnvironmentName,
+			Tests:              make([]test.HTTPTestRequest, len(req.Suite.Tests)),
+			ApiKey:             req.ApiKey,             // Pass the optional ApiKey
+			VoiceflowSubdomain: req.VoiceflowSubdomain, // Pass the optional VoiceflowSubdomain
 		}
 
 		// Convert the tests

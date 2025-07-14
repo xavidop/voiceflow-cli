@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -14,9 +15,15 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride string, logCollector *LogCollector) error {
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
-	// Here, you would implement the actual test execution logic
+
+	// Check if this is an agent test
+	if test.Agent != nil {
+		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig)
+	}
+
+	// Original interaction-based test logic
 	for _, interaction := range test.Interactions {
 		logCollector.AddLog("Interaction ID: " + interaction.ID)
 		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
@@ -24,7 +31,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride str
 			logCollector.AddLog("\tInteraction Request Payload: " + fmt.Sprintf("%v", interaction.User.Text))
 		}
 
-		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride)
+		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride, subdomainOverride)
 		if err != nil {
 			return err
 		}
@@ -34,7 +41,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride str
 		for _, interactionResponse := range interactionResponses {
 			logCollector.AddLog("\tInteraction Response Type: " + interactionResponse.Type)
 
-			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, logCollector)
+			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 			if err != nil {
 				return err
 			}
@@ -43,11 +50,45 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride str
 		if len(validations) == 0 {
 			logCollector.AddLog("All validations passed for Interaction ID: " + interaction.ID)
 		} else {
-			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed: %v", interaction.ID, validations)
+			// Convert to JSON to automatically omit nil/empty fields
+			validationsJSON, _ := json.Marshal(validations)
+			return fmt.Errorf("validation failed for Interaction ID: %s, validation: %s", interaction.ID, string(validationsJSON))
 		}
 	}
 	// No errors, test passed
 	return nil
+}
+
+// runAgentTest executes an agent-to-agent test
+func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
+	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
+
+	agentTest := *test.Agent
+	// Apply suite-level OpenAI configuration if test doesn't have its own config
+	if agentTest.OpenAIConfig == nil && suiteOpenAIConfig != nil {
+		agentTest.OpenAIConfig = suiteOpenAIConfig
+		logCollector.AddLog("Using suite-level OpenAI configuration")
+	}
+
+	// Check if this is a Voiceflow agent testing configuration
+	if agentTest.VoiceflowAgentTesterConfig != nil {
+		logCollector.AddLog("Using Voiceflow agent as the tester")
+
+		// Create Voiceflow agent test runner
+		runner := NewVoiceflowAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+		// Execute the Voiceflow agent test
+		return runner.ExecuteAgentTest(agentTest)
+	}
+
+	// Default to OpenAI-based agent testing
+	logCollector.AddLog("Using OpenAI as the tester")
+
+	// Create OpenAI agent test runner
+	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+	// Execute the agent test
+	return runner.ExecuteAgentTest(agentTest)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {
@@ -61,7 +102,7 @@ func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validati
 
 }
 
-func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID string, logCollector *LogCollector) ([]tests.Validation, error) {
+func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) ([]tests.Validation, error) {
 	messageResponse, ok := getNestedValue(interactionResponse.Payload, "message")
 	// Ensure payload is of type Speak before accessing its fields
 	// Create a slice to store validations that should be kept
@@ -112,7 +153,7 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 			}
 
 			if validation.Type == "variable" {
-				if checkVariableValue(validation, environmentName, userID, logCollector) {
+				if checkVariableValue(validation, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector) {
 					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + validation.Value + " and config " + fmt.Sprintf("%v", *validation.VariableConfig))
 					passed = true
 				}
@@ -126,9 +167,9 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 	return remainingValidations, nil
 }
 
-func checkVariableValue(validation tests.Validation, environmentName, userID string, logCollector *LogCollector) bool {
+func checkVariableValue(validation tests.Validation, environmentName, userID, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) bool {
 
-	state, err := voiceflow.FetchState(environmentName, userID)
+	state, err := voiceflow.FetchStateWithOverrides(environmentName, userID, apiKeyOverride, subdomainOverride)
 	if err != nil {
 		errorMsg := "Error fetching variable state: " + err.Error()
 		logCollector.AddLog(errorMsg)

@@ -8,6 +8,9 @@ The Voiceflow CLI now includes an HTTP API server that exposes test execution fu
 - **Real-time Logging**: Capture and return test execution logs in API responses
 - **OpenAPI/Swagger**: Auto-generated API documentation at `/swagger/index.html`
 - **Asynchronous Execution**: Non-blocking test execution with status tracking
+- **Custom Subdomains**: Support for per-request Voiceflow subdomain overrides
+- **Multi-Environment Testing**: Concurrent testing against different environments
+- **Thread Safety**: No race conditions when testing multiple subdomains simultaneously
 - **CORS Support**: Enable cross-origin requests for web frontends
 - **Health Checks**: Built-in health check endpoints
 

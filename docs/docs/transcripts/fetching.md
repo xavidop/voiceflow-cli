@@ -1,6 +1,6 @@
 # Fetching transcripts
 
-With the `vocieflow-cli` you can fetch the transcripts of your project. This is useful when you want to analyze the conversation flow of your agent. The `voiceflow-cli` has 2 commands that allow you to fetch the transcripts from your terminal:
+With the `voiceflow-cli` you can fetch the transcripts of your project. This is useful when you want to analyze the conversation flow of your agent. The `voiceflow-cli` has 2 commands that allow you to fetch the transcripts from your terminal:
 
 ## Fetching all transcripts
 

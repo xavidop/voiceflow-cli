@@ -1,6 +1,6 @@
 # Fetch Analytics
 
-With the `vocieflow-cli` you can fetch the analytics of your project. This is useful when you want to get the get the analytics and import them to another system. The `voiceflow-cli` has one command that allows you to export your voiceflow agent Analytics from your terminal:
+With the `voiceflow-cli` you can fetch the analytics of your project. This is useful when you want to get the get the analytics and import them to another system. The `voiceflow-cli` has one command that allows you to export your voiceflow agent Analytics from your terminal:
 
 To export the analytics, you need to know the `agent-id` of the agent you want to export from. You can find that information in the Voiceflow Agent section under your Agent Settings on [voiceflow.com](https://voiceflow.com).
 

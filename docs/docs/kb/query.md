@@ -1,6 +1,6 @@
 # Export an agent
 
-With the `vocieflow-cli` you can query your agents' knowledge base. This is useful when you want to perform a query on your knowledge base. The `voiceflow-cli` has one command that allows you to query your knowledge base from your terminal:
+With the `voiceflow-cli` you can query your agents' knowledge base. This is useful when you want to perform a query on your knowledge base. The `voiceflow-cli` has one command that allows you to query your knowledge base from your terminal:
 
 ## Parameters
 
