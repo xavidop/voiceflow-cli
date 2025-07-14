@@ -9,11 +9,18 @@ type Test struct {
 
 // AgentTest defines an agent-to-agent test configuration
 type AgentTest struct {
-	Goal            string        `yaml:"goal" json:"goal"`
-	Persona         string        `yaml:"persona" json:"persona"`
-	MaxSteps        int           `yaml:"maxSteps" json:"maxSteps"`
-	UserInformation []UserInfo    `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
-	OpenAIConfig    *OpenAIConfig `yaml:"openAIConfig,omitempty" json:"openAIConfig,omitempty"`
+	Goal                       string                      `yaml:"goal" json:"goal"`
+	Persona                    string                      `yaml:"persona" json:"persona"`
+	MaxSteps                   int                         `yaml:"maxSteps" json:"maxSteps"`
+	UserInformation            []UserInfo                  `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
+	OpenAIConfig               *OpenAIConfig               `yaml:"openAIConfig,omitempty" json:"openAIConfig,omitempty"`
+	VoiceflowAgentTesterConfig *VoiceflowAgentTesterConfig `yaml:"voiceflowAgentTesterConfig,omitempty" json:"voiceflowAgentTesterConfig,omitempty"`
+}
+
+// VoiceflowAgentTesterConfig defines configuration for using a Voiceflow agent as the tester
+type VoiceflowAgentTesterConfig struct {
+	EnvironmentName string `yaml:"environmentName" json:"environmentName"`
+	APIKey          string `yaml:"apiKey" json:"apiKey"`
 }
 
 // UserInfo represents information that the agent can use when requested

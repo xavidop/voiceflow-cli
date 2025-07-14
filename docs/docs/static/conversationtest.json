@@ -37,6 +37,9 @@
 					},
 					"openAIConfig": {
 						"$ref": "#/$defs/OpenAIConfig"
+					},
+					"voiceflowAgentTesterConfig": {
+						"$ref": "#/$defs/VoiceflowAgentTesterConfig"
 					}
 				},
 				"additionalProperties": false,
@@ -210,6 +213,22 @@
 				"type": "object",
 				"required": [
 					"name"
+				]
+			},
+			"VoiceflowAgentTesterConfig": {
+				"properties": {
+					"environmentName": {
+						"type": "string"
+					},
+					"apiKey": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"environmentName",
+					"apiKey"
 				]
 			}
 		},

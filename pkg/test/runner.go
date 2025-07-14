@@ -63,15 +63,29 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
 	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
 
-	// Create agent test runner
-	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
-
-	// Apply suite-level OpenAI configuration if test doesn't have its own config
 	agentTest := *test.Agent
+	// Apply suite-level OpenAI configuration if test doesn't have its own config
 	if agentTest.OpenAIConfig == nil && suiteOpenAIConfig != nil {
 		agentTest.OpenAIConfig = suiteOpenAIConfig
 		logCollector.AddLog("Using suite-level OpenAI configuration")
 	}
+
+	// Check if this is a Voiceflow agent testing configuration
+	if agentTest.VoiceflowAgentTesterConfig != nil {
+		logCollector.AddLog("Using Voiceflow agent as the tester")
+
+		// Create Voiceflow agent test runner
+		runner := NewVoiceflowAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+		// Execute the Voiceflow agent test
+		return runner.ExecuteAgentTest(agentTest)
+	}
+
+	// Default to OpenAI-based agent testing
+	logCollector.AddLog("Using OpenAI as the tester")
+
+	// Create OpenAI agent test runner
+	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
 	// Execute the agent test
 	return runner.ExecuteAgentTest(agentTest)

@@ -1,30 +1,17 @@
 package test
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
 
-	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
-	"github.com/xavidop/voiceflow-cli/internal/utils"
-	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
 // AgentTestRunner handles the execution of agent-to-agent tests
 type AgentTestRunner struct {
-	environmentName   string
-	userID            string
-	apiKeyOverride    string
-	subdomainOverride string
-	logCollector      *LogCollector
-	userInformation   map[string]string
-	chatHistory       []ChatMessage
-	openAIConfig      *tests.OpenAIConfig
+	*BaseRunner
+	userInformation map[string]string
 }
 
 // ChatMessage represents a message in the conversation history
@@ -35,19 +22,14 @@ type ChatMessage struct {
 
 // addLog logs to both the log collector and the global logger for immediate visibility
 func (atr *AgentTestRunner) addLog(message string) {
-	atr.logCollector.AddLog(message)
+	atr.AddLog(message)
 }
 
 // NewAgentTestRunner creates a new agent test runner
 func NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) *AgentTestRunner {
 	return &AgentTestRunner{
-		environmentName:   environmentName,
-		userID:            userID,
-		apiKeyOverride:    apiKeyOverride,
-		subdomainOverride: subdomainOverride,
-		logCollector:      logCollector,
-		userInformation:   make(map[string]string),
-		chatHistory:       make([]ChatMessage, 0),
+		BaseRunner:      NewBaseRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector),
+		userInformation: make(map[string]string),
 	}
 }
 
@@ -59,15 +41,8 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 	}
 
 	// Configure OpenAI settings for this test
-	atr.openAIConfig = agentTest.OpenAIConfig
-	if atr.openAIConfig != nil {
-		if atr.openAIConfig.Model != "" {
-			atr.addLog(fmt.Sprintf("Using OpenAI model: %s", atr.openAIConfig.Model))
-		}
-		if atr.openAIConfig.Temperature != nil {
-			atr.addLog(fmt.Sprintf("Using OpenAI temperature: %.2f", *atr.openAIConfig.Temperature))
-		}
-	}
+	atr.SetOpenAIConfig(agentTest.OpenAIConfig)
+	atr.LogOpenAIConfig()
 
 	atr.addLog(fmt.Sprintf("Starting agent test with goal: %s", agentTest.Goal))
 	atr.addLog(fmt.Sprintf("Agent persona: %s", agentTest.Persona))
@@ -75,10 +50,7 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 
 	// Initialize conversation with a system prompt that defines the agent's persona and goal
 	systemPrompt := atr.buildSystemPrompt(agentTest)
-	atr.chatHistory = append(atr.chatHistory, ChatMessage{
-		Role:    "system",
-		Content: systemPrompt,
-	})
+	atr.AddToChatHistory("system", systemPrompt)
 
 	// Start the conversation by sending a launch event to Voiceflow
 	currentStep := 0
@@ -102,7 +74,7 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 		atr.addLog(fmt.Sprintf("Step %d", currentStep))
 
 		// Check if goal is achieved
-		achieved, err := atr.isGoalAchieved(agentTest.Goal)
+		achieved, err := atr.IsGoalAchieved(agentTest.Goal)
 		if err != nil {
 			atr.addLog(fmt.Sprintf("Error checking goal: %v", err))
 		} else if achieved {
@@ -133,7 +105,7 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 
 	if !goalAchieved {
 		// Final goal check
-		achieved, err := atr.isGoalAchieved(agentTest.Goal)
+		achieved, err := atr.IsGoalAchieved(agentTest.Goal)
 		if err != nil {
 			atr.addLog(fmt.Sprintf("Error in final goal check: %v", err))
 		} else if achieved {
@@ -182,68 +154,13 @@ Remember: Your goal is to %s. Work towards this goal while maintaining your pers
 
 // interactWithVoiceflow sends a message to the Voiceflow Dialog Manager
 func (atr *AgentTestRunner) interactWithVoiceflow(messageType, message string) ([]interact.InteractionResponse, error) {
-	// Log the interaction being sent
-	if messageType == "launch" {
-		atr.addLog("Sending launch interaction to Voiceflow")
-	} else {
-		atr.addLog(fmt.Sprintf("Sending %s interaction to Voiceflow: %s", messageType, message))
-	}
-
-	// Convert to the expected interaction format
-	voiceflowInteraction := tests.Interaction{
-		ID: "agent-interaction",
-		User: tests.User{
-			Type: messageType,
-			Text: message,
-		},
-	}
-
-	// Use the existing Voiceflow interaction method
-	responses, err := voiceflow.DialogManagerInteract(atr.environmentName, atr.userID, voiceflowInteraction, atr.apiKeyOverride, atr.subdomainOverride)
-	if err != nil {
-		return nil, err
-	}
-
-	// If there are responses, concatenate messages when there are multiple
-	if len(responses) > 0 {
-		// If there are multiple responses, concatenate their messages
-		if len(responses) > 1 {
-			var concatenatedMessage strings.Builder
-			for i, response := range responses {
-				if message, ok := response.Payload["message"].(string); ok && message != "" {
-					if i > 0 {
-						concatenatedMessage.WriteString(" ")
-					}
-					concatenatedMessage.WriteString(message)
-				}
-			}
-
-			// Update the first response with the concatenated message
-			if concatenatedMessage.Len() > 0 {
-				responses[0].Payload["message"] = concatenatedMessage.String()
-			}
-
-			// Return only the first response with the concatenated message
-			return responses[:1], nil
-		}
-
-		return responses, nil
-	}
-
-	atr.addLog("No response received from Voiceflow")
-	return []interact.InteractionResponse{}, nil
+	return atr.InteractWithVoiceflow(messageType, message, atr.environmentName, atr.userID, atr.apiKeyOverride)
 }
 
 // getNextAction uses OpenAI to determine the next action based on the conversation history
 func (atr *AgentTestRunner) getNextAction(voiceflowResponse []interact.InteractionResponse, goal string, currentStep, maxSteps int) (string, error) {
 	// Extract message from Voiceflow response
-	var voiceflowMessage string
-	if len(voiceflowResponse) > 0 && voiceflowResponse[0].Payload != nil {
-		if message, ok := voiceflowResponse[0].Payload["message"].(string); ok {
-			voiceflowMessage = message
-		}
-	}
-
+	voiceflowMessage := atr.ExtractMessage(voiceflowResponse)
 	if voiceflowMessage == "" {
 		voiceflowMessage = "No message received"
 	}
@@ -252,10 +169,7 @@ func (atr *AgentTestRunner) getNextAction(voiceflowResponse []interact.Interacti
 	atr.addLog(fmt.Sprintf("Voiceflow message: %s", voiceflowMessage))
 
 	// Add the Voiceflow message to conversation history
-	atr.chatHistory = append(atr.chatHistory, ChatMessage{
-		Role:    "assistant",
-		Content: fmt.Sprintf("Voiceflow said: %s", voiceflowMessage),
-	})
+	atr.AddToChatHistory("assistant", fmt.Sprintf("Voiceflow said: %s", voiceflowMessage))
 
 	prompt := fmt.Sprintf(`Based on the conversation so far, what should your next response be?
 
@@ -267,72 +181,28 @@ Provide only your response message, without any explanation or meta-commentary. 
 		currentStep, maxSteps, goal, voiceflowMessage)
 
 	// Add the prompt as a user message
-	messages := append(atr.chatHistory, ChatMessage{
+	messages := append(atr.GetChatHistory(), ChatMessage{
 		Role:    "user",
 		Content: prompt,
 	})
 
 	// Get response from OpenAI
 	atr.addLog("Generating next action using OpenAI...")
-	response, err := atr.callOpenAI(messages)
+	response, err := atr.CallOpenAI(messages)
 	if err != nil {
 		return "", fmt.Errorf("error generating response: %w", err)
 	}
 
 	// Add the agent's response to conversation history
-	atr.chatHistory = append(atr.chatHistory, ChatMessage{
-		Role:    "assistant",
-		Content: response,
-	})
+	atr.AddToChatHistory("assistant", response)
 
 	return strings.TrimSpace(response), nil
-}
-
-// isGoalAchieved uses OpenAI to evaluate if the goal has been achieved
-func (atr *AgentTestRunner) isGoalAchieved(goal string) (bool, error) {
-	// Build conversation summary
-	var conversationSummary strings.Builder
-	for _, msg := range atr.chatHistory {
-		if msg.Role != "system" {
-			conversationSummary.WriteString(fmt.Sprintf("%s: %s\n", msg.Role, msg.Content))
-		}
-	}
-
-	prompt := fmt.Sprintf(`Analyze the following conversation and determine if the goal has been achieved.
-
-Goal: %s
-
-Conversation:
-%s
-
-Has the goal been achieved? Respond with only "YES" or "NO".`, goal, conversationSummary.String())
-
-	messages := []ChatMessage{
-		{Role: "system", Content: "You are a helpful assistant that analyzes conversations and determines if goals have been achieved."},
-		{Role: "user", Content: prompt},
-	}
-
-	atr.addLog("Evaluating goal achievement...")
-	response, err := atr.callOpenAI(messages)
-	if err != nil {
-		return false, fmt.Errorf("error evaluating goal: %w", err)
-	}
-
-	isAchieved := strings.TrimSpace(strings.ToUpper(response)) == "YES"
-	atr.addLog(fmt.Sprintf("Goal achievement evaluation: %s (response: %s)", map[bool]string{true: "ACHIEVED", false: "NOT ACHIEVED"}[isAchieved], response))
-
-	return isAchieved, nil
 }
 
 // checkForUserInfoRequest uses OpenAI to determine which user information is being requested and provides it
 func (atr *AgentTestRunner) checkForUserInfoRequest(voiceflowResponse []interact.InteractionResponse, agentResponse string) string {
 	// Extract message from Voiceflow response
-	var voiceflowMessage string
-	if len(voiceflowResponse) > 0 && voiceflowResponse[0].Payload != nil {
-		if message, ok := voiceflowResponse[0].Payload["message"].(string); ok {
-			voiceflowMessage = message
-		}
-	}
+	voiceflowMessage := atr.ExtractMessage(voiceflowResponse)
 
 	// Build available user information list for context
 	var availableInfo strings.Builder
@@ -369,7 +239,7 @@ Response format: Either the field name, "INVENT:type", or "NONE"`,
 	}
 
 	atr.addLog("Analyzing user information request...")
-	response, err := atr.callOpenAI(messages)
+	response, err := atr.CallOpenAI(messages)
 	if err != nil {
 		atr.addLog(fmt.Sprintf("Error analyzing user info request: %v", err))
 		return ""
@@ -429,7 +299,7 @@ Just respond with the %s value only, no explanation.`, infoType, infoType)
 		{Role: "user", Content: prompt},
 	}
 
-	response, err := atr.callOpenAI(messages)
+	response, err := atr.CallOpenAI(messages)
 	if err != nil {
 		// Fallback to simple defaults if OpenAI fails
 		switch strings.ToLower(infoType) {
@@ -453,78 +323,4 @@ Just respond with the %s value only, no explanation.`, infoType, infoType)
 	}
 
 	return strings.TrimSpace(response)
-}
-
-// callOpenAI makes a request to the OpenAI API
-func (atr *AgentTestRunner) callOpenAI(messages []ChatMessage) (string, error) {
-	apiURL := "https://api.openai.com/v1/chat/completions"
-
-	// Set default values
-	model := "gpt-4o"
-	temperature := 0.7
-
-	// Override with custom config if available
-	if atr.openAIConfig != nil {
-		// Use custom model if provided, otherwise use default
-		if atr.openAIConfig.Model != "" {
-			model = atr.openAIConfig.Model
-		}
-		// Use custom temperature if explicitly provided (including 0), otherwise use default
-		if atr.openAIConfig.Temperature != nil {
-			temperature = *atr.openAIConfig.Temperature
-		}
-	}
-
-	// Create the request payload
-	payload := map[string]interface{}{
-		"model":       model,
-		"temperature": temperature,
-		"messages":    messages,
-	}
-
-	// Serialize the payload to JSON
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return "", fmt.Errorf("failed to serialize payload: %w", err)
-	}
-
-	// Make the HTTP POST request
-	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Set("Authorization", "Bearer "+global.OpenAIAPIKey)
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("request failed: %w", err)
-	}
-	defer utils.SafeClose(resp.Body)
-
-	// Read and parse the response
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(body))
-	}
-
-	var response map[string]interface{}
-	if err := json.Unmarshal(body, &response); err != nil {
-		return "", fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	// Extract the response from the API result
-	choices := response["choices"].([]interface{})
-	if len(choices) == 0 {
-		return "", fmt.Errorf("no choices returned in the response")
-	}
-
-	responseText := choices[0].(map[string]interface{})["message"].(map[string]interface{})["content"].(string)
-	return responseText, nil
 }

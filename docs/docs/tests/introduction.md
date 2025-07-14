@@ -22,8 +22,19 @@ Test the conversation flow with **predefined interactions** where you send speci
 It is important to know which [suites](/tests/suites) and [tests](/tests/interaction-tests) you can build. Because of that, you can find the entire reference on the [Reference](/tests/suites) page. Suites and test are defined as `yaml` files.
 
 ### 🤖 Agent-to-Agent Testing
-Simulate **realistic conversations** using AI-powered agents that interact naturally with your Voiceflow agent to achieve specific goals. This approach is ideal for:
+Simulate **realistic conversations** using AI-powered agents that interact naturally with your Voiceflow agent to achieve specific goals. This approach offers two testing methods:
 
+**OpenAI-Powered Testing:**
+- Uses OpenAI models (GPT-4, GPT-4o, etc.) to simulate user behavior
+- Configurable personas and dynamic user information
+- Ideal for testing varied user types and edge cases
+
+**Voiceflow Agent Testing:**
+- Uses another Voiceflow agent as the tester
+- Consistent, reproducible test behavior
+- Leverages existing Voiceflow agent configurations
+
+Both methods are ideal for:
 - **End-to-end conversation testing** with natural, adaptive interactions
 - **User behavior simulation** where the AI agent responds dynamically like real users
 - **Goal-oriented testing** to ensure your agent can handle varied conversation paths

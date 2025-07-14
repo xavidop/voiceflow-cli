@@ -128,6 +128,8 @@ definitions:
         items:
           $ref: '#/definitions/tests.UserInfo'
         type: array
+      voiceflowAgentTesterConfig:
+        $ref: '#/definitions/tests.VoiceflowAgentTesterConfig'
     type: object
   tests.Interaction:
     properties:
@@ -209,6 +211,13 @@ definitions:
       jsonPath:
         type: string
       name:
+        type: string
+    type: object
+  tests.VoiceflowAgentTesterConfig:
+    properties:
+      apiKey:
+        type: string
+      environmentName:
         type: string
     type: object
 host: localhost:8080

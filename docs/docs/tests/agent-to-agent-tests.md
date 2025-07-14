@@ -4,9 +4,14 @@
 
 Agent-to-Agent testing is a revolutionary approach to conversation testing that uses AI-powered agents to simulate realistic user interactions with your Voiceflow agent. Instead of predefined scripts, these tests use artificial intelligence to conduct natural, goal-oriented conversations.
 
+There are two types of agent-to-agent testing available:
+
+1. **OpenAI-Powered Testing**: Uses OpenAI models (GPT-4, GPT-3.5, etc.) to simulate user behavior
+2. **Voiceflow Agent Testing**: Uses another Voiceflow agent as the tester to interact with your target agent
+
 ## How It Works
 
-### The Testing Flow
+### OpenAI-Powered Testing Flow
 
 1. **🚀 Initialization**: An AI agent is configured with a specific goal, persona, and user information
 2. **💬 Conversation Start**: The AI agent launches a conversation with your Voiceflow agent
@@ -15,6 +20,14 @@ Agent-to-Agent testing is a revolutionary approach to conversation testing that 
 5. **🎯 Goal Tracking**: The system continuously evaluates progress toward the specified goal
 6. **✅ Completion**: The test succeeds when the goal is achieved or times out after maximum steps
 
+### Voiceflow Agent-to-Agent Testing Flow
+
+1. **🚀 Initialization**: Two Voiceflow agents are configured - one as the tester and one as the target
+2. **💬 Conversation Start**: Both agents are launched simultaneously
+3. **🤖 Agent Interaction**: The tester agent conducts a conversation with your target agent
+4. **🎯 Goal Tracking**: OpenAI evaluates whether the specified goal is achieved based on the conversation
+5. **✅ Completion**: The test succeeds when the goal is achieved or times out after maximum steps
+
 ### Key Advantages
 
 - **🎭 Natural Conversations**: AI agents respond like real users, not scripted robots
@@ -22,10 +35,11 @@ Agent-to-Agent testing is a revolutionary approach to conversation testing that 
 - **📊 Comprehensive Coverage**: Tests edge cases and unexpected user behaviors
 - **⚡ Efficient**: Replaces dozens of traditional tests with one adaptive test
 - **🎯 Goal-Focused**: Measures success based on outcomes, not exact responses
+- **🤖 Dual Testing Modes**: Choose between OpenAI-powered testing or Voiceflow agent testing based on your needs
 
 ## Test Configuration
 
-### Basic Structure
+### OpenAI-Powered Testing Structure
 
 ```yaml
 name: Customer Support Agent Test
@@ -42,6 +56,29 @@ agent:
       value: 'ACC-123456'
     - name: 'phone'
       value: '555-0123'
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.7
+```
+
+### Voiceflow Agent-to-Agent Testing Structure
+
+```yaml
+name: Customer Support Agent Test
+description: Test using a Voiceflow agent as the tester
+
+agent:
+  goal: "Get help with a billing issue and update account information"
+  maxSteps: 15
+  # OpenAI config is still used for goal evaluation
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.3
+  voiceflowAgentTesterConfig:
+    environmentName: "production"  # Environment of the tester agent
+    apiKey: "VF.DM.your-tester-agent-api-key"
+  # Note: userInformation is not used with Voiceflow agent testing
+  # The tester agent should be pre-configured with any needed information
 ```
 
 ### Configuration Properties
@@ -56,8 +93,8 @@ Defines what the AI agent is trying to accomplish. Be specific and measurable.
 - `"Get technical support for a software installation problem"`
 - `"Schedule a doctor's appointment for next month"`
 
-#### `persona` (Required)
-Describes the character and context the AI agent should adopt during the conversation.
+#### `persona` (OpenAI-Powered Testing Only)
+Describes the character and context the AI agent should adopt during the conversation. **This property is only used with OpenAI-powered testing and is ignored when using Voiceflow agent testing.**
 
 **Examples:**
 
@@ -75,8 +112,10 @@ Maximum number of conversation turns before the test is considered failed. Consi
 - Medium complexity: 10-20 steps
 - Complex scenarios: 20-30 steps
 
-#### `userInformation` (Optional)
-Predefined user data that the AI agent can provide when your Voiceflow agent requests personal information.
+#### `userInformation` (OpenAI-Powered Testing Testing Only)
+Predefined user data that the AI agent can provide when your Voiceflow agent requests personal information. **This property is only used with OpenAI-powered testing.**
+
+For Voiceflow agent testing, any required user information should be pre-configured within the tester agent itself.
 
 **Common Information Types:**
 
@@ -88,14 +127,32 @@ Predefined user data that the AI agent can provide when your Voiceflow agent req
 #### `openAIConfig` (Optional)
 Configures the OpenAI model and parameters used for the AI agent in this specific test. This configuration overrides any suite-level OpenAI settings.
 
+**For OpenAI Testing**: Used to power the AI agent that conducts the conversation.
+**For Voiceflow Agent Testing**: Used only for goal evaluation to determine if the test objective has been achieved.
+
 **Properties:**
 
 - `model`: The OpenAI model to use (default: `gpt-4o`)
 - `temperature`: Controls response randomness from 0.0 (deterministic) to 1.0 (creative) (default: `0.7`)
 
+#### `voiceflowAgentTesterConfig` (Voiceflow Agent-to-Agent Testing Only)
+Configures a Voiceflow agent to act as the tester instead of using OpenAI. When this configuration is present, the system will use agent-to-agent testing with two Voiceflow agents.
+
+**Properties:**
+
+- `environmentName`: The environment name of the tester Voiceflow agent (e.g., "production", "development")
+- `apiKey`: The API key for the tester Voiceflow agent (format: `VF.DM.xxxxx.xxxxx`)
+
+**Important Notes:**
+
+- When using Voiceflow agent testing, the `persona` and `userInformation` properties are ignored
+- The tester agent should be pre-configured with appropriate conversation logic and any required user data
+- OpenAI is still used for goal evaluation even when using Voiceflow agent testing
+
 **Example:**
 
 ```yaml
+# OpenAI-powered testing configuration
 agent:
   goal: "Get technical support for a complex software issue"
   persona: "A software developer who needs detailed technical assistance"
@@ -105,13 +162,61 @@ agent:
     temperature: 0.3  # Lower temperature for more focused technical responses
 ```
 
-**Model Recommendations:**
+```yaml
+# Voiceflow agent-to-agent testing configuration
+agent:
+  goal: "Complete a hotel booking for this weekend"
+  maxSteps: 12
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.3  # Used only for goal evaluation
+  voiceflowAgentTesterConfig:
+    environmentName: "production"
+    apiKey: "VF.DM.your-tester-agent-key"
+```
+
+## Choosing Between Testing Methods
+
+### OpenAI-Powered Testing
+
+**Best for:**
+
+- ✅ Flexible persona and behavior simulation
+- ✅ Dynamic user information generation
+- ✅ Complex reasoning and decision-making scenarios
+- ✅ Testing edge cases and unexpected user behaviors
+- ✅ Rapid prototyping and testing different user types
+
+**Requirements:**
+
+- OpenAI API key and sufficient quota
+- Persona and user information configuration
+
+### Voiceflow Agent Testing
+
+**Best for:**
+
+- ✅ Consistent, reproducible test behavior
+- ✅ Testing specific conversation flows designed in Voiceflow
+- ✅ Using existing Voiceflow agents as test users
+- ✅ Avoiding OpenAI API costs for conversation simulation
+- ✅ Pre-configured user personas built in Voiceflow
+
+**Requirements:**
+
+- A separate Voiceflow agent configured as the tester
+- API key for the tester agent
+- OpenAI API key still needed for goal evaluation
+
+## OpenAI Model Configuration
+
+### Model Recommendations
 
 - `gpt-4o`: Best for complex reasoning and nuanced conversations
 - `gpt-4o-mini`: Good balance of performance and cost for most use cases
 - `gpt-3.5-turbo`: Budget-friendly option for simpler interactions
 
-**Temperature Guidelines:**
+### Temperature Guidelines
 
 - `0.0-0.3`: Highly focused, deterministic responses (ideal for technical support)
 - `0.4-0.7`: Balanced responses with some creativity (good for general conversations)
@@ -136,6 +241,8 @@ tests:
     file: ./tests/billing_test.yaml
   - id: technical_support
     file: ./tests/technical_test.yaml  # Can override with test-level config
+  - id: voiceflow_agent_test
+    file: ./tests/voiceflow_agent_test.yaml  # Uses suite config for goal evaluation
 ```
 
 ## Best Practices
@@ -154,7 +261,7 @@ tests:
 - Impossible tasks
 - Testing internal system functions
 
-### Creating Realistic Personas
+### Creating Realistic Personas (OpenAI Testing)
 
 ✅ **Good Personas:**
 
@@ -168,6 +275,21 @@ tests:
 - Inconsistent characteristics
 - Unrealistic behaviors
 
+### Configuring Voiceflow Tester Agents
+
+✅ **Best Practices:**
+
+- Design the tester agent with clear conversation flows
+- Include appropriate user information within the agent
+- Test the tester agent independently before using in tests
+- Use meaningful environment names and secure API keys
+
+❌ **Avoid:**
+
+- Using production agents directly as testers
+- Hardcoding sensitive information in tester agents
+- Creating overly complex tester agent flows
+
 ### Setting Appropriate Step Limits
 
 - **Too Low**: May timeout before completion
@@ -176,26 +298,58 @@ tests:
 
 ## Authentication Requirements
 
-Agent-to-Agent tests require OpenAI API access for the AI agent functionality. Make sure to:
+### OpenAI Testing Requirements
+
+OpenAI-powered agent tests require OpenAI API access for the AI agent functionality. Make sure to:
 
 1. Set up your OpenAI API key in your environment
 2. Configure authentication as described in the [Authentication](/overview/authentication) page
 3. Ensure sufficient API quota for test execution
 
+### Voiceflow Agent Testing Requirements
+
+Voiceflow agent-to-agent tests require:
+
+1. **Target Agent**: API key for the agent being tested
+2. **Tester Agent**: API key for the agent acting as the tester (specified in `voiceflowAgentTesterConfig`)
+3. **OpenAI API**: Still required for goal evaluation functionality
+4. **Environment Access**: Ensure both agents are accessible in their respective environments
+
 ## Monitoring and Debugging
 
 ### Test Logs
 
-Agent-to-Agent tests provide detailed logs including:
+Both testing methods provide detailed logs including:
+
+**OpenAI Testing Logs:**
 
 - AI agent's thought process and responses
 - Conversation flow and decision points
 - Goal achievement evaluation
 - User information requests and responses
 
+**Voiceflow Agent Testing Logs:**
+
+- Interaction between tester and target agents
+- Message exchange flow
+- Goal achievement evaluation
+- Agent response details
+
 ### Common Issues
+
+**General Issues:**
+
 - **Goal not achieved**: Review if the goal is realistic and achievable
 - **Timeout errors**: Consider increasing `maxSteps` or simplifying the goal
-- **Authentication errors**: Verify OpenAI API key configuration
-- **Inconsistent behavior**: AI responses may vary; focus on goal achievement rather than exact responses
+- **Authentication errors**: Verify API key configuration
 
+**OpenAI Testing Specific:**
+
+- **Inconsistent behavior**: AI responses may vary; focus on goal achievement rather than exact responses
+- **OpenAI API errors**: Check API key and quota limits
+
+**Voiceflow Agent Testing Specific:**
+
+- **Tester agent errors**: Verify the tester agent is properly configured and accessible
+- **API key issues**: Ensure both target and tester agent API keys are valid
+- **Environment mismatches**: Verify environment names are correct for both agents

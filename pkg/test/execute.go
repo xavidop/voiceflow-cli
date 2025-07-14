@@ -124,10 +124,7 @@ func ExecuteSuite(suitesPath string) error {
 				global.Log.Errorf("Error running test: %v", err)
 				return err
 			}
-			// Log the collected logs to the global logger for file-based execution
-			for _, logLine := range logCollector.Logs {
-				global.Log.Info(logLine)
-			}
+
 		}
 	}
 	return nil

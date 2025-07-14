@@ -1,0 +1,16 @@
+name: Voiceflow Agent-to-Agent Test Example
+description: Test using a Voiceflow agent as the tester instead of OpenAI
+agent:
+  goal: "Have a friendly conversation and get information about available services"
+  maxSteps: 8
+  # Optional: OpenAI configuration for goal evaluation
+  # (The tester agent handles conversation, but OpenAI evaluates if the goal was achieved)
+  openAIConfig:
+    model: gpt-4o
+    temperature: 0.3
+  voiceflowAgentTesterConfig:
+    environmentName: "production"
+    apiKey: "VF.DM.6874e0b864978a40d4cd4ea5.rjOMQdMxW4tgOIqR"
+  # Note: This test type does not use userInformation since the tester is a Voiceflow agent
+
+# yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json
