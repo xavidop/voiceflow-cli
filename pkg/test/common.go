@@ -129,11 +129,12 @@ func (br *BaseRunner) IsGoalAchieved(goal string) (bool, error) {
 	var conversationSummary strings.Builder
 	for _, msg := range br.chatHistory {
 		if msg.Role != "system" {
-			if msg.Role == "user" {
+			switch msg.Role {
+			case "user":
 				conversationSummary.WriteString(fmt.Sprintf("User: %s\n", msg.Content))
-			} else if msg.Role == "assistant" {
+			case "assistant":
 				conversationSummary.WriteString(fmt.Sprintf("Agent: %s\n", msg.Content))
-			} else {
+			default:
 				conversationSummary.WriteString(fmt.Sprintf("%s: %s\n", msg.Role, msg.Content))
 			}
 		}
