@@ -10,7 +10,7 @@ agent:
     temperature: 0.3
   voiceflowAgentTesterConfig:
     environmentName: "production"
-    apiKey: "VF.DM.6874e0b864978a40d4cd4ea5.rjOMQdMxW4tgOIqR"
+    apiKey: "VF.DM.my.key"
   # Note: This test type does not use userInformation since the tester is a Voiceflow agent
 
 # yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json
