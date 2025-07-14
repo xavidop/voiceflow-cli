@@ -323,6 +323,32 @@ const docTemplate = `{
                 }
             }
         },
+        "tests.AgentTest": {
+            "type": "object",
+            "properties": {
+                "goal": {
+                    "type": "string"
+                },
+                "maxSteps": {
+                    "type": "integer"
+                },
+                "openAIConfig": {
+                    "$ref": "#/definitions/tests.OpenAIConfig"
+                },
+                "persona": {
+                    "type": "string"
+                },
+                "userInformation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.UserInfo"
+                    }
+                },
+                "voiceflowAgentTesterConfig": {
+                    "$ref": "#/definitions/tests.VoiceflowAgentTesterConfig"
+                }
+            }
+        },
         "tests.Interaction": {
             "type": "object",
             "properties": {
@@ -334,6 +360,17 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/tests.User"
+                }
+            }
+        },
+        "tests.OpenAIConfig": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
                 }
             }
         },
@@ -363,6 +400,9 @@ const docTemplate = `{
         "tests.Test": {
             "type": "object",
             "properties": {
+                "agent": {
+                    "$ref": "#/definitions/tests.AgentTest"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -384,6 +424,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.UserInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
                     "type": "string"
                 }
             }
@@ -421,6 +472,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.VoiceflowAgentTesterConfig": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "environmentName": {
                     "type": "string"
                 }
             }

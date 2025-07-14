@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -14,9 +15,15 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) error {
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
-	// Here, you would implement the actual test execution logic
+
+	// Check if this is an agent test
+	if test.Agent != nil {
+		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig)
+	}
+
+	// Original interaction-based test logic
 	for _, interaction := range test.Interactions {
 		logCollector.AddLog("Interaction ID: " + interaction.ID)
 		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
@@ -43,11 +50,45 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 		if len(validations) == 0 {
 			logCollector.AddLog("All validations passed for Interaction ID: " + interaction.ID)
 		} else {
-			return fmt.Errorf("validation failed for Interaction ID: %s, not all validations were executed: %v", interaction.ID, validations)
+			// Convert to JSON to automatically omit nil/empty fields
+			validationsJSON, _ := json.Marshal(validations)
+			return fmt.Errorf("validation failed for Interaction ID: %s, validation: %s", interaction.ID, string(validationsJSON))
 		}
 	}
 	// No errors, test passed
 	return nil
+}
+
+// runAgentTest executes an agent-to-agent test
+func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
+	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
+
+	agentTest := *test.Agent
+	// Apply suite-level OpenAI configuration if test doesn't have its own config
+	if agentTest.OpenAIConfig == nil && suiteOpenAIConfig != nil {
+		agentTest.OpenAIConfig = suiteOpenAIConfig
+		logCollector.AddLog("Using suite-level OpenAI configuration")
+	}
+
+	// Check if this is a Voiceflow agent testing configuration
+	if agentTest.VoiceflowAgentTesterConfig != nil {
+		logCollector.AddLog("Using Voiceflow agent as the tester")
+
+		// Create Voiceflow agent test runner
+		runner := NewVoiceflowAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+		// Execute the Voiceflow agent test
+		return runner.ExecuteAgentTest(agentTest)
+	}
+
+	// Default to OpenAI-based agent testing
+	logCollector.AddLog("Using OpenAI as the tester")
+
+	// Create OpenAI agent test runner
+	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+
+	// Execute the agent test
+	return runner.ExecuteAgentTest(agentTest)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {

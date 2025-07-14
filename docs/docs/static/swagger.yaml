@@ -114,6 +114,23 @@ definitions:
           $ref: '#/definitions/tests.Validation'
         type: array
     type: object
+  tests.AgentTest:
+    properties:
+      goal:
+        type: string
+      maxSteps:
+        type: integer
+      openAIConfig:
+        $ref: '#/definitions/tests.OpenAIConfig'
+      persona:
+        type: string
+      userInformation:
+        items:
+          $ref: '#/definitions/tests.UserInfo'
+        type: array
+      voiceflowAgentTesterConfig:
+        $ref: '#/definitions/tests.VoiceflowAgentTesterConfig'
+    type: object
   tests.Interaction:
     properties:
       agent:
@@ -122,6 +139,13 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/tests.User'
+    type: object
+  tests.OpenAIConfig:
+    properties:
+      model:
+        type: string
+      temperature:
+        type: number
     type: object
   tests.SimilarityConfig:
     properties:
@@ -140,6 +164,8 @@ definitions:
     type: object
   tests.Test:
     properties:
+      agent:
+        $ref: '#/definitions/tests.AgentTest'
       description:
         type: string
       interactions:
@@ -154,6 +180,13 @@ definitions:
       text:
         type: string
       type:
+        type: string
+    type: object
+  tests.UserInfo:
+    properties:
+      name:
+        type: string
+      value:
         type: string
     type: object
   tests.Validation:
@@ -178,6 +211,13 @@ definitions:
       jsonPath:
         type: string
       name:
+        type: string
+    type: object
+  tests.VoiceflowAgentTesterConfig:
+    properties:
+      apiKey:
+        type: string
+      environmentName:
         type: string
     type: object
 host: localhost:8080

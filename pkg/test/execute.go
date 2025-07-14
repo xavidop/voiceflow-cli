@@ -1,6 +1,8 @@
 package test
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
@@ -9,12 +11,13 @@ import (
 
 // HTTPSuiteRequest represents a test suite from HTTP request
 type HTTPSuiteRequest struct {
-	Name               string            `json:"name"`
-	Description        string            `json:"description"`
-	EnvironmentName    string            `json:"environment_name"`
-	Tests              []HTTPTestRequest `json:"tests"`
-	ApiKey             string            `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
-	VoiceflowSubdomain string            `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
+	Name               string              `json:"name"`
+	Description        string              `json:"description"`
+	EnvironmentName    string              `json:"environment_name"`
+	Tests              []HTTPTestRequest   `json:"tests"`
+	ApiKey             string              `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
+	VoiceflowSubdomain string              `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
+	OpenAIConfig       *tests.OpenAIConfig `json:"openAIConfig,omitempty"`        // Optional OpenAI configuration for agent tests
 }
 
 // HTTPTestRequest represents a test from HTTP request
@@ -30,7 +33,11 @@ type LogCollector struct {
 
 // AddLog adds a log message to the collector
 func (lc *LogCollector) AddLog(message string) {
+	// Remove tabs from the message for cleaner logging
+	// This is useful to avoid issues with tab characters in logs
+	message = strings.ReplaceAll(message, "\t", "")
 	lc.Logs = append(lc.Logs, message)
+	global.Log.Info(message) // Also log to the global logger
 }
 
 // ExecuteFromHTTPRequest executes a test suite directly from HTTP request data
@@ -76,7 +83,7 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 	// Execute each test directly from the request data
 	for _, testReq := range suiteReq.Tests {
 		logCollector.AddLog("Running Test ID: " + testReq.ID)
-		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector)
+		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig)
 		if err != nil {
 			errorMsg := "Error running test " + testReq.ID + ": " + err.Error()
 			logCollector.AddLog(errorMsg)
@@ -112,15 +119,12 @@ func ExecuteSuite(suitesPath string) error {
 			}
 			// Create a dummy log collector for the existing file-based execution
 			logCollector := &LogCollector{Logs: []string{}}
-			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector) // No token or subdomain provided, will use global values
+			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig) // Pass suite-level OpenAI config
 			if err != nil {
 				global.Log.Errorf("Error running test: %v", err)
 				return err
 			}
-			// Log the collected logs to the global logger for file-based execution
-			for _, logLine := range logCollector.Logs {
-				global.Log.Info(logLine)
-			}
+
 		}
 	}
 	return nil
