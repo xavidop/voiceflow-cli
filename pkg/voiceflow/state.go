@@ -12,10 +12,22 @@ import (
 )
 
 func FetchState(EnvironmentName, userID string) (state.State, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
+	return FetchStateWithOverrides(EnvironmentName, userID, "", "")
+}
+
+func FetchStateWithOverrides(EnvironmentName, userID, apiKeyOverride, subdomainOverride string) (state.State, error) {
+	// Use the provided subdomain override, or fall back to global if not provided
+	subdomain := global.VoiceflowSubdomain
+	if subdomainOverride != "" {
+		subdomain = subdomainOverride
 	}
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s", global.VoiceflowSubdomain, userID)
+
+	// Add the dot prefix if subdomain is not empty
+	if subdomain != "" {
+		subdomain = "." + subdomain
+	}
+
+	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s", subdomain, userID)
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -25,7 +37,13 @@ func FetchState(EnvironmentName, userID string) (state.State, error) {
 
 	req.Header.Add("accept", "application/json")
 	req.Header.Add("content-type", "application/json")
-	req.Header.Add("Authorization", global.VoiceflowAPIKey)
+
+	// Use the provided API key override, or fall back to global if not provided
+	apiKey := global.VoiceflowAPIKey
+	if apiKeyOverride != "" {
+		apiKey = apiKeyOverride
+	}
+	req.Header.Add("Authorization", apiKey)
 	req.Header.Add("versionID", EnvironmentName)
 
 	res, err := http.DefaultClient.Do(req)

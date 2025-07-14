@@ -41,7 +41,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 		for _, interactionResponse := range interactionResponses {
 			logCollector.AddLog("\tInteraction Response Type: " + interactionResponse.Type)
 
-			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, logCollector)
+			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 			if err != nil {
 				return err
 			}
@@ -102,7 +102,7 @@ func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validati
 
 }
 
-func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID string, logCollector *LogCollector) ([]tests.Validation, error) {
+func validateResponse(interactionResponse interact.InteractionResponse, validations []tests.Validation, environmentName, userID, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) ([]tests.Validation, error) {
 	messageResponse, ok := getNestedValue(interactionResponse.Payload, "message")
 	// Ensure payload is of type Speak before accessing its fields
 	// Create a slice to store validations that should be kept
@@ -153,7 +153,7 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 			}
 
 			if validation.Type == "variable" {
-				if checkVariableValue(validation, environmentName, userID, logCollector) {
+				if checkVariableValue(validation, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector) {
 					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + validation.Value + " and config " + fmt.Sprintf("%v", *validation.VariableConfig))
 					passed = true
 				}
@@ -167,9 +167,9 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 	return remainingValidations, nil
 }
 
-func checkVariableValue(validation tests.Validation, environmentName, userID string, logCollector *LogCollector) bool {
+func checkVariableValue(validation tests.Validation, environmentName, userID, apiKeyOverride, subdomainOverride string, logCollector *LogCollector) bool {
 
-	state, err := voiceflow.FetchState(environmentName, userID)
+	state, err := voiceflow.FetchStateWithOverrides(environmentName, userID, apiKeyOverride, subdomainOverride)
 	if err != nil {
 		errorMsg := "Error fetching variable state: " + err.Error()
 		logCollector.AddLog(errorMsg)
