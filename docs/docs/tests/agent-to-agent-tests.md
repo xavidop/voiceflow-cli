@@ -13,6 +13,10 @@ There are two types of agent-to-agent testing available:
 
 ### OpenAI-Powered Testing Flow
 
+<p align="center">
+  <img alt="OpenAI Agent To agent" src="/images/openai-agent-to-agent.png" />
+</p>
+
 1. **🚀 Initialization**: An AI agent is configured with a specific goal, persona, and user information
 2. **💬 Conversation Start**: The AI agent launches a conversation with your Voiceflow agent
 3. **🤖 Dynamic Interaction**: The AI agent responds naturally to your agent's messages, adapting to different conversation paths
@@ -21,6 +25,10 @@ There are two types of agent-to-agent testing available:
 6. **✅ Completion**: The test succeeds when the goal is achieved or times out after maximum steps
 
 ### Voiceflow Agent-to-Agent Testing Flow
+
+<p align="center">
+  <img alt="Voiceflow Agent To agent" src="/images/voiceflow-agent-to-agent.png" />
+</p>
 
 1. **🚀 Initialization**: Two Voiceflow agents are configured - one as the tester and one as the target
 2. **💬 Conversation Start**: Both agents are launched simultaneously

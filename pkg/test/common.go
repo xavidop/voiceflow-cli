@@ -63,12 +63,6 @@ func (br *BaseRunner) GetChatHistory() []ChatMessage {
 
 // InteractWithVoiceflow sends a message to a Voiceflow Dialog Manager
 func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentName, userID, apiKey string) ([]interact.InteractionResponse, error) {
-	// Log the interaction being sent
-	if messageType == "launch" {
-		br.AddLog("Sending launch interaction to Voiceflow")
-	} else {
-		br.AddLog(fmt.Sprintf("Sending %s interaction to Voiceflow: %s", messageType, message))
-	}
 
 	// Convert to the expected interaction format
 	voiceflowInteraction := tests.Interaction{
