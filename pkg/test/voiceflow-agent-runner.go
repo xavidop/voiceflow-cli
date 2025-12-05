@@ -90,7 +90,7 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 			break
 		}
 
-		// Log the tester agent's message if the flag is enabled
+		// Log the tester agent's message to the target agent if the flag is enabled
 		if global.ShowTesterMessages {
 			vatr.addLog(fmt.Sprintf("Tester agent says: %s", testerMessage))
 		}

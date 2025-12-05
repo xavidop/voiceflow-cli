@@ -200,7 +200,7 @@ Provide only your response message, without any explanation or meta-commentary. 
 	// Add the agent's response to conversation history
 	atr.AddToChatHistory("assistant", trimmedResponse)
 
-	// Log the tester agent's message if the flag is enabled
+	// Log the generated tester agent response if the flag is enabled
 	if global.ShowTesterMessages {
 		atr.addLog(fmt.Sprintf("Tester agent message: %s", trimmedResponse))
 	}
