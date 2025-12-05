@@ -40,6 +40,9 @@ The server includes auto-generated OpenAPI/Swagger documentation available at /s
 
 		voiceflow.SetVoiceflowAPIKey()
 		openai.SetOpenAIAPIKey()
+		
+		// Enable tester messages in server mode for better observability
+		global.ShowTesterMessages = true
 
 		config := &server.ServerConfig{
 			Port:           port,
