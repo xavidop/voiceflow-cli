@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # See: https://goreleaser.com/ci/actions/
 
@@ -30,7 +30,7 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: sigstore/cosign-installer@v3.10.0
-      - uses: anchore/sbom-action/download-syft@v0.20.6
+      - uses: anchore/sbom-action/download-syft@v0.20.10
       - uses: crazy-max/ghaction-upx@v3
         with:
           install-only: true
@@ -38,7 +38,7 @@ jobs:
         with:
           github_access_token: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
       - name: Checkout chocolatey/choco 📥
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: chocolatey/choco
           path: ${{ github.workspace }}/voiceflow-cli/choco
