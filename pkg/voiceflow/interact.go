@@ -79,7 +79,7 @@ func DialogManagerInteract(environmentName, userID string, interaction tests.Int
 	var interactions []interact.InteractionResponse
 	err = json.Unmarshal([]byte(string(body)), &interactions)
 	if err != nil {
-		return []interact.InteractionResponse{}, fmt.Errorf("error unmarshalling response: %v", err)
+		return []interact.InteractionResponse{}, fmt.Errorf("error unmarshalling: %v. Response body: %s", err, string(body))
 	}
 
 	return interactions, nil
