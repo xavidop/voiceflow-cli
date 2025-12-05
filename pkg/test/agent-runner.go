@@ -194,15 +194,18 @@ Provide only your response message, without any explanation or meta-commentary. 
 		return "", fmt.Errorf("error generating response: %w", err)
 	}
 
+	// Trim the response once
+	trimmedResponse := strings.TrimSpace(response)
+
 	// Add the agent's response to conversation history
-	atr.AddToChatHistory("assistant", response)
+	atr.AddToChatHistory("assistant", trimmedResponse)
 
 	// Log the tester agent's message if the flag is enabled
 	if global.ShowTesterMessages {
-		atr.addLog(fmt.Sprintf("Tester agent message: %s", strings.TrimSpace(response)))
+		atr.addLog(fmt.Sprintf("Tester agent message: %s", trimmedResponse))
 	}
 
-	return strings.TrimSpace(response), nil
+	return trimmedResponse, nil
 }
 
 // checkForUserInfoRequest uses OpenAI to determine which user information is being requested and provides it
