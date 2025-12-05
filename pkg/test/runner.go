@@ -114,7 +114,7 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 		for i := 0; i < len(validations); i++ {
 			validation := validations[i]
 			passed := false
-			if validation.Type == "equals" {
+			if validation.Type == "equals" || validation.Type == "exact_match" {
 				if message == validation.Value {
 					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
 					passed = true
@@ -160,6 +160,36 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 			}
 			if !passed {
 				logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
+				remainingValidations = append(remainingValidations, validation)
+			}
+		}
+	} else {
+		// If there's no message in the response, keep all validations that require a message
+		// Only validations that don't require a message (like traceType, variable) should be processed
+		for _, validation := range validations {
+			switch validation.Type {
+			case "variable":
+				// Variable validations don't require a message, so check them
+				if checkVariableValue(validation, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector) {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + validation.Value + " and config " + fmt.Sprintf("%v", *validation.VariableConfig))
+					// Don't add to remainingValidations since it passed
+				} else {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
+					remainingValidations = append(remainingValidations, validation)
+				}
+			case "traceType":
+				// TraceType validations can be checked without a message
+				if interactionResponse.Type == validation.Value {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
+					// Don't add to remainingValidations since it passed
+				} else {
+					logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
+					remainingValidations = append(remainingValidations, validation)
+				}
+			default:
+				// For message-based validations (equals, exact_match, contains, regexp, similarity),
+				// if there's no message, the validation fails
+				logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED - no message in response")
 				remainingValidations = append(remainingValidations, validation)
 			}
 		}
