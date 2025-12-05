@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 
+	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 )
@@ -89,7 +90,10 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 			break
 		}
 
-		vatr.addLog(fmt.Sprintf("Tester agent says: %s", testerMessage))
+		// Log the tester agent's message to the target agent if the flag is enabled
+		if global.ShowTesterMessages {
+			vatr.addLog(fmt.Sprintf("Tester agent says: %s", testerMessage))
+		}
 
 		// Send tester's message to target agent
 		targetAgentResponse, err = vatr.interactWithTargetAgent("text", testerMessage)

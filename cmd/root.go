@@ -71,5 +71,6 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&global.VoiceflowSubdomain, "voiceflow-subdomain", "b", "", "Voiceflow Base URL (optional). Default: empty")
 	rootCmd.PersistentFlags().BoolVarP(&global.SkipUpdate, "skip-update-check", "u", false, "Skip the check for updates check run before every command (optional)")
 	rootCmd.PersistentFlags().StringVarP(&global.Output, "output-format", "o", "text", "Output Format. Options: text, json. Default: text (optional)")
+	rootCmd.PersistentFlags().BoolVar(&global.ShowTesterMessages, "show-tester-messages", true, "Show tester agent messages in agent-to-agent tests (optional)")
 
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 )
@@ -193,10 +194,18 @@ Provide only your response message, without any explanation or meta-commentary. 
 		return "", fmt.Errorf("error generating response: %w", err)
 	}
 
-	// Add the agent's response to conversation history
-	atr.AddToChatHistory("assistant", response)
+	// Optimize by trimming response once to avoid redundant string operations
+	trimmedResponse := strings.TrimSpace(response)
 
-	return strings.TrimSpace(response), nil
+	// Add the agent's response to conversation history
+	atr.AddToChatHistory("assistant", trimmedResponse)
+
+	// Log the generated tester agent response if the flag is enabled
+	if global.ShowTesterMessages {
+		atr.addLog(fmt.Sprintf("Tester agent message: %s", trimmedResponse))
+	}
+
+	return trimmedResponse, nil
 }
 
 // checkForUserInfoRequest uses OpenAI to determine which user information is being requested and provides it
