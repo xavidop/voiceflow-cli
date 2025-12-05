@@ -194,7 +194,7 @@ Provide only your response message, without any explanation or meta-commentary. 
 		return "", fmt.Errorf("error generating response: %w", err)
 	}
 
-	// Trim the response once
+	// Optimize by trimming response once to avoid redundant string operations
 	trimmedResponse := strings.TrimSpace(response)
 
 	// Add the agent's response to conversation history
