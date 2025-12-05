@@ -167,7 +167,8 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 		// If there's no message in the response, keep all validations that require a message
 		// Only validations that don't require a message (like traceType, variable) should be processed
 		for _, validation := range validations {
-			if validation.Type == "variable" {
+			switch validation.Type {
+			case "variable":
 				// Variable validations don't require a message, so check them
 				if checkVariableValue(validation, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector) {
 					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with values: " + validation.Value + " and config " + fmt.Sprintf("%v", *validation.VariableConfig))
@@ -176,7 +177,7 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 					logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
 					remainingValidations = append(remainingValidations, validation)
 				}
-			} else if validation.Type == "traceType" {
+			case "traceType":
 				// TraceType validations can be checked without a message
 				if interactionResponse.Type == validation.Value {
 					logCollector.AddLog("\tValidation type: " + validation.Type + " PASSED with value: " + validation.Value)
@@ -185,7 +186,7 @@ func validateResponse(interactionResponse interact.InteractionResponse, validati
 					logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED with value: " + validation.Value)
 					remainingValidations = append(remainingValidations, validation)
 				}
-			} else {
+			default:
 				// For message-based validations (equals, exact_match, contains, regexp, similarity),
 				// if there's no message, the validation fails
 				logCollector.AddLog("\tValidation type: " + validation.Type + " FAILED - no message in response")
