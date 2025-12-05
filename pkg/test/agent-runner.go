@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 )
@@ -195,6 +196,11 @@ Provide only your response message, without any explanation or meta-commentary. 
 
 	// Add the agent's response to conversation history
 	atr.AddToChatHistory("assistant", response)
+
+	// Log the tester agent's message if the flag is enabled
+	if global.ShowTesterMessages {
+		atr.addLog(fmt.Sprintf("Tester agent message: %s", strings.TrimSpace(response)))
+	}
 
 	return strings.TrimSpace(response), nil
 }

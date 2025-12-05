@@ -11,3 +11,4 @@ var VersionString string
 var Output string
 var Verbose bool
 var SkipUpdate bool
+var ShowTesterMessages bool
