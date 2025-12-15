@@ -17,6 +17,7 @@ voiceflow document [flags]
 ```
   -z, --open-api-key string          Open API Key (optional)
   -o, --output-format string         Output Format. Options: text, json. Default: text (optional) (default "text")
+      --show-tester-messages         Show tester agent messages in agent-to-agent tests (optional) (default true)
   -u, --skip-update-check            Skip the check for updates check run before every command (optional)
   -v, --verbose                      verbose error output (with stack trace) (optional)
   -x, --voiceflow-api-key string     Voiceflow API Key (optional)

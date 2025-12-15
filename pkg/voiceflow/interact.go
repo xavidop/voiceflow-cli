@@ -13,7 +13,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
-func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string) ([]interact.InteractionResponse, error) {
+func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string, availableButtons []tests.Button) ([]interact.InteractionResponse, error) {
 	// Use the provided subdomain override, or fall back to global if not provided
 	subdomain := global.VoiceflowSubdomain
 	if subdomainOverride != "" {
@@ -39,6 +39,62 @@ func DialogManagerInteract(environmentName, userID string, interaction tests.Int
 			Action: interact.Action{
 				Type:    "text",
 				Payload: interaction.User.Text,
+			},
+		}
+	case "event":
+		interatctionRequest = interact.InteratctionRequest{
+			Action: interact.Action{
+				Type: "event",
+				Payload: interact.EventPayload{
+					Event: interact.EventData{
+						Name: interaction.User.Event,
+					},
+				},
+			},
+		}
+	case "intent":
+		if interaction.User.Intent == nil {
+			return []interact.InteractionResponse{}, fmt.Errorf("intent request requires intent data")
+		}
+		// Convert test entities to interact entities
+		var entities []interact.Entity
+		for _, e := range interaction.User.Intent.Entities {
+			entities = append(entities, interact.Entity{
+				Name:  e.Name,
+				Value: e.Value,
+			})
+		}
+		interatctionRequest = interact.InteratctionRequest{
+			Action: interact.Action{
+				Type: "intent",
+				Payload: interact.IntentPayload{
+					Intent: interact.IntentData{
+						Name: interaction.User.Intent.Name,
+					},
+					Entities: entities,
+				},
+			},
+		}
+	case "button":
+		// Find the button by label from available buttons
+		if len(availableButtons) == 0 {
+			return []interact.InteractionResponse{}, fmt.Errorf("no buttons available from previous interaction")
+		}
+		var selectedButton *tests.Button
+		for _, btn := range availableButtons {
+			if btn.Request.Payload["label"] == interaction.User.Value {
+				selectedButton = &btn
+				break
+			}
+		}
+		if selectedButton == nil {
+			return []interact.InteractionResponse{}, fmt.Errorf("button with label '%s' not found in available buttons", interaction.User.Value)
+		}
+		// Send the button's request as the action
+		interatctionRequest = interact.InteratctionRequest{
+			Action: interact.Action{
+				Type:    selectedButton.Request.Type,
+				Payload: selectedButton.Request.Payload,
 			},
 		}
 	}

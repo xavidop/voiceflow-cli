@@ -1,8 +1,30 @@
 package interact
 
+type EventPayload struct {
+	Event EventData `json:"event"`
+}
+
+type EventData struct {
+	Name string `json:"name"`
+}
+
+type IntentPayload struct {
+	Intent   IntentData `json:"intent"`
+	Entities []Entity   `json:"entities,omitempty"`
+}
+
+type IntentData struct {
+	Name string `json:"name"`
+}
+
+type Entity struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 type Action struct {
-	Type    string `json:"type"`
-	Payload string `json:"payload"`
+	Type    string      `json:"type"`
+	Payload interface{} `json:"payload,omitempty"`
 }
 
 type Config struct {

@@ -74,7 +74,7 @@ func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentNam
 	}
 
 	// Use the existing Voiceflow interaction method
-	responses, err := voiceflow.DialogManagerInteract(environmentName, userID, voiceflowInteraction, apiKey, br.subdomainOverride)
+	responses, err := voiceflow.DialogManagerInteract(environmentName, userID, voiceflowInteraction, apiKey, br.subdomainOverride, nil)
 	if err != nil {
 		return nil, err
 	}

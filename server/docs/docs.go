@@ -349,6 +349,31 @@ const docTemplate = `{
                 }
             }
         },
+        "tests.IntentEntity": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.IntentRequest": {
+            "type": "object",
+            "properties": {
+                "entities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.IntentEntity"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "tests.Interaction": {
             "type": "object",
             "properties": {
@@ -420,10 +445,20 @@ const docTemplate = `{
         "tests.User": {
             "type": "object",
             "properties": {
+                "event": {
+                    "type": "string"
+                },
+                "intent": {
+                    "$ref": "#/definitions/tests.IntentRequest"
+                },
                 "text": {
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Used for button label",
                     "type": "string"
                 }
             }
