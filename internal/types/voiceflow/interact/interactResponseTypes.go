@@ -48,7 +48,17 @@ type End struct {
 	Payload interface{} `json:"payload"` // Can be null, so use interface{} to allow nil
 }
 
+type Choice struct {
+	Type    string        `json:"type"`
+	Time    int64         `json:"time"`
+	Payload ChoicePayload `json:"payload"`
+}
+
 // Specific payload types
+type ChoicePayload struct {
+	Buttons []Button `json:"buttons"`
+}
+
 type VisualPayload struct {
 	VisualType       string     `json:"visualType"`
 	Image            string     `json:"image"`

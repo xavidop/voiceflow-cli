@@ -30,14 +30,40 @@ type UserInfo struct {
 }
 
 type Interaction struct {
-	ID    string `yaml:"id" json:"id"`
-	User  User   `yaml:"user" json:"user"`
-	Agent Agent  `yaml:"agent" json:"agent"`
+	ID      string   `yaml:"id" json:"id"`
+	User    User     `yaml:"user" json:"user"`
+	Agent   Agent    `yaml:"agent" json:"agent"`
+	Buttons []Button `yaml:"-" json:"-"` // Stores buttons from previous response, not serialized
 }
 
 type User struct {
-	Type string `yaml:"type" json:"type"`
-	Text string `yaml:"text,omitempty" json:"text,omitempty"`
+	Type   string         `yaml:"type" json:"type"`
+	Text   string         `yaml:"text,omitempty" json:"text,omitempty"`
+	Value  string         `yaml:"value,omitempty" json:"value,omitempty"` // Used for button label
+	Event  string         `yaml:"event,omitempty" json:"event,omitempty"`
+	Intent *IntentRequest `yaml:"intent,omitempty" json:"intent,omitempty"`
+}
+
+type IntentRequest struct {
+	Name     string         `yaml:"name" json:"name"`
+	Entities []IntentEntity `yaml:"entities,omitempty" json:"entities,omitempty"`
+}
+
+type IntentEntity struct {
+	Name  string `yaml:"name" json:"name"`
+	Value string `yaml:"value" json:"value"`
+}
+
+// Button represents a button from a choice trace, matching the interact response type
+type Button struct {
+	Name    string        `json:"name"`
+	Request ButtonRequest `json:"request"`
+}
+
+// ButtonRequest represents the request object attached to a button
+type ButtonRequest struct {
+	Type    string                 `json:"type"`
+	Payload map[string]interface{} `json:"payload"`
 }
 
 type Agent struct {

@@ -24,34 +24,60 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 	}
 
 	// Original interaction-based test logic
+	var availableButtons []tests.Button // Track buttons from previous choice responses
 	for _, interaction := range test.Interactions {
 		logCollector.AddLog("Interaction ID: " + interaction.ID)
 		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
-		if interaction.User.Type != "launch" {
+		if interaction.User.Type == "text" {
 			logCollector.AddLog("\tInteraction Request Payload: " + fmt.Sprintf("%v", interaction.User.Text))
 		}
+		if interaction.User.Type == "event" {
+			logCollector.AddLog("\tInteraction Request Event: " + fmt.Sprintf("%v", interaction.User.Event))
+		}
+		if interaction.User.Type == "intent" {
+			logCollector.AddLog("\tInteraction Request Intent: " + fmt.Sprintf("%v", interaction.User.Intent))
+		}
+		if interaction.User.Type == "launch" {
+			logCollector.AddLog("\tInteraction Request Launch")
+		}
+		if interaction.User.Type == "button" {
+			logCollector.AddLog("\tInteraction Request Button: " + interaction.User.Value)
+		}
 
-		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride, subdomainOverride)
+		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride, subdomainOverride, availableButtons)
 		if err != nil {
 			return err
 		}
 		validations := interaction.Agent.Validate
 		validations = autoGenerateValidationsIDs(validations)
 
+		// Track which validations have passed across all responses
+		remainingValidations := validations
+
 		for _, interactionResponse := range interactionResponses {
 			logCollector.AddLog("\tInteraction Response Type: " + interactionResponse.Type)
 
-			validations, err = validateResponse(interactionResponse, validations, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
+			// Check if this is a choice response and extract buttons
+			if interactionResponse.Type == "choice" {
+				if buttonsInterface, ok := interactionResponse.Payload["buttons"]; ok {
+					// Convert buttons from interface{} to []tests.Button
+					availableButtons = convertToButtons(buttonsInterface)
+					logCollector.AddLog(fmt.Sprintf("\tExtracted %d buttons from choice response", len(availableButtons)))
+				}
+			}
+
+			// Only validate the remaining validations that haven't passed yet
+			remainingValidations, err = validateResponse(interactionResponse, remainingValidations, environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 			if err != nil {
 				return err
 			}
 
 		}
-		if len(validations) == 0 {
+		if len(remainingValidations) == 0 {
 			logCollector.AddLog("All validations passed for Interaction ID: " + interaction.ID)
 		} else {
 			// Convert to JSON to automatically omit nil/empty fields
-			validationsJSON, _ := json.Marshal(validations)
+			validationsJSON, _ := json.Marshal(remainingValidations)
 			return fmt.Errorf("validation failed for Interaction ID: %s, validation: %s", interaction.ID, string(validationsJSON))
 		}
 	}
@@ -256,6 +282,40 @@ func checkSimilarity(message string, stringsToEvaluate []string, similarityConfi
 		logCollector.AddLog(errorMsg)
 		return false
 	}
+}
+
+// convertToButtons converts interface{} to []tests.Button
+func convertToButtons(buttonsInterface interface{}) []tests.Button {
+	var buttons []tests.Button
+	buttonsArray, ok := buttonsInterface.([]interface{})
+	if !ok {
+		return buttons
+	}
+
+	for _, btnInterface := range buttonsArray {
+		btnMap, ok := btnInterface.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		button := tests.Button{}
+		if name, ok := btnMap["name"].(string); ok {
+			button.Name = name
+		}
+
+		if requestInterface, ok := btnMap["request"].(map[string]interface{}); ok {
+			if reqType, ok := requestInterface["type"].(string); ok {
+				button.Request.Type = reqType
+			}
+			if payload, ok := requestInterface["payload"].(map[string]interface{}); ok {
+				button.Request.Payload = payload
+			}
+		}
+
+		buttons = append(buttons, button)
+	}
+
+	return buttons
 }
 
 func getNestedValue(data map[string]interface{}, keys ...string) (interface{}, bool) {

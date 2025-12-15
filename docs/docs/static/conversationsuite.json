@@ -111,6 +111,40 @@
 							"maxSteps"
 						]
 					},
+					"IntentEntity": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"value": {
+								"type": "string"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"name",
+							"value"
+						]
+					},
+					"IntentRequest": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"entities": {
+								"items": {
+									"$ref": "#/$defs/IntentEntity"
+								},
+								"type": "array"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object",
+						"required": [
+							"name"
+						]
+					},
 					"Interaction": {
 						"properties": {
 							"id": {
@@ -207,6 +241,15 @@
 							},
 							"text": {
 								"type": "string"
+							},
+							"value": {
+								"type": "string"
+							},
+							"event": {
+								"type": "string"
+							},
+							"intent": {
+								"$ref": "#/$defs/IntentRequest"
 							}
 						},
 						"additionalProperties": false,
