@@ -304,6 +304,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Example Suite"
                 },
+                "new_session_per_test": {
+                    "type": "boolean",
+                    "example": false
+                },
                 "tests": {
                     "type": "array",
                     "items": {

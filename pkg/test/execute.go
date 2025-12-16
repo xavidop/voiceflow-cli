@@ -14,6 +14,7 @@ type HTTPSuiteRequest struct {
 	Name               string              `json:"name"`
 	Description        string              `json:"description"`
 	EnvironmentName    string              `json:"environment_name"`
+	NewSessionPerTest  bool                `json:"new_session_per_test,omitempty"` // Optional flag to create a new user session for each test (default: false)
 	Tests              []HTTPTestRequest   `json:"tests"`
 	ApiKey             string              `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
 	VoiceflowSubdomain string              `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
@@ -68,7 +69,7 @@ func ExecuteFromHTTPRequest(suiteReq HTTPSuiteRequest) *ExecuteSuiteResult {
 // executeHTTPSuite executes a suite from HTTP request data
 func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) error {
 	// Define the user ID
-	userID := uuid.New().String()
+	userID := "test-" + uuid.New().String()
 
 	if suiteReq.VoiceflowSubdomain != "" {
 		logCollector.AddLog("Using Voiceflow subdomain: " + suiteReq.VoiceflowSubdomain)
@@ -77,11 +78,20 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 	logCollector.AddLog("Suite: " + suiteReq.Name)
 	logCollector.AddLog("Description: " + suiteReq.Description)
 	logCollector.AddLog("Environment: " + suiteReq.EnvironmentName)
-	logCollector.AddLog("User ID: " + userID)
+	if suiteReq.NewSessionPerTest {
+		logCollector.AddLog("New session per test: enabled")
+	} else {
+		logCollector.AddLog("User ID: " + userID)
+	}
 	logCollector.AddLog("Running Tests:")
 
 	// Execute each test directly from the request data
 	for _, testReq := range suiteReq.Tests {
+		// Create a new user ID for each test if newSessionPerTest is enabled
+		if suiteReq.NewSessionPerTest {
+			userID = "test-" + uuid.New().String()
+			logCollector.AddLog("User ID for test " + testReq.ID + ": " + userID)
+		}
 		logCollector.AddLog("Running Test ID: " + testReq.ID)
 		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig)
 		if err != nil {
@@ -97,7 +107,7 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 func ExecuteSuite(suitesPath string) error {
 
 	// Define the user ID
-	userID := uuid.New().String()
+	userID := "test-" + uuid.New().String()
 
 	// Load all suites from the path
 	suites, err := utils.LoadSuitesFromPath(suitesPath)
@@ -108,10 +118,19 @@ func ExecuteSuite(suitesPath string) error {
 
 	// Iterate over each suite and its tests
 	for _, suite := range suites {
-		global.Log.Infof("Suite: %s\nDescription: %s\nEnvironment: %s\nUser ID: %s", suite.Name, suite.Description, suite.EnvironmentName, userID)
+		if suite.NewSessionPerTest {
+			global.Log.Infof("Suite: %s\nDescription: %s\nEnvironment: %s\nNew session per test: enabled", suite.Name, suite.Description, suite.EnvironmentName)
+		} else {
+			global.Log.Infof("Suite: %s\nDescription: %s\nEnvironment: %s\nUser ID: %s", suite.Name, suite.Description, suite.EnvironmentName, userID)
+		}
 		global.Log.Infof("Running Tests:")
 
 		for _, testFile := range suite.Tests {
+			// Create a new user ID for each test if newSessionPerTest is enabled
+			if suite.NewSessionPerTest {
+				userID = "test-" + uuid.New().String()
+				global.Log.Infof("User ID for test %s: %s", testFile.ID, userID)
+			}
 			test, err := utils.LoadTestFromPath(testFile.File)
 			if err != nil {
 				global.Log.Errorf("Error loading test: %v", err)
