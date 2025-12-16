@@ -98,6 +98,9 @@ definitions:
       name:
         example: Example Suite
         type: string
+      new_session_per_test:
+        example: false
+        type: boolean
       tests:
         items:
           $ref: '#/definitions/TestRequest'

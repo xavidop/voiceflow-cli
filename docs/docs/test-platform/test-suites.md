@@ -12,6 +12,7 @@ A Test Suite is a JSON-formatted definition that contains:
 - **Test Configuration**: API keys, environment settings, and Voiceflow project details
 - **Test Cases**: Individual test scenarios with user inputs and expected agent responses
 - **Validation Rules**: Criteria for determining test success or failure
+- **Session Management**: Control whether tests share the same user session or use isolated sessions
 
 ## Creating Test Suites
 
@@ -75,6 +76,37 @@ Individual test case files referenced in the suite. You can find more details on
 ### Test Suite Structure
 
 For more details on the JSON structure, refer to the [Test Suite JSON Schema](https://docs.voiceflow.com/reference/post_api-v1-tests-execute#/).
+
+#### Session Management
+
+Test suites support session management through the `new_session_per_test` field:
+
+```json
+{
+  "name": "Example Suite",
+  "description": "Test suite with isolated sessions",
+  "environment_name": "production",
+  "new_session_per_test": true,
+  "tests": [...]
+}
+```
+
+**Session Behavior:**
+
+- **`false` (default)**: All tests share the same user session
+  - Variables persist across tests
+  - Conversation context carries over between tests
+  - Tests execute sequentially with shared state
+
+- **`true`**: Each test gets a fresh user session
+  - New user ID generated for each test
+  - Complete isolation between tests
+  - No shared context or variables
+
+**When to use isolated sessions:**
+- Testing independent scenarios that shouldn't affect each other
+- Validating conversation flows from a fresh start
+- Ensuring tests don't have hidden dependencies on execution order
 
 ## API Integration
 

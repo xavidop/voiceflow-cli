@@ -1,6 +1,9 @@
 name: Example Conversation Profiler Suite
 description: Suite used as an example
 environmentName: production
+# Optional: Create a new user session for each test (default: false)
+# When enabled, each test will run with a fresh user session
+newSessionPerTest: true
 tests:
   - id: traditional_test
     file: ./tests/test_1.yaml

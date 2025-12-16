@@ -26,6 +26,9 @@
 					"environmentName": {
 						"type": "string"
 					},
+					"newSessionPerTest": {
+						"type": "boolean"
+					},
 					"tests": {
 						"items": {
 							"$ref": "#/$defs/TestFile"

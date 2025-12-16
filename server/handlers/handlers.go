@@ -23,10 +23,11 @@ type TestExecutionRequest struct {
 
 // TestSuiteRequest represents a test suite configuration for HTTP requests
 type TestSuiteRequest struct {
-	Name            string        `json:"name" binding:"required" example:"Example Suite"`
-	Description     string        `json:"description" example:"Suite used as an example"`
-	EnvironmentName string        `json:"environment_name" binding:"required" example:"production"`
-	Tests           []TestRequest `json:"tests" binding:"required,dive"`
+	Name              string        `json:"name" binding:"required" example:"Example Suite"`
+	Description       string        `json:"description" example:"Suite used as an example"`
+	EnvironmentName   string        `json:"environment_name" binding:"required" example:"production"`
+	NewSessionPerTest bool          `json:"new_session_per_test" example:"false"`
+	Tests             []TestRequest `json:"tests" binding:"required,dive"`
 } // @name TestSuiteRequest
 
 // TestRequest represents a test configuration for HTTP requests
@@ -187,6 +188,7 @@ func ExecuteTestSuite(c *gin.Context) {
 			Name:               req.Suite.Name,
 			Description:        req.Suite.Description,
 			EnvironmentName:    req.Suite.EnvironmentName,
+			NewSessionPerTest:  req.Suite.NewSessionPerTest,
 			Tests:              make([]test.HTTPTestRequest, len(req.Suite.Tests)),
 			ApiKey:             req.ApiKey,             // Pass the optional ApiKey
 			VoiceflowSubdomain: req.VoiceflowSubdomain, // Pass the optional VoiceflowSubdomain
