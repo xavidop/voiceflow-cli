@@ -93,7 +93,7 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 			logCollector.AddLog("User ID for test " + testReq.ID + ": " + userID)
 		}
 		logCollector.AddLog("Running Test ID: " + testReq.ID)
-		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig)
+		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig, suiteReq.NewSessionPerTest)
 		if err != nil {
 			errorMsg := "Error running test " + testReq.ID + ": " + err.Error()
 			logCollector.AddLog(errorMsg)
@@ -138,7 +138,7 @@ func ExecuteSuite(suitesPath string) error {
 			}
 			// Create a dummy log collector for the existing file-based execution
 			logCollector := &LogCollector{Logs: []string{}}
-			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig) // Pass suite-level OpenAI config
+			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig, suite.NewSessionPerTest) // Pass suite-level OpenAI config
 			if err != nil {
 				global.Log.Errorf("Error running test: %v", err)
 				return err

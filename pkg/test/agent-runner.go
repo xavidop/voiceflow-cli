@@ -35,7 +35,7 @@ func NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverri
 }
 
 // ExecuteAgentTest runs an agent-to-agent test
-func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
+func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest, newSessionPerTest bool) error {
 	// Set up user information for easy lookup
 	for _, info := range agentTest.UserInformation {
 		atr.userInformation[info.Name] = info.Value
@@ -57,11 +57,16 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
 	currentStep := 0
 	goalAchieved := false
 
-	// Launch the conversation
-	atr.addLog("Launching conversation with Voiceflow agent")
-	voiceflowResponse, err := atr.interactWithVoiceflow("launch", "")
-	if err != nil {
-		return fmt.Errorf("failed to launch conversation: %w", err)
+	var voiceflowResponse []interact.InteractionResponse
+	var err error
+
+	// Launch the conversation if newSessionPerTest is enabled
+	if newSessionPerTest {
+		atr.addLog("Launching conversation with Voiceflow agent (new session per test enabled)")
+		voiceflowResponse, err = atr.interactWithVoiceflow("launch", "")
+		if err != nil {
+			return fmt.Errorf("failed to launch conversation: %w", err)
+		}
 	}
 
 	// Process the initial response

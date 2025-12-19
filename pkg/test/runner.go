@@ -15,12 +15,12 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
+func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
 
 	// Check if this is an agent test
 	if test.Agent != nil {
-		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig)
+		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig, newSessionPerTest)
 	}
 
 	// Original interaction-based test logic
@@ -86,7 +86,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 }
 
 // runAgentTest executes an agent-to-agent test
-func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig) error {
+func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
 	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
 
 	agentTest := *test.Agent
@@ -104,7 +104,7 @@ func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverrid
 		runner := NewVoiceflowAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
 		// Execute the Voiceflow agent test
-		return runner.ExecuteAgentTest(agentTest)
+		return runner.ExecuteAgentTest(agentTest, newSessionPerTest)
 	}
 
 	// Default to OpenAI-based agent testing
@@ -114,7 +114,7 @@ func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverrid
 	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
 	// Execute the agent test
-	return runner.ExecuteAgentTest(agentTest)
+	return runner.ExecuteAgentTest(agentTest, newSessionPerTest)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {

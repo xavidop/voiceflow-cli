@@ -31,7 +31,7 @@ func (vatr *VoiceflowAgentTestRunner) addLog(message string) {
 }
 
 // ExecuteAgentTest runs an agent-to-agent test using a Voiceflow agent as the tester
-func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest) error {
+func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest, newSessionPerTest bool) error {
 	// Validate that we have the required Voiceflow agent tester configuration
 	if agentTest.VoiceflowAgentTesterConfig == nil {
 		return fmt.Errorf("voiceflowAgentTesterConfig is required for Voiceflow agent testing")
@@ -54,18 +54,24 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 	currentStep := 0
 	goalAchieved := false
 
-	// Launch the conversation with the target agent
-	vatr.addLog("Launching conversation with target Voiceflow agent")
-	targetAgentResponse, err := vatr.interactWithTargetAgent("launch", "")
-	if err != nil {
-		return fmt.Errorf("failed to launch conversation with target agent: %w", err)
-	}
+	var targetAgentResponse []interact.InteractionResponse
+	var err error
 
 	// Launch the conversation with the tester agent and provide the goal
 	vatr.addLog("Launching conversation with tester Voiceflow agent")
 	_, err = vatr.interactWithTesterAgent("launch", "")
 	if err != nil {
 		return fmt.Errorf("failed to launch conversation with tester agent: %w", err)
+	}
+
+	// Launch the conversation with the target agent if newSessionPerTest is enabled
+	if newSessionPerTest {
+		vatr.addLog("Launching conversation with target Voiceflow agent (new session per test enabled)")
+		targetAgentResponse, err = vatr.interactWithTargetAgent("launch", "")
+		if err != nil {
+			return fmt.Errorf("failed to launch conversation with target agent: %w", err)
+		}
+
 	}
 
 	// Send the target agent's initial response to the tester agent
