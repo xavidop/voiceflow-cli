@@ -131,6 +131,8 @@ definitions:
         items:
           $ref: '#/definitions/tests.UserInfo'
         type: array
+      voiceflowAgentTargetConfig:
+        $ref: '#/definitions/tests.VoiceflowAgentTargetConfig'
       voiceflowAgentTesterConfig:
         $ref: '#/definitions/tests.VoiceflowAgentTesterConfig'
     type: object
@@ -238,6 +240,12 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  tests.VoiceflowAgentTargetConfig:
+    properties:
+      variables:
+        additionalProperties: true
+        type: object
     type: object
   tests.VoiceflowAgentTesterConfig:
     properties:

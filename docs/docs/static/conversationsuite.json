@@ -104,6 +104,9 @@
 							},
 							"voiceflowAgentTesterConfig": {
 								"$ref": "#/$defs/VoiceflowAgentTesterConfig"
+							},
+							"voiceflowAgentTargetConfig": {
+								"$ref": "#/$defs/VoiceflowAgentTargetConfig"
 							}
 						},
 						"additionalProperties": false,
@@ -321,6 +324,15 @@
 						"required": [
 							"name"
 						]
+					},
+					"VoiceflowAgentTargetConfig": {
+						"properties": {
+							"variables": {
+								"type": "object"
+							}
+						},
+						"additionalProperties": false,
+						"type": "object"
 					},
 					"VoiceflowAgentTesterConfig": {
 						"properties": {

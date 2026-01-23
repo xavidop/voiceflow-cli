@@ -89,6 +89,21 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 			return fmt.Errorf("failed to launch conversation with target agent: %w", err)
 		}
 
+		// Update target agent variables if provided
+		if agentTest.VoiceflowAgentTargetConfig != nil && len(agentTest.VoiceflowAgentTargetConfig.Variables) > 0 {
+			vatr.addLog(fmt.Sprintf("Setting %d variables in target agent", len(agentTest.VoiceflowAgentTargetConfig.Variables)))
+			err = voiceflow.UpdateStateVariables(
+				vatr.environmentName,
+				vatr.userID,
+				agentTest.VoiceflowAgentTargetConfig.Variables,
+				vatr.apiKeyOverride,
+				vatr.subdomainOverride,
+			)
+			if err != nil {
+				return fmt.Errorf("failed to update target agent variables: %w", err)
+			}
+			vatr.addLog("Successfully updated target agent variables")
+		}
 	}
 
 	// Send the target agent's initial response to the tester agent

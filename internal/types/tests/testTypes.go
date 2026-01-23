@@ -15,6 +15,7 @@ type AgentTest struct {
 	UserInformation            []UserInfo                  `yaml:"userInformation,omitempty" json:"userInformation,omitempty"`
 	OpenAIConfig               *OpenAIConfig               `yaml:"openAIConfig,omitempty" json:"openAIConfig,omitempty"`
 	VoiceflowAgentTesterConfig *VoiceflowAgentTesterConfig `yaml:"voiceflowAgentTesterConfig,omitempty" json:"voiceflowAgentTesterConfig,omitempty"`
+	VoiceflowAgentTargetConfig *VoiceflowAgentTargetConfig `yaml:"voiceflowAgentTargetConfig,omitempty" json:"voiceflowAgentTargetConfig,omitempty"`
 }
 
 // VoiceflowAgentTesterConfig defines configuration for using a Voiceflow agent as the tester
@@ -22,6 +23,11 @@ type VoiceflowAgentTesterConfig struct {
 	EnvironmentName string                 `yaml:"environmentName" json:"environmentName"`
 	APIKey          string                 `yaml:"apiKey" json:"apiKey"`
 	Variables       map[string]interface{} `yaml:"variables,omitempty" json:"variables,omitempty"`
+}
+
+// VoiceflowAgentTargetConfig defines configuration for the target Voiceflow agent being tested
+type VoiceflowAgentTargetConfig struct {
+	Variables map[string]interface{} `yaml:"variables,omitempty" json:"variables,omitempty"`
 }
 
 // UserInfo represents information that the agent can use when requested

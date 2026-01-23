@@ -32,9 +32,10 @@ There are two types of agent-to-agent testing available:
 
 1. **🚀 Initialization**: Two Voiceflow agents are configured - one as the tester and one as the target
 2. **💬 Conversation Start**: Both agents are launched simultaneously
-3. **🤖 Agent Interaction**: The tester agent conducts a conversation with your target agent
-4. **🎯 Goal Tracking**: OpenAI evaluates whether the specified goal is achieved based on the conversation
-5. **✅ Completion**: The test succeeds when the goal is achieved or times out after maximum steps
+3. **🔧 Variable Setup**: Optional variables are set in both agents using the State Variables API
+4. **🤖 Agent Interaction**: The tester agent conducts a conversation with your target agent
+5. **🎯 Goal Tracking**: OpenAI evaluates whether the specified goal is achieved based on the conversation
+6. **✅ Completion**: The test succeeds when the goal is achieved or times out after maximum steps
 
 ### Key Advantages
 
@@ -159,6 +160,19 @@ Configures a Voiceflow agent to act as the tester instead of using OpenAI. When 
 - Variables are set immediately after the launch event, allowing you to initialize the tester agent's state for each test
 - OpenAI is still used for goal evaluation even when using Voiceflow agent testing
 
+#### `voiceflowAgentTargetConfig` (Voiceflow Agent-to-Agent Testing Only)
+Configures variables for the target Voiceflow agent being tested. This allows you to initialize the target agent's state for each test run.
+
+**Properties:**
+
+- `variables` (Optional): A map of variables to set in the target agent after the launch event. These variables will be set using the [Voiceflow State Variables API](https://docs.voiceflow.com/reference/updatestatevariables-1) after launching the target agent.
+
+**Important Notes:**
+
+- Variables are only set when `newSessionPerTest` is enabled (since the target agent needs to be launched)
+- This is useful for setting up test data or initial state in the agent being tested
+- Variables are set after the launch event but before the conversation begins
+
 **Example:**
 
 ```yaml
@@ -173,17 +187,22 @@ agent:
 ```
 
 ```yaml
-# Voiceflow agent-to-agent testing configuration
+# Voiceflow agent-to-agent testing configuration with variables
 agent:
   goal: "Complete a hotel booking for this weekend"
   maxSteps: 12
   openAIConfig:
     model: gpt-4o
     temperature: 0.3  # Used only for goal evaluation
+  voiceflowAgentTargetConfig:
+    # Variables for the target agent being tested
+    variables:
+      service_list: "basic, premium, enterprise"
+      greeting_message: "Welcome! How can I help?"
   voiceflowAgentTesterConfig:
     environmentName: "production"
     apiKey: "VF.DM.your-tester-agent-key"
-    # Optional: Set variables in the tester agent
+    # Variables for the tester agent
     variables:
       user_name: "John Doe"
       user_id: "12345"

@@ -8,6 +8,12 @@ agent:
   openAIConfig:
     model: gpt-4o
     temperature: 0.3
+  # Optional: Variables to set in the target agent being tested after launch
+  # Note: Target agent variables are only set when newSessionPerTest is enabled in the suite
+  voiceflowAgentTargetConfig:
+    variables:
+      service_list: "basic, premium, enterprise"
+      greeting_message: "Welcome to our service! How can I assist you today?"
   voiceflowAgentTesterConfig:
     environmentName: "production"
     apiKey: "VF.DM.my.key"

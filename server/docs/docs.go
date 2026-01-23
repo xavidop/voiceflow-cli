@@ -348,6 +348,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/tests.UserInfo"
                     }
                 },
+                "voiceflowAgentTargetConfig": {
+                    "$ref": "#/definitions/tests.VoiceflowAgentTargetConfig"
+                },
                 "voiceflowAgentTesterConfig": {
                     "$ref": "#/definitions/tests.VoiceflowAgentTesterConfig"
                 }
@@ -512,6 +515,15 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "tests.VoiceflowAgentTargetConfig": {
+            "type": "object",
+            "properties": {
+                "variables": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },
