@@ -59,7 +59,7 @@ jobs:
       - name: setup-snapcraft
         run: |
           sudo apt-get update || true
-          sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft --classic
           mkdir -p $HOME/.cache/snapcraft/download
           mkdir -p $HOME/.cache/snapcraft/stage-packages
       - name: snapcraft-login
