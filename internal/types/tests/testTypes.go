@@ -19,8 +19,9 @@ type AgentTest struct {
 
 // VoiceflowAgentTesterConfig defines configuration for using a Voiceflow agent as the tester
 type VoiceflowAgentTesterConfig struct {
-	EnvironmentName string `yaml:"environmentName" json:"environmentName"`
-	APIKey          string `yaml:"apiKey" json:"apiKey"`
+	EnvironmentName string                 `yaml:"environmentName" json:"environmentName"`
+	APIKey          string                 `yaml:"apiKey" json:"apiKey"`
+	Variables       map[string]interface{} `yaml:"variables,omitempty" json:"variables,omitempty"`
 }
 
 // UserInfo represents information that the agent can use when requested

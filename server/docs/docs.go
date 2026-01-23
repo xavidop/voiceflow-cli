@@ -523,6 +523,10 @@ const docTemplate = `{
                 },
                 "environmentName": {
                     "type": "string"
+                },
+                "variables": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         }

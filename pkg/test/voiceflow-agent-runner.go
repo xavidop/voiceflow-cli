@@ -6,6 +6,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
+	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
 // VoiceflowAgentTestRunner handles the execution of agent-to-agent tests using a Voiceflow agent as the tester
@@ -62,6 +63,22 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 	_, err = vatr.interactWithTesterAgent("launch", "")
 	if err != nil {
 		return fmt.Errorf("failed to launch conversation with tester agent: %w", err)
+	}
+
+	// Update tester agent variables if provided
+	if len(agentTest.VoiceflowAgentTesterConfig.Variables) > 0 {
+		vatr.addLog(fmt.Sprintf("Setting %d variables in tester agent", len(agentTest.VoiceflowAgentTesterConfig.Variables)))
+		err = voiceflow.UpdateStateVariables(
+			vatr.testerEnvironmentName,
+			vatr.testerUserID,
+			agentTest.VoiceflowAgentTesterConfig.Variables,
+			vatr.testerAPIKey,
+			vatr.subdomainOverride,
+		)
+		if err != nil {
+			return fmt.Errorf("failed to update tester agent variables: %w", err)
+		}
+		vatr.addLog("Successfully updated tester agent variables")
 	}
 
 	// Launch the conversation with the target agent if newSessionPerTest is enabled

@@ -150,11 +150,13 @@ Configures a Voiceflow agent to act as the tester instead of using OpenAI. When 
 
 - `environmentName`: The environment name of the tester Voiceflow agent (e.g., "production", "development")
 - `apiKey`: The API key for the tester Voiceflow agent (format: `VF.DM.xxxxx.xxxxx`)
+- `variables` (Optional): A map of variables to set in the tester agent after the launch event. These variables will be set using the [Voiceflow State Variables API](https://docs.voiceflow.com/reference/updatestatevariables-1) after launching the tester agent.
 
 **Important Notes:**
 
 - When using Voiceflow agent testing, the `persona` and `userInformation` properties are ignored
 - The tester agent should be pre-configured with appropriate conversation logic and any required user data
+- Variables are set immediately after the launch event, allowing you to initialize the tester agent's state for each test
 - OpenAI is still used for goal evaluation even when using Voiceflow agent testing
 
 **Example:**
@@ -181,6 +183,12 @@ agent:
   voiceflowAgentTesterConfig:
     environmentName: "production"
     apiKey: "VF.DM.your-tester-agent-key"
+    # Optional: Set variables in the tester agent
+    variables:
+      user_name: "John Doe"
+      user_id: "12345"
+      booking_type: "hotel"
+      check_in_date: "2026-02-15"
 ```
 
 ## Choosing Between Testing Methods
@@ -288,7 +296,8 @@ tests:
 ✅ **Best Practices:**
 
 - Design the tester agent with clear conversation flows
-- Include appropriate user information within the agent
+- Include appropriate user information within the agent or use the `variables` property to set dynamic values
+- Use the `variables` property to initialize agent state for different test scenarios
 - Test the tester agent independently before using in tests
 - Use meaningful environment names and secure API keys
 

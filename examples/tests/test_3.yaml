@@ -11,6 +11,12 @@ agent:
   voiceflowAgentTesterConfig:
     environmentName: "production"
     apiKey: "VF.DM.my.key"
+    # Optional: Variables to set in the tester agent after launch
+    # These variables will be set using the Voiceflow State API after the launch event
+    variables:
+      user_name: "John Doe"
+      user_address: "12345"
+      subscription_tier: "premium"
   # Note: This test type does not use userInformation since the tester is a Voiceflow agent
 
 # yaml-language-server: $schema=https://voiceflow.xavidop.me/static/conversationtest.json
