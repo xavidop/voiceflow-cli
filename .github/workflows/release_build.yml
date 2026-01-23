@@ -62,10 +62,10 @@ jobs:
           sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
           mkdir -p $HOME/.cache/snapcraft/download
           mkdir -p $HOME/.cache/snapcraft/stage-packages
-      - name: snapcraft-login
-        run: |
-          echo "${{ secrets.SNAPCRAFT_LOGIN }}" | snapcraft login --with -
+          export SNAPCRAFT_STORE_CREDENTIALS=$(echo "${{ secrets.SNAPCRAFT_LOGIN }}") snapcraft login
           snapcraft whoami
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
       - name: Write signing key to disk
         run: 'echo "$KEY" > cosign.key'
         shell: bash
