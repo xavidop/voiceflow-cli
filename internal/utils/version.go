@@ -6,7 +6,7 @@ import (
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 
-	"github.com/google/go-github/v68/github"
+	"github.com/google/go-github/v82/github"
 )
 
 func CheckAvailableUpdate(currVersion string, output bool) (string, error) {
