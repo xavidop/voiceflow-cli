@@ -44,9 +44,30 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 			logCollector.AddLog("\tInteraction Request Button: " + interaction.User.Value)
 		}
 
+		// For non-launch interactions, set variables BEFORE the interaction
+		if interaction.User.Type != "launch" && len(interaction.Variables) > 0 {
+			logCollector.AddLog(fmt.Sprintf("\tSetting %d variables in agent state before interaction", len(interaction.Variables)))
+			err := voiceflow.UpdateStateVariables(environmentName, userID, interaction.Variables, apiKeyOverride, subdomainOverride)
+			if err != nil {
+				return fmt.Errorf("error setting variables for Interaction ID %s: %v", interaction.ID, err)
+			}
+			logCollector.AddLog("\tSuccessfully updated agent state variables")
+		}
+
 		interactionResponses, err := voiceflow.DialogManagerInteract(environmentName, userID, interaction, apiKeyOverride, subdomainOverride, availableButtons)
 		if err != nil {
 			return err
+		}
+
+		// For launch interactions, set variables AFTER the interaction
+		// (the session must exist before variables can be set)
+		if interaction.User.Type == "launch" && len(interaction.Variables) > 0 {
+			logCollector.AddLog(fmt.Sprintf("\tSetting %d variables in agent state after launch", len(interaction.Variables)))
+			err = voiceflow.UpdateStateVariables(environmentName, userID, interaction.Variables, apiKeyOverride, subdomainOverride)
+			if err != nil {
+				return fmt.Errorf("error setting variables for Interaction ID %s: %v", interaction.ID, err)
+			}
+			logCollector.AddLog("\tSuccessfully updated agent state variables")
 		}
 		validations := interaction.Agent.Validate
 		validations = autoGenerateValidationsIDs(validations)

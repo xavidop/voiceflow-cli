@@ -37,10 +37,11 @@ type UserInfo struct {
 }
 
 type Interaction struct {
-	ID      string   `yaml:"id" json:"id"`
-	User    User     `yaml:"user" json:"user"`
-	Agent   Agent    `yaml:"agent" json:"agent"`
-	Buttons []Button `yaml:"-" json:"-"` // Stores buttons from previous response, not serialized
+	ID        string                 `yaml:"id" json:"id"`
+	User      User                   `yaml:"user" json:"user"`
+	Agent     Agent                  `yaml:"agent" json:"agent"`
+	Variables map[string]interface{} `yaml:"variables,omitempty" json:"variables,omitempty"` // Variables to set in the agent state
+	Buttons   []Button               `yaml:"-" json:"-"`                                     // Stores buttons from previous response, not serialized
 }
 
 type User struct {

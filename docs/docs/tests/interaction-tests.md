@@ -23,6 +23,20 @@ interactions:
     user:
       # the input type
       # it could be text, audio or prompt
+      type: launch
+    # Optional: Variables to set in the agent state after this interaction
+    variables:
+      user_name: "John Doe"
+      account_type: "premium"
+    agent:
+      validate:
+        - type: traceType
+          value: speak
+
+  - id: test_2
+    user:
+      # the input type
+      # it could be text, audio or prompt
       type: text
       # The input itself in text format. For type: audio, you have to specify the audio file.
       text: I want 3 pizzas
@@ -247,7 +261,92 @@ interactions:
           value: "You selected yes"
 ```
 
+## Setting Variables
 
+You can set variables in the agent's state during a test using the `variables` property on any interaction. Variables are set using the [Voiceflow State Variables API](https://docs.voiceflow.com/reference/updatestatevariables-1) **after** the interaction completes. This is especially important for `launch` interactions, where the session must exist before variables can be set.
+
+### When to Use Variables
+
+- **Initialize agent state**: Set variables after launching a session to configure the agent's behavior
+- **Simulate pre-existing data**: Set user data or context variables that your agent expects
+- **Test different scenarios**: Use different variable values to test how your agent responds under various conditions
+
+### How It Works
+
+1. **For `launch` interactions**: The launch is executed first to create the session, then variables are set afterwards (the session must exist before variables can be set)
+2. **For all other interactions**: Variables are set **before** the interaction executes, so the agent has access to them during the interaction
+3. Subsequent interactions will have access to the updated variables
+
+### Example
+
+```yaml
+name: Variable Setting Example
+description: Test demonstrating variable setting in interaction tests
+
+interactions:
+  - id: launch_conversation
+    user:
+      type: launch
+    # Variables are set AFTER the launch interaction creates the session
+    variables:
+      user_name: "John Doe"
+      account_type: "premium"
+      service_list: "basic, premium, enterprise"
+    agent:
+      validate:
+        - type: traceType
+          value: speak
+
+  - id: ask_about_account
+    user:
+      type: text
+      text: "What is my account type?"
+    agent:
+      validate:
+        - type: contains
+          value: "premium"
+
+  - id: update_preferences
+    user:
+      type: text
+      text: "Update my preferences"
+    # For non-launch interactions, variables are set BEFORE the interaction
+    variables:
+      preferred_language: "Spanish"
+    agent:
+      validate:
+        - type: contains
+          value: "preferences updated"
+```
+
+### Variable Types
+
+Variables support any value type including strings, numbers, booleans, arrays, and objects:
+
+```yaml
+variables:
+  # String
+  user_name: "Jane Smith"
+  # Number
+  retry_count: 3
+  # Boolean
+  is_vip: true
+  # Object
+  user_profile:
+    name: "Jane Smith"
+    email: "jane@example.com"
+  # Array/List
+  selected_items:
+    - "item1"
+    - "item2"
+```
+
+### Important Notes
+
+- For `launch` interactions, variables are set **after** the interaction (the session must exist first)
+- For all other interactions, variables are set **before** the interaction executes
+- The `variables` property uses the same underlying API as the [Agent-to-Agent testing variables](/tests/agent-to-agent-tests/#voiceflowagenttargetconfig-voiceflow-agent-to-agent-testing-only)
+- Variables are merged with existing state variables (PATCH operation), not replacing them entirely
 
 ## Validation types
 

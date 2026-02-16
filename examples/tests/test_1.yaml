@@ -4,6 +4,9 @@ interactions:
   - id: test_1_1
     user: 
       type: launch
+    variables:
+      user_name: "John Doe"
+      account_type: "premium"
     agent:
       validate:
         - type: contains
@@ -14,6 +17,9 @@ interactions:
     user: 
       type: text
       text: 'I am doing well'
+    variables:
+      user_name: "John Does"
+      account_type: "premium"
     agent:
       validate:
         - type: traceType
