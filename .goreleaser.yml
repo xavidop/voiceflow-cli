@@ -22,6 +22,9 @@ builds:
     - arm64
   goarm:
     - "7"
+  ignore:
+    - goos: windows
+      goarch: arm
 
 archives:
   - name_template: >-
