@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	openaiauth "github.com/xavidop/voiceflow-cli/internal/openai"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
@@ -18,7 +19,7 @@ func OpenAICheckSimilarity(message string, s []string, similarityConfig tests.Si
 	}
 
 	// OpenAI API endpoint
-	apiURL := "https://api.openai.com/v1/chat/completions"
+	apiURL := openaiauth.GetChatCompletionsURL()
 
 	// Prepare the prompt for similarity comparison
 	prompt := fmt.Sprintf(

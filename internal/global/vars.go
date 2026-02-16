@@ -6,6 +6,7 @@ var Log logrus.Logger
 
 var VoiceflowAPIKey string
 var OpenAIAPIKey string
+var OpenAIBaseURL string
 var VoiceflowSubdomain string
 var VersionString string
 var Output string
