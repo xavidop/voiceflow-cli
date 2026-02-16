@@ -22,6 +22,7 @@ var executeCmd = &cobra.Command{
 		suite := args[0]
 		voiceflow.SetVoiceflowAPIKey()
 		openai.SetOpenAIAPIKey()
+		openai.SetOpenAIBaseURL()
 		if err := test.ExecuteSuite(suite); err != nil {
 			global.Log.Errorf("%s", err.Error())
 			os.Exit(1)

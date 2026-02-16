@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
+	openaiauth "github.com/xavidop/voiceflow-cli/internal/openai"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
 	"github.com/xavidop/voiceflow-cli/internal/utils"
@@ -169,7 +170,7 @@ Has the goal been achieved? Respond with only "YES" or "NO".`, goal, conversatio
 
 // CallOpenAI makes a request to the OpenAI API
 func (br *BaseRunner) CallOpenAI(messages []ChatMessage) (string, error) {
-	apiURL := "https://api.openai.com/v1/chat/completions"
+	apiURL := openaiauth.GetChatCompletionsURL()
 
 	// Set default values
 	model := "gpt-4o"
