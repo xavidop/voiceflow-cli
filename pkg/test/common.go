@@ -132,11 +132,11 @@ func (br *BaseRunner) IsGoalAchieved(goal string) (bool, error) {
 		if msg.Role != "system" {
 			switch msg.Role {
 			case "user":
-				conversationSummary.WriteString(fmt.Sprintf("User: %s\n", msg.Content))
+				fmt.Fprintf(&conversationSummary, "User: %s\n", msg.Content)
 			case "assistant":
-				conversationSummary.WriteString(fmt.Sprintf("Agent: %s\n", msg.Content))
+				fmt.Fprintf(&conversationSummary, "Agent: %s\n", msg.Content)
 			default:
-				conversationSummary.WriteString(fmt.Sprintf("%s: %s\n", msg.Role, msg.Content))
+				fmt.Fprintf(&conversationSummary, "%s: %s\n", msg.Role, msg.Content)
 			}
 		}
 	}

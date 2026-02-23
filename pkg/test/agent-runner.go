@@ -230,7 +230,7 @@ func (atr *AgentTestRunner) checkForUserInfoRequest(voiceflowResponse []interact
 	if len(atr.userInformation) > 0 {
 		availableInfo.WriteString("Available user information:\n")
 		for name, value := range atr.userInformation {
-			availableInfo.WriteString(fmt.Sprintf("- %s: %s\n", name, value))
+			fmt.Fprintf(&availableInfo, "- %s: %s\n", name, value)
 		}
 	} else {
 		availableInfo.WriteString("No predefined user information available.")

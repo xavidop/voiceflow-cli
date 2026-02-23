@@ -79,7 +79,7 @@ func HandleWebSocket(c *gin.Context) {
 		global.Log.Errorf("WebSocket upgrade failed: %v", err)
 		return
 	}
-	defer ws.Close()
+	defer func() { _ = ws.Close() }()
 
 	conn := &wsConn{conn: ws}
 
