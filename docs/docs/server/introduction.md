@@ -1,13 +1,15 @@
 # API Server Introduction
 
-The Voiceflow CLI now includes an HTTP API server that exposes test execution functionality as REST endpoints with auto-generated OpenAPI/Swagger documentation.
+The Voiceflow CLI now includes an HTTP API server that exposes test execution functionality as REST endpoints with auto-generated OpenAPI/Swagger documentation and **WebSocket support for real-time log streaming**.
 
 ## Features
 
 - **HTTP API**: Execute test suites via REST endpoints
+- **WebSocket API**: Execute, cancel, and monitor test suites over a persistent WebSocket connection with real-time log streaming
 - **Real-time Logging**: Capture and return test execution logs in API responses
 - **OpenAPI/Swagger**: Auto-generated API documentation at `/swagger/index.html`
 - **Asynchronous Execution**: Non-blocking test execution with status tracking
+- **Cancellation Support**: Cancel running test executions via REST or WebSocket
 - **Custom Subdomains**: Support for per-request Voiceflow subdomain overrides
 - **Multi-Environment Testing**: Concurrent testing against different environments
 - **Thread Safety**: No race conditions when testing multiple subdomains simultaneously

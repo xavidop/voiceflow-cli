@@ -15,6 +15,7 @@ require (
 	github.com/gin-gonic/gin v1.11.0
 	github.com/google/go-github/v82 v82.0.0
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/invopop/jsonschema v0.13.0
 	github.com/joho/godotenv v1.5.1
 	github.com/muesli/mango-cobra v1.3.0

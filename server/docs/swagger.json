@@ -41,6 +41,50 @@
                 }
             }
         },
+        "/api/v1/tests/cancel/{id}": {
+            "post": {
+                "description": "Cancel a test execution that is currently running",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tests"
+                ],
+                "summary": "Cancel a running test execution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test execution ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TestStatusResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/tests/execute": {
             "post": {
                 "description": "Execute a Voiceflow test suite from request data and return execution ID",

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -15,17 +16,23 @@ import (
 )
 
 // Function to simulate running a test
-func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
+func runTest(ctx context.Context, environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
 	logCollector.AddLog("Running Test ID: " + test.Name)
 
 	// Check if this is an agent test
 	if test.Agent != nil {
-		return runAgentTest(environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig, newSessionPerTest)
+		return runAgentTest(ctx, environmentName, userID, test, apiKeyOverride, subdomainOverride, logCollector, suiteOpenAIConfig, newSessionPerTest)
 	}
 
 	// Original interaction-based test logic
 	var availableButtons []tests.Button // Track buttons from previous choice responses
 	for _, interaction := range test.Interactions {
+		// Check for cancellation before each interaction
+		if ctx.Err() != nil {
+			logCollector.AddLog("Test execution cancelled")
+			return ctx.Err()
+		}
+
 		logCollector.AddLog("Interaction ID: " + interaction.ID)
 		logCollector.AddLog("\tInteraction Request Type: " + interaction.User.Type)
 		if interaction.User.Type == "text" {
@@ -107,7 +114,7 @@ func runTest(environmentName, userID string, test tests.Test, apiKeyOverride, su
 }
 
 // runAgentTest executes an agent-to-agent test
-func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
+func runAgentTest(ctx context.Context, environmentName, userID string, test tests.Test, apiKeyOverride, subdomainOverride string, logCollector *LogCollector, suiteOpenAIConfig *tests.OpenAIConfig, newSessionPerTest bool) error {
 	logCollector.AddLog("Executing agent-to-agent test: " + test.Name)
 
 	agentTest := *test.Agent
@@ -125,7 +132,7 @@ func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverrid
 		runner := NewVoiceflowAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
 		// Execute the Voiceflow agent test
-		return runner.ExecuteAgentTest(agentTest, newSessionPerTest)
+		return runner.ExecuteAgentTest(ctx, agentTest, newSessionPerTest)
 	}
 
 	// Default to OpenAI-based agent testing
@@ -135,7 +142,7 @@ func runAgentTest(environmentName, userID string, test tests.Test, apiKeyOverrid
 	runner := NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverride, logCollector)
 
 	// Execute the agent test
-	return runner.ExecuteAgentTest(agentTest, newSessionPerTest)
+	return runner.ExecuteAgentTest(ctx, agentTest, newSessionPerTest)
 }
 
 func autoGenerateValidationsIDs(validations []tests.Validation) []tests.Validation {

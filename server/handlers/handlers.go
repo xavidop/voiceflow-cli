@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 	"runtime"
 	"sync"
@@ -79,6 +80,7 @@ type TestExecution struct {
 	Logs        []string
 	Error       string
 	mutex       sync.RWMutex
+	cancelFunc  context.CancelFunc
 }
 
 // Thread-safe methods for TestExecution
@@ -105,6 +107,21 @@ func (te *TestExecution) SetError(error string) {
 	te.Status = "failed"
 	now := time.Now()
 	te.CompletedAt = &now
+}
+
+func (te *TestExecution) Cancel() bool {
+	te.mutex.Lock()
+	defer te.mutex.Unlock()
+	if te.Status != "running" {
+		return false
+	}
+	te.Status = "cancelled"
+	now := time.Now()
+	te.CompletedAt = &now
+	if te.cancelFunc != nil {
+		te.cancelFunc()
+	}
+	return true
 }
 
 func (te *TestExecution) GetStatus() TestStatusResponse {
@@ -176,8 +193,14 @@ func ExecuteTestSuite(c *gin.Context) {
 	testExecutions[executionID] = execution
 	testExecutionsMutex.Unlock()
 
+	// Create a cancellable context for this execution
+	ctx, cancel := context.WithCancel(context.Background())
+	execution.cancelFunc = cancel
+
 	// Start test execution in a goroutine
 	go func() {
+		defer cancel()
+
 		// Create a custom logger that captures output
 		execution.AddLog("Starting test suite execution...")
 		execution.AddLog("Suite: " + req.Suite.Name)
@@ -202,17 +225,20 @@ func ExecuteTestSuite(c *gin.Context) {
 			}
 		}
 
-		// Execute the test suite with log capture
-		result := test.ExecuteFromHTTPRequest(httpSuite)
-
-		// Add all captured logs
-		for _, logLine := range result.Logs {
-			execution.AddLog(logLine)
-		}
+		// Execute the test suite with log capture and cancellation support.
+		// Use the callback variant so logs are added to the execution in
+		// real-time, ensuring they are visible via the status endpoint even
+		// if the test is cancelled and the status is queried immediately.
+		result := test.ExecuteFromHTTPRequestWithCallback(ctx, httpSuite, execution.AddLog)
 
 		if !result.Success {
-			execution.SetError(result.Error.Error())
-			execution.AddLog("Test suite execution failed: " + result.Error.Error())
+			if ctx.Err() != nil {
+				execution.AddLog("Test suite execution cancelled")
+				// Status already set to cancelled by Cancel()
+			} else {
+				execution.SetError(result.Error.Error())
+				execution.AddLog("Test suite execution failed: " + result.Error.Error())
+			}
 		} else {
 			execution.SetStatus("completed")
 			execution.AddLog("Test suite execution completed successfully")
@@ -275,4 +301,41 @@ func GetSystemInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+// CancelTestExecution godoc
+// @Summary Cancel a running test execution
+// @Description Cancel a test execution that is currently running
+// @Tags tests
+// @Accept json
+// @Produce json
+// @Param id path string true "Test execution ID"
+// @Success 200 {object} TestStatusResponse
+// @Failure 404 {object} ErrorResponse
+// @Failure 409 {object} ErrorResponse
+// @Router /api/v1/tests/cancel/{id} [post]
+func CancelTestExecution(c *gin.Context) {
+	executionID := c.Param("id")
+
+	testExecutionsMutex.RLock()
+	execution, exists := testExecutions[executionID]
+	testExecutionsMutex.RUnlock()
+
+	if !exists {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Error:   "Test execution not found",
+			Message: "No test execution found with ID: " + executionID,
+		})
+		return
+	}
+
+	if !execution.Cancel() {
+		c.JSON(http.StatusConflict, ErrorResponse{
+			Error:   "Cannot cancel test execution",
+			Message: "Test execution is not running (current status: " + execution.GetStatus().Status + ")",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, execution.GetStatus())
 }

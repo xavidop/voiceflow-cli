@@ -1,10 +1,11 @@
 # Voiceflow CLI API Server
 
-The Voiceflow CLI now includes an HTTP API server that exposes test execution functionality as REST endpoints with auto-generated OpenAPI/Swagger documentation.
+The Voiceflow CLI now includes an HTTP API server that exposes test execution functionality as REST endpoints with auto-generated OpenAPI/Swagger documentation and **WebSocket support for real-time log streaming**.
 
 ## Features
 
 - **HTTP API**: Execute test suites via REST endpoints
+- **WebSocket API**: Execute, cancel, and monitor test suites over a persistent WebSocket connection with real-time log streaming
 - **Real-time Logging**: Capture and return test execution logs in API responses
 - **OpenAPI/Swagger**: Auto-generated API documentation at `/swagger/index.html`
 - **Asynchronous Execution**: Non-blocking test execution with status tracking
@@ -138,6 +139,157 @@ Once the server is running, you can access the interactive API documentation at:
 
 ```
 http://localhost:8080/swagger/index.html
+```
+
+## WebSocket API
+
+Connect to `ws://localhost:8080/ws` for a persistent connection with real-time log streaming. The WebSocket endpoint exposes the same functionality as the REST API but pushes log lines as they happen instead of requiring polling.
+
+### Protocol
+
+All messages are JSON objects.
+
+**Client → Server:**
+
+| Action | Description | Fields |
+|--------|-------------|--------|
+| `execute` | Start a test suite | `{ "action": "execute", "data": <TestExecutionRequest> }` |
+| `cancel` | Cancel a running execution | `{ "action": "cancel", "id": "<execution-id>" }` |
+| `status` | Get execution status | `{ "action": "status", "id": "<execution-id>" }` |
+
+**Server → Client:**
+
+| Type | Description |
+|------|-------------|
+| `log` | Real-time log line: `{ "type": "log", "id": "...", "message": "..." }` |
+| `status` | Status update: `{ "type": "status", "id": "...", "data": <TestStatusResponse> }` |
+| `result` | Final result when execution finishes: `{ "type": "result", "id": "...", "data": <TestStatusResponse> }` |
+| `error` | Error message: `{ "type": "error", "message": "..." }` |
+
+### WebSocket Examples
+
+#### Using websocat (CLI)
+
+```bash
+# Install: brew install websocat
+websocat ws://localhost:8080/ws
+```
+
+Then paste JSON messages:
+
+```json
+{"action":"execute","data":{"suite":{"name":"Example Suite","description":"Test","environment_name":"production","tests":[{"id":"test_1","test":{"name":"Example test","description":"Test","interactions":[{"id":"t1","user":{"type":"text","text":"hi"},"agent":{"validate":[{"type":"contains","value":"hello"}]}}]}}]}}}
+```
+
+Cancel a running execution:
+
+```json
+{"action":"cancel","id":"<execution-id-from-status-message>"}
+```
+
+#### Using JavaScript
+
+```javascript
+const ws = new WebSocket('ws://localhost:8080/ws');
+
+ws.onopen = () => {
+  // Execute a test suite
+  ws.send(JSON.stringify({
+    action: 'execute',
+    data: {
+      api_key: 'your_api_key',
+      suite: {
+        name: 'Example Suite',
+        description: 'Suite used as an example',
+        environment_name: 'production',
+        tests: [
+          {
+            id: 'test_1',
+            test: {
+              name: 'Example test',
+              description: 'These are some tests',
+              interactions: [
+                {
+                  id: 'test_1_1',
+                  user: { type: 'text', text: 'hi' },
+                  agent: { validate: [{ type: 'contains', value: 'hello' }] }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }));
+};
+
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  switch (msg.type) {
+    case 'log':
+      console.log(`[LOG] ${msg.message}`);
+      break;
+    case 'status':
+      console.log(`[STATUS] ${msg.id}: ${msg.message || msg.data.status}`);
+      // Cancel example: ws.send(JSON.stringify({ action: 'cancel', id: msg.id }));
+      break;
+    case 'result':
+      console.log('[RESULT]', msg.data);
+      break;
+    case 'error':
+      console.error('[ERROR]', msg.message);
+      break;
+  }
+};
+```
+
+#### Using Python
+
+```python
+import asyncio
+import json
+import websockets
+
+async def run_tests():
+    async with websockets.connect('ws://localhost:8080/ws') as ws:
+        # Execute a test suite
+        await ws.send(json.dumps({
+            'action': 'execute',
+            'data': {
+                'api_key': 'your_api_key',
+                'suite': {
+                    'name': 'Example Suite',
+                    'description': 'Test',
+                    'environment_name': 'production',
+                    'tests': [{
+                        'id': 'test_1',
+                        'test': {
+                            'name': 'Example test',
+                            'description': 'Test',
+                            'interactions': [{
+                                'id': 't1',
+                                'user': {'type': 'text', 'text': 'hi'},
+                                'agent': {'validate': [{'type': 'contains', 'value': 'hello'}]}
+                            }]
+                        }
+                    }]
+                }
+            }
+        }))
+
+        # Read messages until execution completes
+        async for message in ws:
+            msg = json.loads(message)
+            if msg['type'] == 'log':
+                print(f"[LOG] {msg['message']}")
+            elif msg['type'] == 'result':
+                print(f"[RESULT] {msg['data']}")
+                break
+            elif msg['type'] == 'error':
+                print(f"[ERROR] {msg['message']}")
+                break
+
+asyncio.run(run_tests())
 ```
 
 ## Usage Examples

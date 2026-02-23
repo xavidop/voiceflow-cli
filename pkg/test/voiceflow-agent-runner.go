@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
@@ -32,7 +33,7 @@ func (vatr *VoiceflowAgentTestRunner) addLog(message string) {
 }
 
 // ExecuteAgentTest runs an agent-to-agent test using a Voiceflow agent as the tester
-func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest, newSessionPerTest bool) error {
+func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agentTest tests.AgentTest, newSessionPerTest bool) error {
 	// Validate that we have the required Voiceflow agent tester configuration
 	if agentTest.VoiceflowAgentTesterConfig == nil {
 		return fmt.Errorf("voiceflowAgentTesterConfig is required for Voiceflow agent testing")
@@ -119,6 +120,12 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest
 
 	// Main conversation loop
 	for currentStep < agentTest.MaxSteps && !goalAchieved {
+		// Check for cancellation before each step
+		if ctx.Err() != nil {
+			vatr.addLog("Agent test execution cancelled")
+			return ctx.Err()
+		}
+
 		vatr.addLog(fmt.Sprintf("Step %d", currentStep))
 
 		// Get the tester's message and send it to the target agent

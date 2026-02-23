@@ -10,6 +10,8 @@
 
 - **CORS**: Cross-Origin Resource Sharing (CORS) is enabled by default. You can disable it using `--cors=false` if not needed.
 
+- **WebSocket**: The WebSocket endpoint (`/ws`) accepts connections from all origins by default. In production, consider restricting allowed origins via a reverse proxy.
+
 ## Troubleshooting
 
 ### Server Won't Start
@@ -42,6 +44,31 @@
 1. Ensure you're using the correct base path `/api/v1/` for API endpoints
 2. Verify the server is running and accessible
 3. Check the server logs for any startup errors
+
+### REST Execute Returns Immediately
+
+**Problem**: `POST /api/v1/tests/execute` returns right away with status `"running"` instead of waiting for the tests to finish.
+
+**Explanation**: This is expected behavior. The REST endpoint is **asynchronous** — it starts the test execution in the background and returns an execution ID immediately.
+
+**Solutions**:
+
+1. Poll the status endpoint to track progress:
+   ```bash
+   curl http://localhost:8080/api/v1/tests/status/YOUR_EXECUTION_ID
+   ```
+
+2. If you want real-time streaming of logs as they happen, use the **WebSocket endpoint** (`/ws`) instead — see the [usage examples](usage-examples.md#websocket-api) for details.
+
+### WebSocket Connection Closes Immediately
+
+**Problem**: WebSocket connection closes right after connecting.
+
+**Solutions**:
+
+1. Make sure you're using a proper WebSocket client (e.g., `wscat`, `websocat`), not `curl` — HTTP tools like `curl` do not support WebSocket
+2. Check server logs for upgrade errors
+3. Verify the URL uses the `ws://` scheme: `ws://localhost:8080/ws`
 
 ### Logs Not Appearing
 

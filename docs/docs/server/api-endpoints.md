@@ -1,13 +1,23 @@
 # API Endpoints
 
-## Health Check
+## REST API
+
+### Health Check
 ```http
 GET /health
 ```
 
 Returns the health status of the server.
 
-## Execute Test Suite
+**Response:**
+```json
+{
+  "status": "healthy",
+  "time": "2026-02-23T14:00:00+01:00"
+}
+```
+
+### Execute Test Suite
 ```http
 POST /api/v1/tests/execute
 Content-Type: application/json
@@ -49,7 +59,7 @@ Content-Type: application/json
 }
 ```
 
-**Response:**
+**Response (202 Accepted):**
 ```json
 {
   "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -59,15 +69,15 @@ Content-Type: application/json
 }
 ```
 
-Executes a test suite asynchronously and returns an execution ID for tracking. The suite configuration and tests are now embedded directly in the request body, making the API more HTTP-friendly and eliminating the need for file system access.
+Executes a test suite asynchronously and returns an execution ID for tracking. The suite configuration and tests are embedded directly in the request body, making the API more HTTP-friendly and eliminating the need for file system access.
 
-### Request Parameters
+#### Request Parameters
 
 - `api_key` (optional): Override the global Voiceflow API key for this specific test execution
 - `voiceflow_subdomain` (optional): Override the global Voiceflow subdomain for this specific test execution. This allows you to test against different Voiceflow environments or custom subdomains without affecting the global configuration
 - `suite`: The test suite configuration containing the test definitions
 
-### Using Custom Subdomains
+#### Using Custom Subdomains
 
 When you specify a `voiceflow_subdomain`, the API will use that subdomain for all interactions in the test suite. For example:
 
@@ -75,7 +85,7 @@ When you specify a `voiceflow_subdomain`, the API will use that subdomain for al
 - If you omit this field, the global subdomain configuration will be used
 - This is particularly useful for testing against staging environments or customer-specific deployments
 
-## Get Test Status
+### Get Test Status
 ```http
 GET /api/v1/tests/status/{execution_id}
 ```
@@ -97,7 +107,33 @@ GET /api/v1/tests/status/{execution_id}
 
 Retrieves the current status and logs of a test execution.
 
-## System Information
+### Cancel Test Execution
+```http
+POST /api/v1/tests/cancel/{execution_id}
+```
+
+Cancels a running test execution.
+
+**Response (200 OK):**
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "cancelled",
+  "started_at": "2023-01-01T00:00:00Z",
+  "completed_at": "2023-01-01T00:02:30Z",
+  "logs": [
+    "Starting test suite execution...",
+    "Test suite execution cancelled"
+  ]
+}
+```
+
+**Error Responses:**
+
+- `404 Not Found`: No execution with the given ID
+- `409 Conflict`: Execution is not running (already completed, failed, or cancelled)
+
+### System Information
 ```http
 GET /api/v1/system/info
 ```
@@ -113,6 +149,31 @@ GET /api/v1/system/info
 ```
 
 Returns system information about the running server instance.
+
+## WebSocket API
+
+Connect to `ws://localhost:8080/ws` for a persistent connection with real-time log streaming. The WebSocket endpoint exposes the same functionality as the REST API but pushes log lines as they happen instead of requiring polling.
+
+### Protocol
+
+All messages are JSON objects.
+
+**Client → Server:**
+
+| Action | Description | Fields |
+|--------|-------------|--------|
+| `execute` | Start a test suite | `{ "action": "execute", "data": <TestExecutionRequest> }` |
+| `cancel` | Cancel a running execution | `{ "action": "cancel", "id": "<execution-id>" }` |
+| `status` | Get execution status | `{ "action": "status", "id": "<execution-id>" }` |
+
+**Server → Client:**
+
+| Type | Description |
+|------|-------------|
+| `log` | Real-time log line: `{ "type": "log", "id": "...", "message": "..." }` |
+| `status` | Status update: `{ "type": "status", "id": "...", "data": <TestStatusResponse> }` |
+| `result` | Final result when execution finishes: `{ "type": "result", "id": "...", "data": <TestStatusResponse> }` |
+| `error` | Error message: `{ "type": "error", "message": "..." }` |
 
 ## OpenAPI/Swagger Documentation
 

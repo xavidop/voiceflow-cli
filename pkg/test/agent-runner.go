@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -35,7 +36,7 @@ func NewAgentTestRunner(environmentName, userID, apiKeyOverride, subdomainOverri
 }
 
 // ExecuteAgentTest runs an agent-to-agent test
-func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest, newSessionPerTest bool) error {
+func (atr *AgentTestRunner) ExecuteAgentTest(ctx context.Context, agentTest tests.AgentTest, newSessionPerTest bool) error {
 	// Set up user information for easy lookup
 	for _, info := range agentTest.UserInformation {
 		atr.userInformation[info.Name] = info.Value
@@ -77,6 +78,12 @@ func (atr *AgentTestRunner) ExecuteAgentTest(agentTest tests.AgentTest, newSessi
 	currentStep++
 
 	for currentStep < agentTest.MaxSteps && !goalAchieved {
+		// Check for cancellation before each step
+		if ctx.Err() != nil {
+			atr.addLog("Agent test execution cancelled")
+			return ctx.Err()
+		}
+
 		atr.addLog(fmt.Sprintf("Step %d", currentStep))
 
 		// Check if goal is achieved

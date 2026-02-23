@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"strings"
 
 	"github.com/google/uuid"
@@ -29,7 +30,8 @@ type HTTPTestRequest struct {
 
 // LogCollector is used to collect logs during test execution
 type LogCollector struct {
-	Logs []string
+	Logs  []string
+	OnLog func(message string) // Optional callback invoked on each log message (e.g. for WebSocket streaming)
 }
 
 // AddLog adds a log message to the collector
@@ -39,13 +41,23 @@ func (lc *LogCollector) AddLog(message string) {
 	message = strings.ReplaceAll(message, "\t", "")
 	lc.Logs = append(lc.Logs, message)
 	global.Log.Info(message) // Also log to the global logger
+	if lc.OnLog != nil {
+		lc.OnLog(message)
+	}
 }
 
 // ExecuteFromHTTPRequest executes a test suite directly from HTTP request data
-func ExecuteFromHTTPRequest(suiteReq HTTPSuiteRequest) *ExecuteSuiteResult {
-	// Create a log collector
+func ExecuteFromHTTPRequest(ctx context.Context, suiteReq HTTPSuiteRequest) *ExecuteSuiteResult {
+	return ExecuteFromHTTPRequestWithCallback(ctx, suiteReq, nil)
+}
+
+// ExecuteFromHTTPRequestWithCallback executes a test suite and invokes onLog for each log line in real-time.
+// This is used by the WebSocket handler to stream logs to the client as they happen.
+func ExecuteFromHTTPRequestWithCallback(ctx context.Context, suiteReq HTTPSuiteRequest, onLog func(string)) *ExecuteSuiteResult {
+	// Create a log collector with optional streaming callback
 	logCollector := &LogCollector{
-		Logs: []string{},
+		Logs:  []string{},
+		OnLog: onLog,
 	}
 
 	// Execute the test suite
@@ -54,7 +66,7 @@ func ExecuteFromHTTPRequest(suiteReq HTTPSuiteRequest) *ExecuteSuiteResult {
 		Logs:    []string{},
 	}
 
-	err := executeHTTPSuite(suiteReq, logCollector)
+	err := executeHTTPSuite(ctx, suiteReq, logCollector)
 	if err != nil {
 		result.Success = false
 		result.Error = err
@@ -67,7 +79,7 @@ func ExecuteFromHTTPRequest(suiteReq HTTPSuiteRequest) *ExecuteSuiteResult {
 }
 
 // executeHTTPSuite executes a suite from HTTP request data
-func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) error {
+func executeHTTPSuite(ctx context.Context, suiteReq HTTPSuiteRequest, logCollector *LogCollector) error {
 	// Define the user ID
 	userID := "test-" + uuid.New().String()
 
@@ -87,13 +99,19 @@ func executeHTTPSuite(suiteReq HTTPSuiteRequest, logCollector *LogCollector) err
 
 	// Execute each test directly from the request data
 	for _, testReq := range suiteReq.Tests {
+		// Check for cancellation before each test
+		if ctx.Err() != nil {
+			logCollector.AddLog("Test execution cancelled")
+			return ctx.Err()
+		}
+
 		// Create a new user ID for each test if newSessionPerTest is enabled
 		if suiteReq.NewSessionPerTest {
 			userID = "test-" + uuid.New().String()
 			logCollector.AddLog("User ID for test " + testReq.ID + ": " + userID)
 		}
 		logCollector.AddLog("Running Test ID: " + testReq.ID)
-		err := runTest(suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig, suiteReq.NewSessionPerTest)
+		err := runTest(ctx, suiteReq.EnvironmentName, userID, testReq.Test, suiteReq.ApiKey, suiteReq.VoiceflowSubdomain, logCollector, suiteReq.OpenAIConfig, suiteReq.NewSessionPerTest)
 		if err != nil {
 			errorMsg := "Error running test " + testReq.ID + ": " + err.Error()
 			logCollector.AddLog(errorMsg)
@@ -138,7 +156,7 @@ func ExecuteSuite(suitesPath string) error {
 			}
 			// Create a dummy log collector for the existing file-based execution
 			logCollector := &LogCollector{Logs: []string{}}
-			err = runTest(suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig, suite.NewSessionPerTest) // Pass suite-level OpenAI config
+			err = runTest(context.Background(), suite.EnvironmentName, userID, test, "", "", logCollector, suite.OpenAIConfig, suite.NewSessionPerTest) // Pass suite-level OpenAI config
 			if err != nil {
 				global.Log.Errorf("Error running test: %v", err)
 				return err

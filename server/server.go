@@ -84,6 +84,7 @@ func (s *Server) setupRoutes() {
 		{
 			tests.POST("/execute", handlers.ExecuteTestSuite)
 			tests.GET("/status/:id", handlers.GetTestStatus)
+			tests.POST("/cancel/:id", handlers.CancelTestExecution)
 		}
 
 		// System endpoints
@@ -92,6 +93,11 @@ func (s *Server) setupRoutes() {
 			system.GET("/info", handlers.GetSystemInfo)
 		}
 	}
+
+	// WebSocket endpoint – provides the same functionality as the REST
+	// endpoints above but over a persistent connection with real-time
+	// log streaming.
+	s.router.GET("/ws", handlers.HandleWebSocket)
 
 	// Swagger documentation
 	if s.config.SwaggerEnabled {
