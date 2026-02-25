@@ -83,7 +83,8 @@ func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentNam
 	return br.ProcessResponses(responses), nil
 }
 
-// ProcessResponses handles multiple responses by concatenating messages
+// ProcessResponses handles multiple responses by concatenating messages.
+// It preserves "end" type responses so callers can detect session termination.
 func (br *BaseRunner) ProcessResponses(responses []interact.InteractionResponse) []interact.InteractionResponse {
 	if len(responses) == 0 {
 		br.AddLog("No response received from Voiceflow")
@@ -93,21 +94,43 @@ func (br *BaseRunner) ProcessResponses(responses []interact.InteractionResponse)
 	// If there are multiple responses, concatenate their messages
 	if len(responses) > 1 {
 		var concatenatedMessage strings.Builder
+		var endResponse *interact.InteractionResponse
+		firstMessageIdx := -1
+
 		for i, response := range responses {
+			// Preserve end response for session termination detection
+			if response.Type == "end" {
+				endResponse = &responses[i]
+				continue
+			}
 			if message, ok := response.Payload["message"].(string); ok && message != "" {
-				if i > 0 {
+				if firstMessageIdx == -1 {
+					firstMessageIdx = i
+				} else {
 					concatenatedMessage.WriteString(" ")
 				}
 				concatenatedMessage.WriteString(message)
 			}
 		}
 
-		// Update the first response with the concatenated message
-		if concatenatedMessage.Len() > 0 {
-			responses[0].Payload["message"] = concatenatedMessage.String()
+		var result []interact.InteractionResponse
+
+		// Update the first message response with the concatenated message
+		if firstMessageIdx >= 0 && concatenatedMessage.Len() > 0 {
+			responses[firstMessageIdx].Payload["message"] = concatenatedMessage.String()
+			result = append(result, responses[firstMessageIdx])
 		}
 
-		// Return only the first response with the concatenated message
+		// Append end response if present so callers can detect session end
+		if endResponse != nil {
+			result = append(result, *endResponse)
+		}
+
+		if len(result) > 0 {
+			return result
+		}
+
+		// Fallback: return the original first response
 		return responses[:1]
 	}
 
@@ -122,6 +145,23 @@ func (br *BaseRunner) ExtractMessage(voiceflowResponse []interact.InteractionRes
 		}
 	}
 	return ""
+}
+
+// HasEndResponse checks if any of the Voiceflow responses contain an "end" type trace,
+// which indicates the agent's session has ended.
+func (br *BaseRunner) HasEndResponse(responses []interact.InteractionResponse) (bool, string) {
+	for _, response := range responses {
+		if response.Type == "end" {
+			reason := ""
+			if response.Payload != nil {
+				if r, ok := response.Payload["reason"].(string); ok {
+					reason = r
+				}
+			}
+			return true, reason
+		}
+	}
+	return false, ""
 }
 
 // IsGoalAchieved uses OpenAI to evaluate if the goal has been achieved
@@ -141,17 +181,22 @@ func (br *BaseRunner) IsGoalAchieved(goal string) (bool, error) {
 		}
 	}
 
-	prompt := fmt.Sprintf(`Analyze the following conversation and determine if the goal has been achieved.
+	prompt := fmt.Sprintf(`Analyze the following conversation between two agents and determine if the stated goal has been achieved or is clearly being fulfilled.
 
 Goal: %s
 
 Conversation:
 %s
 
-Has the goal been achieved? Respond with only "YES" or "NO".`, goal, conversationSummary.String())
+When evaluating, consider:
+- Has the goal been explicitly completed (e.g., a clear confirmation message)?
+- Has the goal been effectively achieved even without an explicit final confirmation? For example, if all required information has been gathered and the action is being processed, or both parties are acting as if the goal is accomplished, consider it achieved.
+- Look at the overall intent and progression of the conversation, not just the last message.
+
+Based on the full conversation context, has the goal been achieved or effectively fulfilled? Respond with only "YES" or "NO".`, goal, conversationSummary.String())
 
 	messages := []ChatMessage{
-		{Role: "system", Content: "You are a helpful assistant that analyzes conversations and determines if goals have been achieved."},
+		{Role: "system", Content: "You are an expert evaluator that analyzes conversations between two agents and determines if a stated goal has been achieved or effectively fulfilled. Consider the overall intent, actions taken, and progression of the conversation. A goal can be considered achieved if the necessary actions have been completed or are clearly being executed, even without an explicit final confirmation message."},
 		{Role: "user", Content: prompt},
 	}
 

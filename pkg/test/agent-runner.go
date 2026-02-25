@@ -108,6 +108,17 @@ func (atr *AgentTestRunner) ExecuteAgentTest(ctx context.Context, agentTest test
 			return fmt.Errorf("failed to interact with Voiceflow at step %d: %w", currentStep, err)
 		}
 
+		// Check if the Voiceflow agent's session has ended
+		if ended, reason := atr.HasEndResponse(voiceflowResponse); ended {
+			atr.addLog(fmt.Sprintf("Voiceflow agent session ended (reason: %s)", reason))
+			// Still extract and log the last message if available
+			lastMessage := atr.ExtractMessage(voiceflowResponse)
+			if lastMessage != "" {
+				atr.addLog(fmt.Sprintf("Voiceflow agent final message: %s", lastMessage))
+			}
+			break
+		}
+
 		// Get the next action from the AI agent
 		agentResponse, err = atr.getNextAction(voiceflowResponse, agentTest.Goal, currentStep+1, agentTest.MaxSteps)
 		if err != nil {

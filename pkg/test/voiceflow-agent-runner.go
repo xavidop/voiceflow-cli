@@ -128,6 +128,12 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 
 		vatr.addLog(fmt.Sprintf("Step %d", currentStep))
 
+		// Check if the tester agent's session has ended
+		if ended, reason := vatr.HasEndResponse(testerResponse); ended {
+			vatr.addLog(fmt.Sprintf("Tester agent session ended (reason: %s)", reason))
+			break
+		}
+
 		// Get the tester's message and send it to the target agent
 		testerMessage := vatr.ExtractMessage(testerResponse)
 		if testerMessage == "" {
@@ -144,6 +150,17 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 		targetAgentResponse, err = vatr.interactWithTargetAgent("text", testerMessage)
 		if err != nil {
 			return fmt.Errorf("failed to interact with target agent at step %d: %w", currentStep, err)
+		}
+
+		// Check if the target agent's session has ended
+		if ended, reason := vatr.HasEndResponse(targetAgentResponse); ended {
+			vatr.addLog(fmt.Sprintf("Target agent session ended (reason: %s)", reason))
+			// Still extract and log the last message if available
+			targetMessage := vatr.ExtractMessage(targetAgentResponse)
+			if targetMessage != "" {
+				vatr.addLog(fmt.Sprintf("Target agent final message: %s", targetMessage))
+			}
+			break
 		}
 
 		targetMessage := vatr.ExtractMessage(targetAgentResponse)
