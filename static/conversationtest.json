@@ -1,0 +1,299 @@
+{
+		"$schema": "https://json-schema.org/draft/2020-12/schema",
+		"$id": "https://github.com/xavidop/voiceflow-cli/internal/types/tests/test",
+		"$ref": "#/$defs/Test",
+		"$defs": {
+			"Agent": {
+				"properties": {
+					"validate": {
+						"items": {
+							"$ref": "#/$defs/Validation"
+						},
+						"type": "array"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"validate"
+				]
+			},
+			"AgentTest": {
+				"properties": {
+					"goal": {
+						"type": "string"
+					},
+					"persona": {
+						"type": "string"
+					},
+					"maxSteps": {
+						"type": "integer"
+					},
+					"userInformation": {
+						"items": {
+							"$ref": "#/$defs/UserInfo"
+						},
+						"type": "array"
+					},
+					"openAIConfig": {
+						"$ref": "#/$defs/OpenAIConfig"
+					},
+					"voiceflowAgentTesterConfig": {
+						"$ref": "#/$defs/VoiceflowAgentTesterConfig"
+					},
+					"voiceflowAgentTargetConfig": {
+						"$ref": "#/$defs/VoiceflowAgentTargetConfig"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"goal",
+					"persona",
+					"maxSteps"
+				]
+			},
+			"IntentEntity": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"value"
+				]
+			},
+			"IntentRequest": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"entities": {
+						"items": {
+							"$ref": "#/$defs/IntentEntity"
+						},
+						"type": "array"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name"
+				]
+			},
+			"Interaction": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"user": {
+						"$ref": "#/$defs/User"
+					},
+					"agent": {
+						"$ref": "#/$defs/Agent"
+					},
+					"variables": {
+						"type": "object",
+						"additionalProperties": true,
+						"description": "Variables to set in the agent state after this interaction completes"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"id",
+					"user",
+					"agent"
+				]
+			},
+			"OpenAIConfig": {
+				"properties": {
+					"model": {
+						"type": "string"
+					},
+					"temperature": {
+						"type": "number"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"SimilarityConfig": {
+				"properties": {
+					"provider": {
+						"type": "string"
+					},
+					"model": {
+						"type": "string"
+					},
+					"temperature": {
+						"type": "number"
+					},
+					"similarityThreshold": {
+						"type": "number"
+					},
+					"top_k": {
+						"type": "integer"
+					},
+					"top_p": {
+						"type": "number"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"provider",
+					"model",
+					"temperature",
+					"similarityThreshold",
+					"top_k",
+					"top_p"
+				]
+			},
+			"Test": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"interactions": {
+						"items": {
+							"$ref": "#/$defs/Interaction"
+						},
+						"type": "array"
+					},
+					"agent": {
+						"$ref": "#/$defs/AgentTest"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"description"
+				]
+			},
+			"User": {
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"text": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					},
+					"event": {
+						"type": "string"
+					},
+					"intent": {
+						"$ref": "#/$defs/IntentRequest"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"type"
+				]
+			},
+			"UserInfo": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"value"
+				]
+			},
+			"Validation": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					},
+					"values": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"similarityConfig": {
+						"$ref": "#/$defs/SimilarityConfig"
+					},
+					"variableConfig": {
+						"$ref": "#/$defs/VariableConfig"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"type"
+				]
+			},
+			"VariableConfig": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"jsonPath": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name"
+				]
+			},
+			"VoiceflowAgentTargetConfig": {
+				"properties": {
+					"variables": {
+						"type": "object"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object"
+			},
+			"VoiceflowAgentTesterConfig": {
+				"properties": {
+					"environmentName": {
+						"type": "string"
+					},
+					"apiKey": {
+						"type": "string"
+					},
+					"variables": {
+						"type": "object"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"environmentName",
+					"apiKey"
+				]
+			}
+		},
+		"description": "voiceflow-cli Conversation Profiler test definition file"
+	}

@@ -1,0 +1,584 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API server for Voiceflow CLI test execution and management",
+        "title": "Voiceflow CLI API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/system/info": {
+            "get": {
+                "description": "Get information about the API server system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Get system information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SystemInfoResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tests/cancel/{id}": {
+            "post": {
+                "description": "Cancel a test execution that is currently running",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tests"
+                ],
+                "summary": "Cancel a running test execution",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test execution ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TestStatusResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tests/execute": {
+            "post": {
+                "description": "Execute a Voiceflow test suite from request data and return execution ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tests"
+                ],
+                "summary": "Execute a test suite",
+                "parameters": [
+                    {
+                        "description": "Test execution request with embedded suite and tests",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TestExecutionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/TestExecutionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/tests/status/{id}": {
+            "get": {
+                "description": "Get the status and logs of a test execution",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tests"
+                ],
+                "summary": "Get test execution status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Test execution ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/TestStatusResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Check if the API server is running",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Detailed error message"
+                }
+            }
+        },
+        "SystemInfoResponse": {
+            "type": "object",
+            "properties": {
+                "arch": {
+                    "type": "string",
+                    "example": "amd64"
+                },
+                "go_version": {
+                    "type": "string",
+                    "example": "go1.20.0"
+                },
+                "os": {
+                    "type": "string",
+                    "example": "linux"
+                },
+                "version": {
+                    "type": "string",
+                    "example": "1.0.0"
+                }
+            }
+        },
+        "TestExecutionRequest": {
+            "type": "object",
+            "required": [
+                "suite"
+            ],
+            "properties": {
+                "api_key": {
+                    "description": "Optional token to override global.VoiceflowAPIKey",
+                    "type": "string"
+                },
+                "suite": {
+                    "$ref": "#/definitions/TestSuiteRequest"
+                },
+                "voiceflow_subdomain": {
+                    "description": "Optional subdomain to override global.VoiceflowSubdomain",
+                    "type": "string"
+                }
+            }
+        },
+        "TestExecutionResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "started_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00Z"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "running"
+                }
+            }
+        },
+        "TestRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "test"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "test_1"
+                },
+                "test": {
+                    "$ref": "#/definitions/tests.Test"
+                }
+            }
+        },
+        "TestStatusResponse": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:05:00Z"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "started_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00Z"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "completed"
+                }
+            }
+        },
+        "TestSuiteRequest": {
+            "type": "object",
+            "required": [
+                "environment_name",
+                "name",
+                "tests"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Suite used as an example"
+                },
+                "environment_name": {
+                    "type": "string",
+                    "example": "production"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Example Suite"
+                },
+                "new_session_per_test": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "tests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TestRequest"
+                    }
+                }
+            }
+        },
+        "tests.Agent": {
+            "type": "object",
+            "properties": {
+                "validate": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.Validation"
+                    }
+                }
+            }
+        },
+        "tests.AgentTest": {
+            "type": "object",
+            "properties": {
+                "goal": {
+                    "type": "string"
+                },
+                "maxSteps": {
+                    "type": "integer"
+                },
+                "openAIConfig": {
+                    "$ref": "#/definitions/tests.OpenAIConfig"
+                },
+                "persona": {
+                    "type": "string"
+                },
+                "userInformation": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.UserInfo"
+                    }
+                },
+                "voiceflowAgentTargetConfig": {
+                    "$ref": "#/definitions/tests.VoiceflowAgentTargetConfig"
+                },
+                "voiceflowAgentTesterConfig": {
+                    "$ref": "#/definitions/tests.VoiceflowAgentTesterConfig"
+                }
+            }
+        },
+        "tests.IntentEntity": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.IntentRequest": {
+            "type": "object",
+            "properties": {
+                "entities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.IntentEntity"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.Interaction": {
+            "type": "object",
+            "properties": {
+                "agent": {
+                    "$ref": "#/definitions/tests.Agent"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/tests.User"
+                }
+            }
+        },
+        "tests.OpenAIConfig": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "number"
+                }
+            }
+        },
+        "tests.SimilarityConfig": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "similarityThreshold": {
+                    "type": "number"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "top_k": {
+                    "type": "integer"
+                },
+                "top_p": {
+                    "type": "number"
+                }
+            }
+        },
+        "tests.Test": {
+            "type": "object",
+            "properties": {
+                "agent": {
+                    "$ref": "#/definitions/tests.AgentTest"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "interactions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tests.Interaction"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.User": {
+            "type": "object",
+            "properties": {
+                "event": {
+                    "type": "string"
+                },
+                "intent": {
+                    "$ref": "#/definitions/tests.IntentRequest"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Used for button label",
+                    "type": "string"
+                }
+            }
+        },
+        "tests.UserInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.Validation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "similarityConfig": {
+                    "$ref": "#/definitions/tests.SimilarityConfig"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                },
+                "values": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "variableConfig": {
+                    "$ref": "#/definitions/tests.VariableConfig"
+                }
+            }
+        },
+        "tests.VariableConfig": {
+            "type": "object",
+            "properties": {
+                "jsonPath": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tests.VoiceflowAgentTargetConfig": {
+            "type": "object",
+            "properties": {
+                "variables": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "tests.VoiceflowAgentTesterConfig": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "environmentName": {
+                    "type": "string"
+                },
+                "variables": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        }
+    }
+}
