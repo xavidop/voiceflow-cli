@@ -178,7 +178,7 @@ Remember: Your goal is to %s. Work towards this goal while maintaining your pers
 
 // interactWithVoiceflow sends a message to the Voiceflow Dialog Manager
 func (atr *AgentTestRunner) interactWithVoiceflow(messageType, message string) ([]interact.InteractionResponse, error) {
-	return atr.InteractWithVoiceflow(messageType, message, atr.environmentName, atr.userID, atr.apiKeyOverride)
+	return atr.InteractWithVoiceflow(messageType, message, atr.environmentName, atr.userID, atr.apiKeyOverride, nil)
 }
 
 // getNextAction uses OpenAI to determine the next action based on the conversation history

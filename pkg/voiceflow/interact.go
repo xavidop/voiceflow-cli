@@ -13,7 +13,7 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/utils"
 )
 
-func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string, availableButtons []tests.Button) ([]interact.InteractionResponse, error) {
+func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string, availableButtons []tests.Button, variables map[string]interface{}) ([]interact.InteractionResponse, error) {
 	// Use the provided subdomain override, or fall back to global if not provided
 	subdomain := global.VoiceflowSubdomain
 	if subdomainOverride != "" {
@@ -98,6 +98,13 @@ func DialogManagerInteract(environmentName, userID string, interaction tests.Int
 			},
 		}
 	}
+	// Add variables to the request state if provided
+	if len(variables) > 0 {
+		interatctionRequest.State = &interact.State{
+			Variables: variables,
+		}
+	}
+
 	byts, err := json.Marshal(interatctionRequest)
 	if err != nil {
 		return []interact.InteractionResponse{}, fmt.Errorf("error marshalling request: %v", err)

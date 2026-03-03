@@ -63,7 +63,7 @@ func (br *BaseRunner) GetChatHistory() []ChatMessage {
 }
 
 // InteractWithVoiceflow sends a message to a Voiceflow Dialog Manager
-func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentName, userID, apiKey string) ([]interact.InteractionResponse, error) {
+func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentName, userID, apiKey string, variables map[string]interface{}) ([]interact.InteractionResponse, error) {
 
 	// Convert to the expected interaction format
 	voiceflowInteraction := tests.Interaction{
@@ -74,8 +74,8 @@ func (br *BaseRunner) InteractWithVoiceflow(messageType, message, environmentNam
 		},
 	}
 
-	// Use the existing Voiceflow interaction method
-	responses, err := voiceflow.DialogManagerInteract(environmentName, userID, voiceflowInteraction, apiKey, br.subdomainOverride, nil)
+	// Use the existing Voiceflow interaction method, passing variables to include in the request state
+	responses, err := voiceflow.DialogManagerInteract(environmentName, userID, voiceflowInteraction, apiKey, br.subdomainOverride, nil, variables)
 	if err != nil {
 		return nil, err
 	}

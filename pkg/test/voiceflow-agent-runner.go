@@ -7,7 +7,6 @@ import (
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/tests"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/interact"
-	"github.com/xavidop/voiceflow-cli/pkg/voiceflow"
 )
 
 // VoiceflowAgentTestRunner handles the execution of agent-to-agent tests using a Voiceflow agent as the tester
@@ -60,50 +59,30 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 	var err error
 
 	// Launch the conversation with the tester agent and provide the goal
+	// Include tester agent variables in the launch request if provided
+	var testerVars map[string]interface{}
+	if len(agentTest.VoiceflowAgentTesterConfig.Variables) > 0 {
+		testerVars = agentTest.VoiceflowAgentTesterConfig.Variables
+		vatr.addLog(fmt.Sprintf("Including %d variables in tester agent launch request", len(testerVars)))
+	}
 	vatr.addLog("Launching conversation with tester Voiceflow agent")
-	_, err = vatr.interactWithTesterAgent("launch", "")
+	_, err = vatr.interactWithTesterAgent("launch", "", testerVars)
 	if err != nil {
 		return fmt.Errorf("failed to launch conversation with tester agent: %w", err)
 	}
 
-	// Update tester agent variables if provided
-	if len(agentTest.VoiceflowAgentTesterConfig.Variables) > 0 {
-		vatr.addLog(fmt.Sprintf("Setting %d variables in tester agent", len(agentTest.VoiceflowAgentTesterConfig.Variables)))
-		err = voiceflow.UpdateStateVariables(
-			vatr.testerEnvironmentName,
-			vatr.testerUserID,
-			agentTest.VoiceflowAgentTesterConfig.Variables,
-			vatr.testerAPIKey,
-			vatr.subdomainOverride,
-		)
-		if err != nil {
-			return fmt.Errorf("failed to update tester agent variables: %w", err)
-		}
-		vatr.addLog("Successfully updated tester agent variables")
-	}
-
 	// Launch the conversation with the target agent if newSessionPerTest is enabled
 	if newSessionPerTest {
+		// Include target agent variables in the launch request if provided
+		var targetVars map[string]interface{}
+		if agentTest.VoiceflowAgentTargetConfig != nil && len(agentTest.VoiceflowAgentTargetConfig.Variables) > 0 {
+			targetVars = agentTest.VoiceflowAgentTargetConfig.Variables
+			vatr.addLog(fmt.Sprintf("Including %d variables in target agent launch request", len(targetVars)))
+		}
 		vatr.addLog("Launching conversation with target Voiceflow agent (new session per test enabled)")
-		targetAgentResponse, err = vatr.interactWithTargetAgent("launch", "")
+		targetAgentResponse, err = vatr.interactWithTargetAgent("launch", "", targetVars)
 		if err != nil {
 			return fmt.Errorf("failed to launch conversation with target agent: %w", err)
-		}
-
-		// Update target agent variables if provided
-		if agentTest.VoiceflowAgentTargetConfig != nil && len(agentTest.VoiceflowAgentTargetConfig.Variables) > 0 {
-			vatr.addLog(fmt.Sprintf("Setting %d variables in target agent", len(agentTest.VoiceflowAgentTargetConfig.Variables)))
-			err = voiceflow.UpdateStateVariables(
-				vatr.environmentName,
-				vatr.userID,
-				agentTest.VoiceflowAgentTargetConfig.Variables,
-				vatr.apiKeyOverride,
-				vatr.subdomainOverride,
-			)
-			if err != nil {
-				return fmt.Errorf("failed to update target agent variables: %w", err)
-			}
-			vatr.addLog("Successfully updated target agent variables")
 		}
 	}
 
@@ -111,7 +90,7 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 	vatr.addLog("Sending target agent's initial response to tester agent")
 	// Use the initial response from the target agent as the first message to the tester agent
 	// This allows the tester agent to start with the context of the target agent's response
-	testerResponse, err := vatr.interactWithTesterAgent("text", vatr.ExtractMessage(targetAgentResponse))
+	testerResponse, err := vatr.interactWithTesterAgent("text", vatr.ExtractMessage(targetAgentResponse), nil)
 	if err != nil {
 		return fmt.Errorf("failed to send goal to tester agent: %w", err)
 	}
@@ -147,7 +126,7 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 		}
 
 		// Send tester's message to target agent
-		targetAgentResponse, err = vatr.interactWithTargetAgent("text", testerMessage)
+		targetAgentResponse, err = vatr.interactWithTargetAgent("text", testerMessage, nil)
 		if err != nil {
 			return fmt.Errorf("failed to interact with target agent at step %d: %w", currentStep, err)
 		}
@@ -177,7 +156,7 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 		}
 
 		// Send target agent's response back to tester agent
-		testerResponse, err = vatr.interactWithTesterAgent("text", targetMessage)
+		testerResponse, err = vatr.interactWithTesterAgent("text", targetMessage, nil)
 		if err != nil {
 			return fmt.Errorf("failed to get response from tester agent at step %d: %w", currentStep, err)
 		}
@@ -205,8 +184,8 @@ func (vatr *VoiceflowAgentTestRunner) ExecuteAgentTest(ctx context.Context, agen
 }
 
 // interactWithTargetAgent sends a message to the target Voiceflow agent being tested
-func (vatr *VoiceflowAgentTestRunner) interactWithTargetAgent(messageType, message string) ([]interact.InteractionResponse, error) {
-	responses, err := vatr.InteractWithVoiceflow(messageType, message, vatr.environmentName, vatr.userID, vatr.apiKeyOverride)
+func (vatr *VoiceflowAgentTestRunner) interactWithTargetAgent(messageType, message string, variables map[string]interface{}) ([]interact.InteractionResponse, error) {
+	responses, err := vatr.InteractWithVoiceflow(messageType, message, vatr.environmentName, vatr.userID, vatr.apiKeyOverride, variables)
 	if err != nil {
 		return nil, err
 	}
@@ -226,6 +205,6 @@ func (vatr *VoiceflowAgentTestRunner) interactWithTargetAgent(messageType, messa
 }
 
 // interactWithTesterAgent sends a message to the tester Voiceflow agent
-func (vatr *VoiceflowAgentTestRunner) interactWithTesterAgent(messageType, message string) ([]interact.InteractionResponse, error) {
-	return vatr.InteractWithVoiceflow(messageType, message, vatr.testerEnvironmentName, vatr.testerUserID, vatr.testerAPIKey)
+func (vatr *VoiceflowAgentTestRunner) interactWithTesterAgent(messageType, message string, variables map[string]interface{}) ([]interact.InteractionResponse, error) {
+	return vatr.InteractWithVoiceflow(messageType, message, vatr.testerEnvironmentName, vatr.testerUserID, vatr.testerAPIKey, variables)
 }

@@ -90,7 +90,7 @@ func Start(userID, environment, recordFile string, saveTest bool) error {
 		userID = uuid.New().String()
 	}
 
-	responses, err := voiceflow.DialogManagerInteract(environment, userID, launchInteraction, "", "", nil)
+	responses, err := voiceflow.DialogManagerInteract(environment, userID, launchInteraction, "", "", nil, nil)
 	if err != nil {
 		return fmt.Errorf("error starting dialog: %v", err)
 	}
@@ -150,7 +150,7 @@ func Start(userID, environment, recordFile string, saveTest bool) error {
 		}
 
 		// Send user input to Voiceflow
-		responses, err := voiceflow.DialogManagerInteract(environment, userID, interaction, "", "", nil)
+		responses, err := voiceflow.DialogManagerInteract(environment, userID, interaction, "", "", nil, nil)
 		if err != nil {
 			return fmt.Errorf("error during dialog: %v", err)
 		}
