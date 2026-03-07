@@ -99,9 +99,7 @@
 						"$ref": "#/$defs/Agent"
 					},
 					"variables": {
-						"type": "object",
-						"additionalProperties": true,
-						"description": "Variables to set in the agent state after this interaction completes"
+						"type": "object"
 					}
 				},
 				"additionalProperties": false,

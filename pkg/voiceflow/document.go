@@ -18,10 +18,7 @@ import (
 )
 
 func UploadDocumentUrl(urlToUpload, name string, overwrite bool, maxChunkSize int, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization bool, tags []string) (string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v1/knowledge-base/docs/upload?", global.VoiceflowSubdomain)
+	url := fmt.Sprintf("%s/v1/knowledge-base/docs/upload?", global.GetAPIBaseURL(""))
 	if overwrite {
 		url = fmt.Sprintf("%soverwrite=true", url)
 	}
@@ -86,10 +83,7 @@ func UploadDocumentUrl(urlToUpload, name string, overwrite bool, maxChunkSize in
 }
 
 func UploadDocumentFile(fileToUpload string, overwrite bool, maxChunkSize int, markdownConversion, llmGeneratedQ, llmPrependContext, llmBasedChunking, llmContentSummarization bool, tags []string) (string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v1/knowledge-base/docs/upload?", global.VoiceflowSubdomain)
+	url := fmt.Sprintf("%s/v1/knowledge-base/docs/upload?", global.GetAPIBaseURL(""))
 	if overwrite {
 		url = fmt.Sprintf("%soverwrite=true", url)
 	}

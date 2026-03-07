@@ -14,18 +14,7 @@ import (
 )
 
 func DialogManagerInteract(environmentName, userID string, interaction tests.Interaction, apiKeyOverride, subdomainOverride string, availableButtons []tests.Button, variables map[string]interface{}) ([]interact.InteractionResponse, error) {
-	// Use the provided subdomain override, or fall back to global if not provided
-	subdomain := global.VoiceflowSubdomain
-	if subdomainOverride != "" {
-		subdomain = subdomainOverride
-	}
-
-	// Add the dot prefix if subdomain is not empty
-	if subdomain != "" {
-		subdomain = "." + subdomain
-	}
-
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s/interact?logs=off", subdomain, userID)
+	url := fmt.Sprintf("%s/state/user/%s/interact?logs=off", global.GetRuntimeBaseURL(subdomainOverride), userID)
 	var interatctionRequest interact.InteratctionRequest
 	switch interaction.User.Type {
 	case "launch":

@@ -430,6 +430,11 @@
                 },
                 "user": {
                     "$ref": "#/definitions/tests.User"
+                },
+                "variables": {
+                    "description": "Variables to set in the agent state",
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },

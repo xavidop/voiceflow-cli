@@ -12,14 +12,17 @@ import (
 
 // HTTPSuiteRequest represents a test suite from HTTP request
 type HTTPSuiteRequest struct {
-	Name               string              `json:"name"`
-	Description        string              `json:"description"`
-	EnvironmentName    string              `json:"environment_name"`
-	NewSessionPerTest  bool                `json:"new_session_per_test,omitempty"` // Optional flag to create a new user session for each test (default: false)
-	Tests              []HTTPTestRequest   `json:"tests"`
-	ApiKey             string              `json:"api_key,omitempty"`             // Optional token to override global.VoiceflowAPIKey
-	VoiceflowSubdomain string              `json:"voiceflow_subdomain,omitempty"` // Optional subdomain to override global.VoiceflowSubdomain
-	OpenAIConfig       *tests.OpenAIConfig `json:"openAIConfig,omitempty"`        // Optional OpenAI configuration for agent tests
+	Name                  string              `json:"name"`
+	Description           string              `json:"description"`
+	EnvironmentName       string              `json:"environment_name"`
+	NewSessionPerTest     bool                `json:"new_session_per_test,omitempty"` // Optional flag to create a new user session for each test (default: false)
+	Tests                 []HTTPTestRequest   `json:"tests"`
+	ApiKey                string              `json:"api_key,omitempty"`                 // Optional token to override global.VoiceflowAPIKey
+	VoiceflowSubdomain    string              `json:"voiceflow_subdomain,omitempty"`     // Optional subdomain to override global.VoiceflowSubdomain
+	VoiceflowAPIURL       string              `json:"voiceflow_api_url,omitempty"`       // Optional custom base URL for the Voiceflow API (creator-api)
+	VoiceflowRuntimeURL   string              `json:"voiceflow_runtime_url,omitempty"`   // Optional custom base URL for the Voiceflow general-runtime
+	VoiceflowAnalyticsURL string              `json:"voiceflow_analytics_url,omitempty"` // Optional custom base URL for the Voiceflow analytics API
+	OpenAIConfig          *tests.OpenAIConfig `json:"openAIConfig,omitempty"`            // Optional OpenAI configuration for agent tests
 }
 
 // HTTPTestRequest represents a test from HTTP request
@@ -86,6 +89,28 @@ func executeHTTPSuite(ctx context.Context, suiteReq HTTPSuiteRequest, logCollect
 	if suiteReq.VoiceflowSubdomain != "" {
 		logCollector.AddLog("Using Voiceflow subdomain: " + suiteReq.VoiceflowSubdomain)
 	}
+
+	// Temporarily apply custom URL overrides for this execution
+	origAPIURL := global.VoiceflowAPIURL
+	origRuntimeURL := global.VoiceflowRuntimeURL
+	origAnalyticsURL := global.VoiceflowAnalyticsURL
+	if suiteReq.VoiceflowAPIURL != "" {
+		global.VoiceflowAPIURL = suiteReq.VoiceflowAPIURL
+		logCollector.AddLog("Using custom Voiceflow API URL: " + suiteReq.VoiceflowAPIURL)
+	}
+	if suiteReq.VoiceflowRuntimeURL != "" {
+		global.VoiceflowRuntimeURL = suiteReq.VoiceflowRuntimeURL
+		logCollector.AddLog("Using custom Voiceflow Runtime URL: " + suiteReq.VoiceflowRuntimeURL)
+	}
+	if suiteReq.VoiceflowAnalyticsURL != "" {
+		global.VoiceflowAnalyticsURL = suiteReq.VoiceflowAnalyticsURL
+		logCollector.AddLog("Using custom Voiceflow Analytics URL: " + suiteReq.VoiceflowAnalyticsURL)
+	}
+	defer func() {
+		global.VoiceflowAPIURL = origAPIURL
+		global.VoiceflowRuntimeURL = origRuntimeURL
+		global.VoiceflowAnalyticsURL = origAnalyticsURL
+	}()
 
 	logCollector.AddLog("Suite: " + suiteReq.Name)
 	logCollector.AddLog("Description: " + suiteReq.Description)

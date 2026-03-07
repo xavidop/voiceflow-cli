@@ -25,6 +25,9 @@ Content-Type: application/json
 {
   "api_key": "your_api_key (optional)",
   "voiceflow_subdomain": "your_custom_subdomain (optional)",
+  "voiceflow_api_url": "https://custom-api-host (optional)",
+  "voiceflow_runtime_url": "https://custom-runtime-host (optional)",
+  "voiceflow_analytics_url": "https://custom-analytics-host (optional)",
   "suite": {
     "name": "Example Suite",
     "description": "Suite used as an example",
@@ -75,6 +78,9 @@ Executes a test suite asynchronously and returns an execution ID for tracking. T
 
 - `api_key` (optional): Override the global Voiceflow API key for this specific test execution
 - `voiceflow_subdomain` (optional): Override the global Voiceflow subdomain for this specific test execution. This allows you to test against different Voiceflow environments or custom subdomains without affecting the global configuration
+- `voiceflow_api_url` (optional): Custom base URL for the Voiceflow creator-api. Takes priority over `voiceflow_subdomain`
+- `voiceflow_runtime_url` (optional): Custom base URL for the Voiceflow general-runtime. Takes priority over `voiceflow_subdomain`
+- `voiceflow_analytics_url` (optional): Custom base URL for the Voiceflow analytics-api. Takes priority over `voiceflow_subdomain`
 - `suite`: The test suite configuration containing the test definitions
 
 #### Using Custom Subdomains
@@ -84,6 +90,22 @@ When you specify a `voiceflow_subdomain`, the API will use that subdomain for al
 - If you set `"voiceflow_subdomain": "my-custom-env"`, requests will be sent to `https://general-runtime.my-custom-env.voiceflow.com`
 - If you omit this field, the global subdomain configuration will be used
 - This is particularly useful for testing against staging environments or customer-specific deployments
+
+#### Using Custom URLs (Ephemeral Environments)
+
+For ephemeral or non-standard environments where the URL pattern differs from `<service>.<subdomain>.voiceflow.com`, use the custom URL parameters:
+
+```json
+{
+  "api_key": "VF.DM.YOUR_API_KEY",
+  "voiceflow_api_url": "https://your-custom-api.example.com",
+  "voiceflow_runtime_url": "https://your-custom-runtime.example.com",
+  "voiceflow_analytics_url": "https://your-custom-analytics.example.com",
+  "suite": { ... }
+}
+```
+
+These take priority over `voiceflow_subdomain`. You only need to set the ones your tests require.
 
 ### Get Test Status
 ```http

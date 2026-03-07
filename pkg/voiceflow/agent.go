@@ -11,10 +11,7 @@ import (
 )
 
 func ExportAgent(agentID, versionID string) (string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/versions/%s/export", global.VoiceflowSubdomain, versionID)
+	url := fmt.Sprintf("%s/v2/versions/%s/export", global.GetAPIBaseURL(""), versionID)
 
 	req, _ := http.NewRequest("GET", url, nil)
 

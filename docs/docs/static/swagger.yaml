@@ -160,6 +160,10 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/tests.User'
+      variables:
+        additionalProperties: true
+        description: Variables to set in the agent state
+        type: object
     type: object
   tests.OpenAIConfig:
     properties:

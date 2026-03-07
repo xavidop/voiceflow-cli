@@ -15,10 +15,7 @@ import (
 )
 
 func FetchAnalytics(agentID string, startTime time.Time, endTime time.Time, limit int, analyticsToFetch []string) (string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://analytics-api%s.voiceflow.com/v1/query/usage", global.VoiceflowSubdomain)
+	url := fmt.Sprintf("%s/v1/query/usage", global.GetAnalyticsBaseURL())
 	analyticsRequest := analytics.Query{}
 	for _, analytic := range analyticsToFetch {
 		analyticsRequest.Query = append(analyticsRequest.Query, analytics.QueryItem{

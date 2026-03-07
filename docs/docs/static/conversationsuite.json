@@ -161,6 +161,9 @@
 							},
 							"agent": {
 								"$ref": "#/$defs/Agent"
+							},
+							"variables": {
+								"type": "object"
 							}
 						},
 						"additionalProperties": false,

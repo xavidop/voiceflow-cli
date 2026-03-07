@@ -14,10 +14,7 @@ import (
 )
 
 func QueryKB(question, model string, temperature float64, chunkLimit int, synthesis bool, systemPrompt string, includeTags []string, includeOperator string, excludeTags []string, excludeOperator string, includeAllTagged bool, includeAllNonTagged bool) (string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/knowledge-base/query", global.VoiceflowSubdomain)
+	url := fmt.Sprintf("%s/knowledge-base/query", global.GetRuntimeBaseURL(""))
 
 	if includeOperator != "" && includeOperator != "and" && includeOperator != "or" && excludeOperator != "" && excludeOperator != "and" && excludeOperator != "or" {
 		return "", fmt.Errorf("invalid operator, must be and/or")

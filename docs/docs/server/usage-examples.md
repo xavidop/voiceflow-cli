@@ -51,6 +51,47 @@ curl -X POST http://localhost:8080/api/v1/tests/execute \
   }'
 ```
 
+#### 1c. Start a test execution with custom URLs (ephemeral environments)
+```bash
+curl -X POST http://localhost:8080/api/v1/tests/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "api_key": "VF.DM.YOUR_API_KEY",
+    "voiceflow_api_url": "https://your-custom-api.example.com",
+    "voiceflow_runtime_url": "https://your-custom-runtime.example.com",
+    "suite": {
+      "name": "Ephemeral Environment Test",
+      "description": "Testing against an ephemeral environment",
+      "environment_name": "production",
+      "tests": [
+        {
+          "id": "ephemeral_test_1",
+          "test": {
+            "name": "Basic ephemeral test",
+            "description": "Test against custom URLs",
+            "interactions": [
+              {
+                "id": "ephemeral_interaction_1",
+                "user": {
+                  "type": "launch"
+                },
+                "agent": {
+                  "validate": [
+                    {
+                      "type": "contains",
+                      "value": "welcome"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }'
+```
+
 #### 2. Check test status
 ```bash
 curl http://localhost:8080/api/v1/tests/status/YOUR_EXECUTION_ID

@@ -14,9 +14,6 @@ import (
 )
 
 func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) ([]transcript.TranscriptInformation, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
 	if startTime != "" {
 		startTime = fmt.Sprintf("&startDate=%s", startTime)
 	}
@@ -29,7 +26,7 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 	if rang != "" {
 		rang = fmt.Sprintf("&range=%s", rang)
 	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s?%s%s%s%s", global.VoiceflowSubdomain, agentID, startTime, endTime, tag, rang)
+	url := fmt.Sprintf("%s/v2/transcripts/%s?%s%s%s%s", global.GetAPIBaseURL(""), agentID, startTime, endTime, tag, rang)
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -57,10 +54,7 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 }
 
 func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s/%s/export?format=csv", global.VoiceflowSubdomain, agentID, transcriptID)
+	url := fmt.Sprintf("%s/v2/transcripts/%s/%s/export?format=csv", global.GetAPIBaseURL(""), agentID, transcriptID)
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -93,11 +87,7 @@ func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
 }
 
 func FetchTranscriptJSON(agentID, transcriptID string) ([]transcript.Turn, error) {
-	if global.VoiceflowSubdomain != "" {
-		global.VoiceflowSubdomain = "." + global.VoiceflowSubdomain
-	}
-
-	url := fmt.Sprintf("https://api%s.voiceflow.com/v2/transcripts/%s/%s", global.VoiceflowSubdomain, agentID, transcriptID)
+	url := fmt.Sprintf("%s/v2/transcripts/%s/%s", global.GetAPIBaseURL(""), agentID, transcriptID)
 
 	req, _ := http.NewRequest("GET", url, nil)
 

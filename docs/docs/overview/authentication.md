@@ -8,7 +8,39 @@ The `voiceflow-cli` source code is open source, you can check it out [here](http
 
 ## Base URL
 
-The base URL for the Voiceflow API is `https://<api>.<subdomain>.voiceflow.com`. The default value is without subdomain: `https://<api>.voiceflow.com`. If you are using a different Voiceflow environment, you can pass the subdomain using the `--voiceflow-subdomain` flag.
+The base URL for the Voiceflow API is `https://<api>.<subdomain>.voiceflow.com`. The default value is without subdomain: `https://<api>.voiceflow.com`. If you are using a different Voiceflow environment, you can pass the subdomain using the `--voiceflow-subdomain` flag or by setting the `VF_SUBDOMAIN` environment variable.
+
+### Custom URLs (Ephemeral / Non-standard Environments)
+
+For environments where the URL pattern does not follow the standard `<service>.<subdomain>.voiceflow.com` convention (e.g. ephemeral review-app deployments), you can override each service URL individually:
+
+| Service | CLI Flag | Environment Variable | Default |
+|---------|----------|---------------------|---------|
+| Creator API | `--voiceflow-api-url` | `VF_API_URL` | `https://api.voiceflow.com` |
+| General Runtime | `--voiceflow-runtime-url` | `VF_RUNTIME_URL` | `https://general-runtime.voiceflow.com` |
+| Analytics API | `--voiceflow-analytics-url` | `VF_ANALYTICS_URL` | `https://analytics-api.voiceflow.com` |
+
+These custom URL flags take **priority** over `--voiceflow-subdomain`. You only need to set the ones your command actually uses.
+
+**Example – pointing to a custom environment:**
+
+```sh
+voiceflow test execute evals \
+  --voiceflow-api-url https://your-custom-api.example.com \
+  --voiceflow-runtime-url https://your-custom-runtime.example.com \
+  --voiceflow-analytics-url https://your-custom-analytics.example.com
+```
+
+Or via a `.env` file / environment variables:
+
+```sh
+VF_API_URL=https://your-custom-api.example.com
+VF_RUNTIME_URL=https://your-custom-runtime.example.com
+VF_ANALYTICS_URL=https://your-custom-analytics.example.com
+```
+
+!!! info "URL resolution priority"
+    Custom URL (`--voiceflow-api-url`, etc.) **>** Subdomain (`--voiceflow-subdomain`) **>** Default (`voiceflow.com`).
 
 ## Open AI PI Key
 

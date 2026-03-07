@@ -17,18 +17,7 @@ func FetchState(EnvironmentName, userID string) (state.State, error) {
 }
 
 func FetchStateWithOverrides(EnvironmentName, userID, apiKeyOverride, subdomainOverride string) (state.State, error) {
-	// Use the provided subdomain override, or fall back to global if not provided
-	subdomain := global.VoiceflowSubdomain
-	if subdomainOverride != "" {
-		subdomain = subdomainOverride
-	}
-
-	// Add the dot prefix if subdomain is not empty
-	if subdomain != "" {
-		subdomain = "." + subdomain
-	}
-
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s", subdomain, userID)
+	url := fmt.Sprintf("%s/state/user/%s", global.GetRuntimeBaseURL(subdomainOverride), userID)
 
 	req, err := http.NewRequest("GET", url, nil)
 
@@ -69,18 +58,7 @@ func FetchStateWithOverrides(EnvironmentName, userID, apiKeyOverride, subdomainO
 
 // UpdateStateVariables updates the variables in the user's state by merging with the provided properties
 func UpdateStateVariables(environmentName, userID string, variables map[string]interface{}, apiKeyOverride, subdomainOverride string) error {
-	// Use the provided subdomain override, or fall back to global if not provided
-	subdomain := global.VoiceflowSubdomain
-	if subdomainOverride != "" {
-		subdomain = subdomainOverride
-	}
-
-	// Add the dot prefix if subdomain is not empty
-	if subdomain != "" {
-		subdomain = "." + subdomain
-	}
-
-	url := fmt.Sprintf("https://general-runtime%s.voiceflow.com/state/user/%s/variables", subdomain, userID)
+	url := fmt.Sprintf("%s/state/user/%s/variables", global.GetRuntimeBaseURL(subdomainOverride), userID)
 
 	// Marshal variables to JSON
 	variablesJSON, err := json.Marshal(variables)

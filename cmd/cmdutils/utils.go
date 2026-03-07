@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/utils"
+	voiceflowauth "github.com/xavidop/voiceflow-cli/internal/voiceflow"
 )
 
 func CheckUpdate(output bool) {
@@ -55,4 +56,7 @@ func PreRun(command string) {
 	if !global.SkipUpdate && command != "version" {
 		CheckUpdate(false)
 	}
+
+	// Populate custom URL overrides from environment variables
+	voiceflowauth.SetVoiceflowURLOverrides()
 }
