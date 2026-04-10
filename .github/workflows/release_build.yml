@@ -43,7 +43,6 @@ jobs:
           repository: chocolatey/choco
           ref: 2.6.0
           path: ${{ github.workspace }}/voiceflow-cli/choco
-          fetch-depth: 0
           persist-credentials: false
       - name: Chocolatey 🍫📦
         run: |
