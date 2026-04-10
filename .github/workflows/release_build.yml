@@ -49,8 +49,8 @@ jobs:
           chmod +x *.sh
           # prevent choco build to calculate version from tag of main repository
           unset GITHUB_REF GITHUB_BASE_REF GITHUB_HEAD_REF
-          # remove remote so GitVersion doesn't find conflicting remote refs
-          git remote remove origin
+          # replace remote URL so GitVersion sees 1 remote but can't fetch conflicting refs
+          git remote set-url origin https://invalid.local/chocolatey/choco.git
           ./build.sh --configuration=ReleaseOfficial
           cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper
           cp -r ./code_drop/temp/_PublishedApps/choco/ /opt/chocolatey
