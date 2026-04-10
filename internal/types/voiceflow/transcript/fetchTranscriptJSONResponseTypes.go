@@ -14,73 +14,49 @@ type Turn struct {
 	StartTime time.Time `json:"startTime"`
 }
 
+// GetTranscriptResponse is the wrapper for the v1 get-transcript API response.
+type GetTranscriptResponse struct {
+	Transcript TranscriptDetail `json:"transcript"`
+}
+
+// TranscriptDetail contains the transcript data from the v1 API.
+type TranscriptDetail struct {
+	ID            string `json:"id"`
+	SessionID     string `json:"sessionID"`
+	ProjectID     string `json:"projectID"`
+	EnvironmentID string `json:"environmentID"`
+	CreatedAt     string `json:"createdAt"`
+	UpdatedAt     string `json:"updatedAt"`
+	Logs          []Log  `json:"logs"`
+}
+
+// Log represents a single log entry in the v1 transcript response.
+type Log struct {
+	Type      string          `json:"type"`
+	Data      json.RawMessage `json:"data"`
+	CreatedAt string          `json:"createdAt"`
+	UpdatedAt string          `json:"updatedAt"`
+}
+
+// LogData is used to partially parse the Data field of a Log entry.
+type LogData struct {
+	Type    string          `json:"type"`
+	Payload json.RawMessage `json:"payload,omitempty"`
+}
+
 type Payload struct {
 	Time    int64       `json:"time,omitempty"`
 	Type    string      `json:"type,omitempty"`
 	Payload interface{} `json:"payload,omitempty"`
 }
 
-type BlockPayload struct {
-	BlockID string `json:"blockID"`
-}
-
-type FlowPayload struct {
-	DiagramID string `json:"diagramID"`
-}
-
-type DebugPayload struct {
-	Type    string `json:"type,omitempty"`
-	Message string `json:"message"`
-}
-
 type TextPayload struct {
-	Slate   Slate  `json:"slate"`
 	Message string `json:"message"`
-	Delay   int    `json:"delay"`
-	AI      bool   `json:"ai"`
-}
-
-type Slate struct {
-	ID                       string    `json:"id"`
-	Content                  []Content `json:"content"`
-	MessageDelayMilliseconds int       `json:"messageDelayMilliseconds"`
-}
-
-type Content struct {
-	Children []Children `json:"children"`
-}
-
-type Children struct {
-	Text string `json:"text"`
-}
-
-type RequestPayload struct {
-	Type    string        `json:"type"`
-	Payload IntentPayload `json:"payload"`
 }
 
 type IntentPayload struct {
-	Query      string        `json:"query"`
-	Intent     Intent        `json:"intent"`
-	Entities   []interface{} `json:"entities"`
-	Confidence float64       `json:"confidence"`
-}
-
-type Intent struct {
-	Name string `json:"name"`
-}
-
-type AIResponseParameters struct {
-	System       string  `json:"system"`
-	Assistant    string  `json:"assistant"`
-	Output       string  `json:"output"`
-	Model        string  `json:"model"`
-	Temperature  float64 `json:"temperature"`
-	MaxTokens    int     `json:"maxTokens"`
-	QueryTokens  int     `json:"queryTokens"`
-	AnswerTokens int     `json:"answerTokens"`
-	Tokens       int     `json:"tokens"`
-	Multiplier   float64 `json:"multiplier"`
+	Query      string  `json:"query"`
+	Confidence float64 `json:"confidence"`
 }
 
 // GetTextPayload extracts TextPayload from generic Payload
@@ -104,26 +80,7 @@ func (p Payload) GetTextPayload() (*TextPayload, error) {
 	return &textPayload, nil
 }
 
-func (p Payload) GetRequestPayload() (*RequestPayload, error) {
-	// Modified condition to accept both "request" and "intent" types
-	if p.Type != "request" {
-		return nil, fmt.Errorf("payload type is not 'request' or 'intent', got: %s", p.Type)
-	}
-
-	payloadBytes, err := json.Marshal(p.Payload)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request payload: %w", err)
-	}
-
-	var requestPayload RequestPayload
-	if err := json.Unmarshal(payloadBytes, &requestPayload); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal request payload: %w", err)
-	}
-
-	return &requestPayload, nil
-}
-
-// Add GetIntentPayload method
+// GetIntentPayload extracts IntentPayload from generic Payload
 func (p Payload) GetIntentPayload() (*IntentPayload, error) {
 	if p.Type != "intent" {
 		return nil, fmt.Errorf("payload type is not 'intent', got: %s", p.Type)

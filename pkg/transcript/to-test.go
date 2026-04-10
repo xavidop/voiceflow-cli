@@ -79,6 +79,25 @@ func TranscriptToTest(transcriptJSON []transcript.Turn, testName, testDescriptio
 					},
 				},
 			})
+		case "user-text":
+			userText, _ := turn.Payload.Payload.(string)
+			agentResponse := findNextAgentTextResponse(transcriptJSON, index)
+			test.Interactions = append(test.Interactions, tests.Interaction{
+				ID: uuid.New().String(),
+				User: tests.User{
+					Text: userText,
+					Type: "text",
+				},
+				Agent: tests.Agent{
+					Validate: []tests.Validation{
+						{
+							ID:    uuid.New().String(),
+							Type:  "equals",
+							Value: agentResponse,
+						},
+					},
+				},
+			})
 		}
 	}
 	return test, nil

@@ -1,12 +1,12 @@
 package voiceflow
 
 import (
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/xavidop/voiceflow-cli/internal/global"
 	"github.com/xavidop/voiceflow-cli/internal/types/voiceflow/transcript"
@@ -14,102 +14,199 @@ import (
 )
 
 func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) ([]transcript.TranscriptInformation, error) {
+	const pageSize = 100
+	var allTranscripts []transcript.TranscriptInformation
+
+	reqBody := transcript.SearchTranscriptsRequest{}
 	if startTime != "" {
-		startTime = fmt.Sprintf("&startDate=%s", startTime)
+		reqBody.StartDate = startTime
 	}
 	if endTime != "" {
-		endTime = fmt.Sprintf("&endDate=%s", endTime)
-	}
-	if tag != "" {
-		tag = fmt.Sprintf("&tag=%s", tag)
-	}
-	if rang != "" {
-		rang = fmt.Sprintf("&range=%s", rang)
-	}
-	url := fmt.Sprintf("%s/v2/transcripts/%s?%s%s%s%s", global.GetAPIBaseURL(""), agentID, startTime, endTime, tag, rang)
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	req.Header.Add("accept", "application/json")
-	req.Header.Add("content-type", "application/json")
-	req.Header.Add("Authorization", global.VoiceflowAPIKey)
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return []transcript.TranscriptInformation{}, err
-	}
-	defer utils.SafeClose(res.Body)
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return []transcript.TranscriptInformation{}, err
-	}
-	var transcriptInformations []transcript.TranscriptInformation
-	err = json.Unmarshal([]byte(string(body)), &transcriptInformations)
-	if err != nil {
-		return []transcript.TranscriptInformation{}, fmt.Errorf("error unmarshalling response: %v", err)
+		reqBody.EndDate = endTime
 	}
 
-	return transcriptInformations, nil
+	for skip := 0; ; skip += pageSize {
+		url := fmt.Sprintf("%s/v1/transcript/project/%s?take=%d&skip=%d&order=DESC", global.GetAnalyticsBaseURL(), agentID, pageSize, skip)
+
+		bodyBytes, err := json.Marshal(reqBody)
+		if err != nil {
+			return nil, fmt.Errorf("error marshalling request: %v", err)
+		}
+
+		req, err := http.NewRequest("POST", url, strings.NewReader(string(bodyBytes)))
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Add("accept", "application/json")
+		req.Header.Add("content-type", "application/json")
+		req.Header.Add("Authorization", global.VoiceflowAPIKey)
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+
+		body, err := io.ReadAll(res.Body)
+		utils.SafeClose(res.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		if res.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("API returned status %d: %s", res.StatusCode, string(body))
+		}
+
+		var searchResponse transcript.SearchTranscriptsResponse
+		err = json.Unmarshal(body, &searchResponse)
+		if err != nil {
+			return nil, fmt.Errorf("error unmarshalling response: %v", err)
+		}
+
+		allTranscripts = append(allTranscripts, searchResponse.Transcripts...)
+
+		// If we got fewer results than the page size, we've reached the end
+		if len(searchResponse.Transcripts) < pageSize {
+			break
+		}
+	}
+
+	return allTranscripts, nil
 }
 
 func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
-	url := fmt.Sprintf("%s/v2/transcripts/%s/%s/export?format=csv", global.GetAPIBaseURL(""), agentID, transcriptID)
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	req.Header.Add("accept", "text/csv")
-	req.Header.Add("Authorization", global.VoiceflowAPIKey)
-
-	res, err := http.DefaultClient.Do(req)
+	turns, err := FetchTranscriptJSON(agentID, transcriptID)
 	if err != nil {
-		return [][]string{}, err
-	}
-	defer utils.SafeClose(res.Body)
-	body, _ := io.ReadAll(res.Body)
-	// Remove quotes from the beginning and end of the string
-	contentString := string(body)[1 : len(string(body))-2]
-	// Remove escaped quotes
-	contentString = strings.ReplaceAll(contentString, `\"`, `"`)
-	// Replace escaped newlines with actual newlines
-	c := strings.Split(contentString, "\\r\\n")
-	contentString = strings.Join(c, "\r\n")
-	contentString = strings.ReplaceAll(contentString, `\n`, ` `)
-
-	// Parse CSV
-	content, err := csv.NewReader(strings.NewReader(contentString)).ReadAll()
-
-	if err != nil {
-		return [][]string{}, err
+		return nil, err
 	}
 
-	return content, nil
+	// Header row
+	rows := [][]string{{"type", "payload_type", "message", "timestamp"}}
+
+	for _, turn := range turns {
+		message := ""
+		switch turn.Payload.Type {
+		case "text":
+			if tp, err := turn.Payload.GetTextPayload(); err == nil {
+				message = tp.Message
+			}
+		case "intent":
+			if ip, err := turn.Payload.GetIntentPayload(); err == nil {
+				message = ip.Query
+			}
+		}
+
+		rows = append(rows, []string{
+			turn.Type,
+			turn.Payload.Type,
+			message,
+			turn.StartTime.Format(time.RFC3339),
+		})
+	}
+
+	return rows, nil
 }
 
 func FetchTranscriptJSON(agentID, transcriptID string) ([]transcript.Turn, error) {
-	url := fmt.Sprintf("%s/v2/transcripts/%s/%s", global.GetAPIBaseURL(""), agentID, transcriptID)
+	url := fmt.Sprintf("%s/v1/transcript/%s", global.GetAnalyticsBaseURL(), transcriptID)
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("content-type", "application/json")
 	req.Header.Add("Authorization", global.VoiceflowAPIKey)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return []transcript.Turn{}, err
+		return nil, err
 	}
 	defer utils.SafeClose(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return []transcript.Turn{}, err
-	}
-	var transcriptResponse []transcript.Turn
-	err = json.Unmarshal([]byte(string(body)), &transcriptResponse)
-	if err != nil {
-		return []transcript.Turn{}, fmt.Errorf("error unmarshalling response: %v", err)
+		return nil, err
 	}
 
-	return transcriptResponse, nil
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API returned status %d: %s", res.StatusCode, string(body))
+	}
+
+	var response transcript.GetTranscriptResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling response: %v", err)
+	}
+
+	return logsToTurns(response.Transcript.Logs)
+}
+
+// logsToTurns converts the v1 API log entries to the Turn slice used by downstream code.
+// Action logs represent user input; trace logs with type "text" represent agent responses.
+func logsToTurns(logs []transcript.Log) ([]transcript.Turn, error) {
+	var turns []transcript.Turn
+
+	for _, log := range logs {
+		var data transcript.LogData
+		if err := json.Unmarshal(log.Data, &data); err != nil {
+			continue
+		}
+
+		createdAt, _ := time.Parse(time.RFC3339, log.CreatedAt)
+
+		switch log.Type {
+		case "action":
+			turn := transcript.Turn{
+				StartTime: createdAt,
+			}
+			switch data.Type {
+			case "launch":
+				turn.Type = "launch"
+			case "intent":
+				turn.Type = "request"
+				turn.Payload = transcript.Payload{
+					Type: "intent",
+				}
+				if data.Payload != nil {
+					var payloadData interface{}
+					_ = json.Unmarshal(data.Payload, &payloadData)
+					turn.Payload.Payload = payloadData
+				}
+			case "text":
+				// User text input — payload is a plain string
+				turn.Type = "user-text"
+				var userText string
+				if data.Payload != nil {
+					_ = json.Unmarshal(data.Payload, &userText)
+				}
+				turn.Payload = transcript.Payload{
+					Type:    "text",
+					Payload: userText,
+				}
+			default:
+				continue
+			}
+			turns = append(turns, turn)
+
+		case "trace":
+			if data.Type != "text" {
+				continue
+			}
+			var payloadData interface{}
+			if data.Payload != nil {
+				_ = json.Unmarshal(data.Payload, &payloadData)
+			}
+			turns = append(turns, transcript.Turn{
+				Type: "text",
+				Payload: transcript.Payload{
+					Type:    "text",
+					Payload: payloadData,
+				},
+				StartTime: createdAt,
+			})
+		}
+	}
+
+	return turns, nil
 }
