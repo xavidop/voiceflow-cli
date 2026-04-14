@@ -14,8 +14,9 @@ import (
 )
 
 func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) ([]transcript.TranscriptInformation, error) {
-	const pageSize = 100
+	const pageSize = 99 // API max take is exclusive < 100
 	var allTranscripts []transcript.TranscriptInformation
+	seen := make(map[string]bool)
 
 	reqBody := transcript.SearchTranscriptsRequest{}
 	if startTime != "" {
@@ -25,8 +26,11 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 		reqBody.EndDate = endTime
 	}
 
-	for skip := 0; ; skip += pageSize {
-		url := fmt.Sprintf("%s/v1/transcript/project/%s?take=%d&skip=%d&order=DESC", global.GetAnalyticsBaseURL(), agentID, pageSize, skip)
+	// Use cursor-based pagination with endDate to avoid skip limits.
+	// Results are ordered DESC (newest first), so we move the endDate
+	// cursor backwards after each full page.
+	for {
+		url := fmt.Sprintf("%s/v1/transcript/project/%s?take=%d&skip=0&order=DESC", global.GetAnalyticsBaseURL(), agentID, pageSize)
 
 		bodyBytes, err := json.Marshal(reqBody)
 		if err != nil {
@@ -63,12 +67,25 @@ func FetchTranscriptInformations(agentID, startTime, endTime, tag, rang string) 
 			return nil, fmt.Errorf("error unmarshalling response: %v", err)
 		}
 
-		allTranscripts = append(allTranscripts, searchResponse.Transcripts...)
+		if len(searchResponse.Transcripts) == 0 {
+			break
+		}
+
+		for _, t := range searchResponse.Transcripts {
+			if !seen[t.ID] {
+				seen[t.ID] = true
+				allTranscripts = append(allTranscripts, t)
+			}
+		}
 
 		// If we got fewer results than the page size, we've reached the end
 		if len(searchResponse.Transcripts) < pageSize {
 			break
 		}
+
+		// Use the oldest transcript's createdAt as the new endDate cursor
+		oldest := searchResponse.Transcripts[len(searchResponse.Transcripts)-1]
+		reqBody.EndDate = oldest.CreatedAt
 	}
 
 	return allTranscripts, nil
@@ -87,8 +104,15 @@ func FetchTranscriptCSV(agentID, transcriptID string) ([][]string, error) {
 		message := ""
 		switch turn.Payload.Type {
 		case "text":
-			if tp, err := turn.Payload.GetTextPayload(); err == nil {
-				message = tp.Message
+			if turn.Type == "user-text" {
+				// User text payload is a plain string
+				if s, ok := turn.Payload.Payload.(string); ok {
+					message = s
+				}
+			} else {
+				if tp, err := turn.Payload.GetTextPayload(); err == nil {
+					message = tp.Message
+				}
 			}
 		case "intent":
 			if ip, err := turn.Payload.GetIntentPayload(); err == nil {

@@ -13,7 +13,7 @@ func Fetch(agentID, transcriptID, outputDirectory string) error {
 		return fmt.Errorf("failed to fetch transcript %s: %w", transcriptID, err)
 	}
 
-	err = SaveTranscript(transcript, outputDirectory)
+	err = SaveTranscript(transcript, transcriptID, outputDirectory)
 	if err != nil {
 		return fmt.Errorf("failed to save transcript %s: %w", transcriptID, err)
 	}

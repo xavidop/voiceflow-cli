@@ -23,7 +23,7 @@ func FetchAll(agentID, startTime, endTime, tag, rang, outputDirectory string) er
 			return fmt.Errorf("failed to fetch transcript %s: %w", transcriptInformation.ID, err)
 		}
 
-		err = SaveTranscript(transcript, outputDirectory)
+		err = SaveTranscript(transcript, transcriptInformation.ID, outputDirectory)
 		if err != nil {
 			return fmt.Errorf("failed to save transcript %s: %w", transcriptInformation.ID, err)
 		}
@@ -32,15 +32,15 @@ func FetchAll(agentID, startTime, endTime, tag, rang, outputDirectory string) er
 	return nil
 }
 
-func SaveTranscript(transcript [][]string, outputDirectory string) error {
+func SaveTranscript(transcript [][]string, transcriptID, outputDirectory string) error {
 	// Create output directory if it doesn't exist
 	if err := os.MkdirAll(outputDirectory, 0755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	// Generate filename with timestamp
+	// Generate filename with transcript ID and timestamp
 	timestamp := time.Now().Format("20060102-150405")
-	filename := fmt.Sprintf("transcript_%s.csv", timestamp)
+	filename := fmt.Sprintf("transcript_%s_%s.csv", transcriptID, timestamp)
 	fullPath := filepath.Join(outputDirectory, filename)
 	buf := new(bytes.Buffer)
 	wr := csv.NewWriter(buf)
