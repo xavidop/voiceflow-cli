@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.1
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -63,7 +63,6 @@ require (
 	github.com/muesli/mango v0.2.0 // indirect
 	github.com/muesli/mango-pflag v0.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.59.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
